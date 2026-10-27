@@ -33,7 +33,14 @@ Navegador Chrome: desktop, celular 390×844 e tablet 768×1024; sem transbordame
 ## Publicação e automação
 Configuração Pages inspecionada no repositório novo: desativada, sem branch de origem e sem site anterior. Fonte alterada para GitHub Actions; sem domínio personalizado. `pages.yml` publica somente `_site`, excluindo o protótipo arquivado e ferramentas de desenvolvimento. `atualizar.yml` usa cron mensal configurável, valida antes de fazer commit e chama workflow reutilizável com SHA explícito, evitando depender de gatilho por push do bot.
 
-Estado remoto final e evidências da primeira execução serão registrados após o envio e a execução real. Uma execução manual bem-sucedida valida o fluxo de atualização; o disparo por cron só poderá ser confirmado depois do primeiro agendamento. ANAC, Comex e Brasil ainda não têm coleta automática.
+Evidências remotas verificadas:
+- [Publicação do snapshot validado](https://github.com/brunogiacomelli1979-cyber/viracopos-cargo-intelligence/actions/runs/40523025672): validação e deploy concluídos com sucesso.
+- [Primeiro ciclo completo de atualização](https://github.com/brunogiacomelli1979-cyber/viracopos-cargo-intelligence/actions/runs/40523186877): `workflow_dispatch`, sucesso em 46 segundos; coleta SGS 432, 1 e 433 com 13 meses cada; histórico de 57 competências preservado; 11 testes Python e quatro JavaScript; commit automático `fcd101b`; jobs update, publish/validate e publish/deploy concluídos com sucesso. Logs e artefato de coleta disponíveis nessa execução.
+- [Site público](https://brunogiacomelli1979-cyber.github.io/viracopos-cargo-intelligence/) aberto e inspecionado no Chrome.
+
+O primeiro ensaio Actions falhou no teste de arquivo original devido a caminhos Windows no manifesto. Separadores normalizados para `/` e `.gitattributes` protege os bytes arquivados; a execução seguinte confirmou hashes no Linux e os demais checks. Nenhum deploy ocorreu na tentativa inválida.
+
+Fluxo mensal validado por disparo manual; primeiro cron previsto para 13/11/2026 às 07:17 em Brasília, ainda não observado. ANAC, Comex e Brasil ainda não têm coleta automática. O runner reportou avisos de Actions com runtime legado executadas pelo GitHub em Node 24 e migração de ubuntu-latest; não impediram os jobs, mas a atualização das majors deve entrar na manutenção.
 
 ## Pendências e próximo passo
 Integração ANAC/SBKP e validação Comex, histórico Brasil, coleta bruta/retries/backfill SGS e indicadores derivados. Plano e critérios em `docs/backlog.md`. Próxima tarefa recomendada: integrar e reconciliar a carga internacional de SBKP com fonte ANAC.

@@ -2,6 +2,8 @@
 
 Observatório independente de carga aérea, comércio exterior e contexto econômico. Projeto de portfólio sem afiliação ou endosso institucional do Aeroporto de Viracopos.
 
+**[Abrir o observatório](https://brunogiacomelli1979-cyber.github.io/viracopos-cargo-intelligence/)** · [Repositório](https://github.com/brunogiacomelli1979-cyber/viracopos-cargo-intelligence) · [Primeira atualização completa verificada](https://github.com/brunogiacomelli1979-cyber/viracopos-cargo-intelligence/actions/runs/40523186877)
+
 A variante azul aprovada é a interface principal: **`index.html`**. Mantém azul-escuro, branco, amarelo, navegação horizontal fixa e índice lateral no desktop. `index_blue.html` encaminha à principal. O pacote recebido está preservado byte a byte em [`docs/archive/initial/`](docs/archive/initial/), com manifesto SHA-256; não integra a publicação Pages.
 
 ## Estado dos dados
@@ -62,6 +64,8 @@ Edite CSVs/metadados e regenere. Não edite as saídas à mão. CSVs têm cabeç
 `pages.yml` valida o snapshot, executa testes e publica somente `_site/`. Pull requests passam pelos checks sem publicar. `atualizar.yml` coleta BCB, testa, versiona as saídas e chama a publicação com o SHA validado. Assim não depende de um push do `GITHUB_TOKEN` para disparar outra Action.
 
 Agenda: **dia 13, 10:17 UTC / 07:17 em Brasília**, configurável no cron. Fontes podem atrasar; executar manualmente quando necessário. Reconsulta 12 meses anteriores à última competência por indicador, preservando o restante. Primeira carga desde janeiro do ano correspondente a quatro anos antes do último mês encerrado. Logs ficam na execução e no artefato `log-coleta` por 30 dias.
+
+Em 27/10/2026, o ciclo real disparado manualmente no Actions concluiu **coleta das três séries, 15 testes, commit automático `fcd101b` e publicação**. O primeiro disparo por cron está previsto para 13/11/2026 e ainda não ocorreu. A rotina automática cobre BCB; ANAC, Comex e Brasil permanecem sem coletor automático.
 
 Configuração de um repositório novo, depois do envio:
 

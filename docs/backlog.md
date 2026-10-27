@@ -5,7 +5,7 @@
 2. **Comex / URF**: confirmar URF, via aérea e classificação NCM/SH. Aceite: recorte reproduzível, setores reconciliados com total, kg líquidos e FOB separados de carga ANAC.
 3. **Brasil histórico**: importar série consolidada e implementar coleta, documentando substituição dos valores arredondados. Aceite: competências únicas e reconciliação MDIC.
 4. **BCB**: retentativas limitadas, respostas brutas, backfill por intervalo e atraso por indicador. Aceite: revisões rastreáveis, histórico preservado e coleta Selic/IPCA confirmada.
-5. **Automação**: confirmar coleta, testes, commit e deploy reais; acompanhar primeiro cron. Aceite: URL responde, SHA corresponde ao validado e falhas parciais visíveis.
+5. **Automação**: ciclo manual completo confirmado em 27/10/2026, conforme auditoria. Acompanhar primeiro cron em 13/11/2026; atualizar majors das Actions para runtimes atuais e fixar imagem do runner quando necessário. Aceite: URL responde, SHA corresponde ao validado e falhas parciais visíveis.
 6. **Web**: ampliar testes visuais e de acessibilidade; manter identidade aprovada. Avaliar hospedagem local de fonte/foto após licença e tamanho.
 
 ## Fase B · mercado
