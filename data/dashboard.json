@@ -1,21 +1,21 @@
 {
   "versao": "1.1.0",
-  "gerado_em_utc": "2026-10-27T14:34:08.147584+00:00",
+  "gerado_em_utc": "2026-10-27T14:39:30.322558+00:00",
   "modo_compilacao": "online",
   "contexto": "Carga física, valor FOB e peso líquido têm coberturas distintas.",
   "coleta_bcb": {
     "selic_meta_pct_aa": {
       "status": "ok",
       "competencia": "2026-09",
-      "coletado_em_utc": "2026-10-27T14:34:08.147584+00:00",
-      "url": "https://api.bcb.gov.br/dados/serie/bcdata.sgs.432/dados?formato=json&dataInicial=01%2F01%2F2022&dataFinal=30%2F09%2F2026",
-      "sha256": "4fdfc6e4c16a3d0bbe71b19defcc9e596a8bab43a520b744bae398158df57fa3",
-      "registros": 1734
+      "coletado_em_utc": "2026-10-27T14:39:30.322558+00:00",
+      "url": "https://api.bcb.gov.br/dados/serie/bcdata.sgs.432/dados?formato=json&dataInicial=01%2F09%2F2025&dataFinal=30%2F09%2F2026",
+      "sha256": "a18befc90fb9e4379aba8aff749cad8839992eb04e19a4ee9248054aba6c74b1",
+      "registros": 395
     },
     "dolar_venda_medio_brl": {
       "status": "ok",
       "competencia": "2026-09",
-      "coletado_em_utc": "2026-10-27T14:34:08.147584+00:00",
+      "coletado_em_utc": "2026-10-27T14:39:30.322558+00:00",
       "url": "https://api.bcb.gov.br/dados/serie/bcdata.sgs.1/dados?formato=json&dataInicial=01%2F09%2F2025&dataFinal=30%2F09%2F2026",
       "sha256": "2db2b05f96749de01c77ecc4380fa0142a035f4f957846aab5dbc78b40aafefb",
       "registros": 273
@@ -23,10 +23,10 @@
     "ipca_pct_mes": {
       "status": "ok",
       "competencia": "2026-09",
-      "coletado_em_utc": "2026-10-27T14:34:08.147584+00:00",
-      "url": "https://api.bcb.gov.br/dados/serie/bcdata.sgs.433/dados?formato=json&dataInicial=01%2F01%2F2022&dataFinal=30%2F09%2F2026",
-      "sha256": "9b8b0a742d454333d6eacb1c2ed1795acdcd71444770d268f543d878ce752699",
-      "registros": 57
+      "coletado_em_utc": "2026-10-27T14:39:30.322558+00:00",
+      "url": "https://api.bcb.gov.br/dados/serie/bcdata.sgs.433/dados?formato=json&dataInicial=01%2F09%2F2025&dataFinal=30%2F09%2F2026",
+      "sha256": "c7a12b993ba31af06b245aed85b83d39036d88e88b8e45132ef79c31ed45a225",
+      "registros": 13
     }
   },
   "metadados": {
@@ -79,7 +79,7 @@
     },
     "macro": {
       "fonte_original": "https://api.bcb.gov.br/dados/serie/bcdata.sgs.{codigo}/dados",
-      "coletado_em_utc": "2026-10-27T14:34:08.147584+00:00",
+      "coletado_em_utc": "2026-10-27T14:39:30.322558+00:00",
       "unidades": {
         "selic_meta_pct_aa": "% a.a.",
         "dolar_venda_medio_brl": "R$/US$",
@@ -96,7 +96,7 @@
         "dolar_venda_medio_brl": {
           "status": "ok",
           "competencia": "2026-09",
-          "coletado_em_utc": "2026-10-27T14:34:08.147584+00:00",
+          "coletado_em_utc": "2026-10-27T14:39:30.322558+00:00",
           "url": "https://api.bcb.gov.br/dados/serie/bcdata.sgs.1/dados?formato=json&dataInicial=01%2F09%2F2025&dataFinal=30%2F09%2F2026",
           "sha256": "2db2b05f96749de01c77ecc4380fa0142a035f4f957846aab5dbc78b40aafefb",
           "registros": 273
@@ -104,18 +104,18 @@
         "selic_meta_pct_aa": {
           "status": "ok",
           "competencia": "2026-09",
-          "coletado_em_utc": "2026-10-27T14:34:08.147584+00:00",
-          "url": "https://api.bcb.gov.br/dados/serie/bcdata.sgs.432/dados?formato=json&dataInicial=01%2F01%2F2022&dataFinal=30%2F09%2F2026",
-          "sha256": "4fdfc6e4c16a3d0bbe71b19defcc9e596a8bab43a520b744bae398158df57fa3",
-          "registros": 1734
+          "coletado_em_utc": "2026-10-27T14:39:30.322558+00:00",
+          "url": "https://api.bcb.gov.br/dados/serie/bcdata.sgs.432/dados?formato=json&dataInicial=01%2F09%2F2025&dataFinal=30%2F09%2F2026",
+          "sha256": "a18befc90fb9e4379aba8aff749cad8839992eb04e19a4ee9248054aba6c74b1",
+          "registros": 395
         },
         "ipca_pct_mes": {
           "status": "ok",
           "competencia": "2026-09",
-          "coletado_em_utc": "2026-10-27T14:34:08.147584+00:00",
-          "url": "https://api.bcb.gov.br/dados/serie/bcdata.sgs.433/dados?formato=json&dataInicial=01%2F01%2F2022&dataFinal=30%2F09%2F2026",
-          "sha256": "9b8b0a742d454333d6eacb1c2ed1795acdcd71444770d268f543d878ce752699",
-          "registros": 57
+          "coletado_em_utc": "2026-10-27T14:39:30.322558+00:00",
+          "url": "https://api.bcb.gov.br/dados/serie/bcdata.sgs.433/dados?formato=json&dataInicial=01%2F09%2F2025&dataFinal=30%2F09%2F2026",
+          "sha256": "c7a12b993ba31af06b245aed85b83d39036d88e88b8e45132ef79c31ed45a225",
+          "registros": 13
         }
       }
     }
