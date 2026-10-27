@@ -1,7 +1,7 @@
 {
   "objetivo": "Auditoria de coleta ANAC SBKP 2020–2024",
   "fonte": "ANAC Etapa Básica — SBKP",
-  "gerado_em_utc": "2026-10-27T20:07:29.892363+00:00",
+  "gerado_em_utc": "2026-10-27T20:26:52.298443+00:00",
   "anos": {
     "2020": {
       "status": "incompleto",
@@ -62,7 +62,7 @@
       "etapas_sbkp_de_meses_ok": 93819
     },
     "2022": {
-      "status": "validado",
+      "status": "incompleto",
       "meses_ok": [
         "2022-01",
         "2022-02",
@@ -70,17 +70,23 @@
         "2022-04",
         "2022-05",
         "2022-06",
-        "2022-07",
         "2022-08",
         "2022-09",
         "2022-10",
         "2022-11",
         "2022-12"
       ],
-      "meses_faltantes": [],
-      "falhas": [],
+      "meses_faltantes": [
+        "2022-07"
+      ],
+      "falhas": [
+        {
+          "competencia": "2022-07",
+          "erro": "Resposta da ANAC não é ZIP plausível"
+        }
+      ],
       "csv_agregado_presente": true,
-      "etapas_sbkp_de_meses_ok": 126461
+      "etapas_sbkp_de_meses_ok": 115631
     },
     "2023": {
       "status": "incompleto",
@@ -132,12 +138,12 @@
     }
   },
   "anos_validados": [
-    2022,
     2024
   ],
   "anos_pendentes": [
     2020,
     2021,
+    2022,
     2023
   ],
   "publicacao_habilitada": false,
