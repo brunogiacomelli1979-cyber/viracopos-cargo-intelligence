@@ -25,6 +25,14 @@ class AnacTest(unittest.TestCase):
         self.assertAlmostEqual(by_dir["desembarque"]["carga_sem_correio_t"],2.5)
         self.assertAlmostEqual(by_dir["embarque"]["correio_t"],0.02)
         self.assertAlmostEqual(by_dir["desembarque"]["correio_t"],0.03)
+    def test_local_leg_separate_and_counted_once(self):
+        raw=(HEADER+"2024;1;SBKP;SBKP;DOMESTICA;1000;500;20\n").encode()
+        rows, info=aggregate_csv(raw,"2024-01")
+        self.assertEqual(len(rows),1)
+        self.assertEqual(rows[0]["sentido"],"local")
+        self.assertEqual(rows[0]["carga_sem_correio_t"],1.5)
+        self.assertEqual(info["etapas_sbkp"],1)
+        self.assertEqual(info["etapas_locais_sbkp"],1)
     def test_missing_cargo_is_not_zero(self):
         raw=(HEADER+"2024;1;SBKP;SBGR;DOMESTICA;;100;0\n").encode()
         with self.assertRaisesRegex(ValueError,"não informados"):
