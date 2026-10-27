@@ -1,0 +1,84 @@
+name: Backfill histórico 2020–2024 (staging)
+on:
+  push:
+    branches: [feat/backfill-real-2020-2024]
+    paths:
+      - 'scripts/coletar_comex.py'
+      - 'scripts/atualizar.py'
+      - '.github/workflows/backfill-2020-2024.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+concurrency:
+  group: vcp-backfill-2020-2024
+  cancel-in-progress: false
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/backfill-real-2020-2024
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: python -m pip install -r requirements.txt
+      - name: Coletar microdados MDIC, RMA e BCB desde 2020
+        shell: bash
+        run: |
+          set -o pipefail
+          python scripts/atualizar.py --mdic-years 2020 2021 2022 2023 2024 --rma-start-year 2020 --macro-start-year 2020 2>&1 | tee backfill.log
+      - name: Conferir integridade e método
+        run: |
+          python scripts/validar_dados.py
+          python scripts/auditar_metodologia.py
+          python -m unittest discover -s tests -v
+          node --test tests/dashboard.test.cjs
+      - name: Exigir históricos completos antes de versionar
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('data/dashboard.json').read_text(encoding='utf-8'))
+          mdic=d['comex']
+          brasil=d['brasil']
+          months={r['mes'] for r in brasil}
+          expected={f'{y}-{m:02d}' for y in range(2020,2025) for m in range(1,13)}
+          missing=expected-months
+          if missing:
+              raise SystemExit('MDIC nacional 2020–24 incompleto: '+','.join(sorted(missing)))
+          for flow in ('importacao','exportacao'):
+              covered={r['mes'] for r in mdic if r['fluxo']==flow}
+              if expected-covered:
+                  raise SystemExit(f'MDIC {flow} 2020–24 com lacunas: '+','.join(sorted(expected-covered)))
+          comex_meta=d['metadados']['comex']
+          receipt={(x['fluxo'], int(x['url'].rsplit('_',1)[-1][:4])):x for x in comex_meta['arquivos'] if 'url' in x}
+          for y in range(2020,2025):
+              for flow in ('importacao','exportacao'):
+                  x=receipt.get((flow,y))
+                  if not x or not x.get('sha256') or x.get('referencia_inicial')!=f'{y}-01' or x.get('referencia_final')!=f'{y}-12':
+                      raise SystemExit(f'Recibo original MDIC ausente ou incompleto: {y}/{flow}')
+          print('MDIC: 60 competências x 2 fluxos, 10 recibos anuais SHA-256 verificados.')
+          PY
+      - name: Registrar apenas arquivos de dados comprovados na branch
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/brasil.csv data/viracopos.csv data/comex_viracopos.csv data/macro.csv data/fontes.json data/dashboard.json index.html
+          if ! git diff --cached --quiet; then
+            git commit -m 'data: recuperar histórico comprovado 2020-2024'
+            git push origin HEAD:feat/backfill-real-2020-2024
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: backfill-2020-2024-log
+          path: backfill.log
+          retention-days: 30
