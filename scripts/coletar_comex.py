@@ -139,17 +139,22 @@ def brasil_rows_from_datasets(datasets):
             for month,values in sorted(totals.items()) if set(values)=={'exportacao','importacao'}]
 
 
-def collect_comex(existing_rows=None, now=None):
-    """Atualiza último ano encerrado/disponível sem reutilizar cache do corrente.
+def collect_comex(existing_rows=None, now=None, years=None):
+    """Atualiza um ano por padrão; no backfill, coleta apenas anos explícitos.
 
-    Na primeira carga, consulta ano anterior e atual. Com histórico existente,
-    reconsulta somente o ano do último mês encerrado; fontes falhas levantam
-    exceção para que o chamador preserve o último snapshot validado.
+    O caminho histórico faz download dos CSVs completos EXP e IMP oficiais,
+    agrega em streaming e substitui grupos mês x fluxo inteiros. Nunca mescla
+    observações incompletas de um mesmo ano no snapshot publicado.
     """
     now = now or datetime.now(timezone.utc)
     existing_rows = existing_rows or []
     end = now.date().replace(day=1) - timedelta(days=1)
-    years = [end.year] if existing_rows else [end.year-1,end.year]
+    if years is None:
+        years = [end.year] if existing_rows else [end.year - 1, end.year]
+    else:
+        if not years or any(type(year) is not int or year < 1997 or year >= now.year for year in years):
+            raise ValueError("Backfill MDIC exige anos encerrados entre 1997 e o ano anterior")
+        years = sorted(set(years))
     labels, ref = references()
     datasets = []
     for year in years:
@@ -157,6 +162,13 @@ def collect_comex(existing_rows=None, now=None):
             cache = OUT / f'{code}_{year}_agregado.json'
             # Current/latest year must always go online, including a revised month.
             dataset = json.loads(cache.read_text(encoding='utf-8')) if year < end.year and cache.exists() else aggregate_file(year,code)
+            # Arquivos de anos encerrados devem cobrir todos os 12 meses; a
+            # ausência de um mês é falha de fonte, não um valor zero imputado.
+            if year < end.year:
+                expected = {f"{year}-{m:02d}" for m in range(1, 13)}
+                observed = set(dataset["brasil"])
+                if observed != expected or dataset["receipt"]["fluxo"] != ("exportacao" if code == "EXP" else "importacao"):
+                    raise ValueError(f"Arquivo MDIC incompleto ou divergente: {code}_{year}; meses: {sorted(observed)}")
             datasets.append(dataset)
     fresh, covered = datasets_to_rows(datasets,labels)
     cutoff = end.strftime('%Y-%m')

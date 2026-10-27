@@ -96,13 +96,15 @@ def aggregate(field, data, start, end):
     return result
 
 
-def collect(existing, metadata, now):
+def collect(existing, metadata, now, start_year=None):
     end = date(now.year, now.month, 1) - timedelta(days=1)
     merged = {row["mes"]: dict(row) for row in existing}
     statuses = {}
     for field, code in SERIES.items():
         history = sorted(row["mes"] for row in existing if row[field] is not None)
         start = date(int(history[-1][:4]) - 1, int(history[-1][5:]), 1) if history else date(max(2000, end.year - 4), 1, 1)
+        if start_year is not None:
+            start = date(start_year, 1, 1)
         try:
             data, receipt = fetch_series(code, start, end)
             result = aggregate(field, data, start, end)
@@ -126,9 +128,13 @@ def collect(existing, metadata, now):
     return rows, statuses
 
 
-def build(offline=False, root=ROOT, rma_start_year=2025):
+def build(offline=False, root=ROOT, rma_start_year=2025, mdic_years=None, macro_start_year=None):
     if not isinstance(rma_start_year, int) or not 2010 <= rma_start_year <= datetime.now(timezone.utc).year:
         raise ValueError('Ano inicial do RMA deve estar entre 2010 e o ano atual')
+    if mdic_years is not None and (not mdic_years or any(type(y) is not int or y < 1997 or y >= datetime.now(timezone.utc).year for y in mdic_years)):
+        raise ValueError("MDIC backfill exige anos encerrados")
+    if macro_start_year is not None and not 1990 <= macro_start_year <= datetime.now(timezone.utc).year:
+        raise ValueError("Ano inicial da macro inválido")
     now = datetime.now(timezone.utc)
     datasets = {name: read_csv(name, root) for name in SCHEMAS}
     metadata = json.loads((root / "data/fontes.json").read_text(encoding="utf-8"))
@@ -138,10 +144,10 @@ def build(offline=False, root=ROOT, rma_start_year=2025):
     statuses = previous_snapshot.get("coleta_bcb", {"status": "não executada"})
     source_statuses = previous_snapshot.get("coleta_fontes", {})
     if not offline:
-        datasets["macro"], statuses = collect(datasets["macro"], metadata, now)
+        datasets["macro"], statuses = (collect(datasets["macro"], metadata, now, start_year=macro_start_year) if macro_start_year is not None else collect(datasets["macro"], metadata, now))
         national_updated = False
         try:
-            incoming, receipt = collect_comex(existing_rows=datasets["comex"], now=now)
+            incoming, receipt = collect_comex(existing_rows=datasets["comex"], now=now, years=mdic_years)
             national = validate_rows("brasil", receipt.pop("_brasil_rows"))
             if not national:
                 raise ValueError("MDIC sem competência nacional comum aos dois fluxos")
@@ -176,6 +182,8 @@ def build(offline=False, root=ROOT, rma_start_year=2025):
         try:
             incoming, receipt = collect_rma(existing_rows=datasets["viracopos"], now=now, start_year=rma_start_year)
             datasets["viracopos"] = validate_rows("viracopos", incoming)
+            # Metadados antigos continuam rastreáveis após um backfill parcial.
+            receipt["documentos"] = merge_receipts(metadata["viracopos"].get("documentos", []), receipt.get("documentos", []))
             metadata["viracopos"] = receipt
             source_statuses["viracopos"] = {"status": "ok", "competencia": incoming[-1]["mes"], "coletado_em_utc": receipt["coletado_em_utc"]}
             logging.info("RMA Viracopos: %s meses, última competência %s", len(incoming), incoming[-1]["mes"])
@@ -215,6 +223,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--offline", action="store_true")
     parser.add_argument("--rma-start-year", type=int, default=2025, help="Ano inicial para busca de RMA; use por exemplo 2021 em backfill explícito")
+    parser.add_argument("--mdic-years", nargs="+", type=int, help="Anos históricos encerrados para MDIC (ex.: 2020 2021 2022 2023 2024)")
+    parser.add_argument("--macro-start-year", type=int, help="Ano inicial da reconsulta BCB")
     args = parser.parse_args()
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
-    build(args.offline, rma_start_year=args.rma_start_year)
+    build(args.offline, rma_start_year=args.rma_start_year, mdic_years=args.mdic_years, macro_start_year=args.macro_start_year)

@@ -1,7 +1,7 @@
 {
   "brasil": {
     "fonte_original": "https://www.gov.br/mdic/pt-br/assuntos/comercio-exterior/estatisticas/base-de-dados-bruta",
-    "coletado_em_utc": "2026-10-27T16:20:01.461474+00:00",
+    "coletado_em_utc": "2026-10-27T16:33:08.719806+00:00",
     "unidades": {
       "exportacoes_usd_bi": "US$ bilhões FOB",
       "importacoes_usd_bi": "US$ bilhões FOB"
@@ -12,6 +12,71 @@
     "limitacoes": "Totais nacionais não representam Viracopos. Dados podem ser revisados. Fallback de publicação consolidada pode ter arredondamento de US$ 0,1 milhão.",
     "status": "validado",
     "arquivos": [
+      {
+        "url": "https://balanca.mdic.gov.br/balanca/bd/comexstat-bd/ncm/EXP_2020.csv",
+        "sha256": "a2f0a398b84874d46ca8040f054c588cabf3afe815422552c5358dfe238625aa",
+        "bytes": 89392892,
+        "linhas_origem": 1344556,
+        "linhas_recorte": 188465,
+        "coletado_em_utc": "2026-10-27T16:33:22.913246+00:00",
+        "urf": 817700,
+        "via": 4,
+        "fluxo": "exportacao",
+        "referencia_inicial": "2020-01",
+        "referencia_final": "2020-12"
+      },
+      {
+        "url": "https://balanca.mdic.gov.br/balanca/bd/comexstat-bd/ncm/EXP_2021.csv",
+        "sha256": "b8842af7f32cef5104eb24ce9c54b84f0815e428657db408bfd025850a76e15b",
+        "bytes": 98548263,
+        "linhas_origem": 1480295,
+        "linhas_recorte": 187625,
+        "coletado_em_utc": "2026-10-27T16:33:39.149129+00:00",
+        "urf": 817700,
+        "via": 4,
+        "fluxo": "exportacao",
+        "referencia_inicial": "2021-01",
+        "referencia_final": "2021-12"
+      },
+      {
+        "url": "https://balanca.mdic.gov.br/balanca/bd/comexstat-bd/ncm/EXP_2022.csv",
+        "sha256": "2d5148d6afb2749a4eb1f11807242d85166d186b4aa82b19b49a9e6c0256f8ea",
+        "bytes": 99641309,
+        "linhas_origem": 1495868,
+        "linhas_recorte": 199820,
+        "coletado_em_utc": "2026-10-27T16:33:56.627804+00:00",
+        "urf": 817700,
+        "via": 4,
+        "fluxo": "exportacao",
+        "referencia_inicial": "2022-01",
+        "referencia_final": "2022-12"
+      },
+      {
+        "url": "https://balanca.mdic.gov.br/balanca/bd/comexstat-bd/ncm/EXP_2023.csv",
+        "sha256": "3bfaeb2751ded80c4387ad2d4964f8fb7e4529c45810777d77a48a466e9c6b36",
+        "bytes": 103932897,
+        "linhas_origem": 1563659,
+        "linhas_recorte": 210081,
+        "coletado_em_utc": "2026-10-27T16:34:13.944432+00:00",
+        "urf": 817700,
+        "via": 4,
+        "fluxo": "exportacao",
+        "referencia_inicial": "2023-01",
+        "referencia_final": "2023-12"
+      },
+      {
+        "url": "https://balanca.mdic.gov.br/balanca/bd/comexstat-bd/ncm/EXP_2024.csv",
+        "sha256": "9dcddfcb2089709c6e738f4a7fd1e529e66f1ceae8c66dcc1550884277548b78",
+        "bytes": 106702953,
+        "linhas_origem": 1603796,
+        "linhas_recorte": 209459,
+        "coletado_em_utc": "2026-10-27T16:34:31.853847+00:00",
+        "urf": 817700,
+        "via": 4,
+        "fluxo": "exportacao",
+        "referencia_inicial": "2024-01",
+        "referencia_final": "2024-12"
+      },
       {
         "url": "https://balanca.mdic.gov.br/balanca/bd/comexstat-bd/ncm/EXP_2025.csv",
         "sha256": "34571d3fb125db0423f4a0785e7b40c26c815a90ccfa9783e457a1c34a96b96c",
@@ -37,6 +102,71 @@
         "fluxo": "exportacao",
         "referencia_inicial": "2026-01",
         "referencia_final": "2026-09"
+      },
+      {
+        "url": "https://balanca.mdic.gov.br/balanca/bd/comexstat-bd/ncm/IMP_2020.csv",
+        "sha256": "4acae16b2c57457332dff8249b7b58476a7b212cf3308061e3da5f1e6df21b17",
+        "bytes": 130405506,
+        "linhas_origem": 1784057,
+        "linhas_recorte": 306527,
+        "coletado_em_utc": "2026-10-27T16:33:31.911121+00:00",
+        "urf": 817700,
+        "via": 4,
+        "fluxo": "importacao",
+        "referencia_inicial": "2020-01",
+        "referencia_final": "2020-12"
+      },
+      {
+        "url": "https://balanca.mdic.gov.br/balanca/bd/comexstat-bd/ncm/IMP_2021.csv",
+        "sha256": "9f2448d99b8073c089ebf70b259888966e923a64946ca21ad18263038a19f251",
+        "bytes": 146808934,
+        "linhas_origem": 1999946,
+        "linhas_recorte": 341001,
+        "coletado_em_utc": "2026-10-27T16:33:49.245731+00:00",
+        "urf": 817700,
+        "via": 4,
+        "fluxo": "importacao",
+        "referencia_inicial": "2021-01",
+        "referencia_final": "2021-12"
+      },
+      {
+        "url": "https://balanca.mdic.gov.br/balanca/bd/comexstat-bd/ncm/IMP_2022.csv",
+        "sha256": "f4b5abe1617dda2c422665d5b1cb8d2eedffe440a7ef32566364d9b9d6082da1",
+        "bytes": 148650131,
+        "linhas_origem": 2023256,
+        "linhas_recorte": 332755,
+        "coletado_em_utc": "2026-10-27T16:34:06.373455+00:00",
+        "urf": 817700,
+        "via": 4,
+        "fluxo": "importacao",
+        "referencia_inicial": "2022-01",
+        "referencia_final": "2022-12"
+      },
+      {
+        "url": "https://balanca.mdic.gov.br/balanca/bd/comexstat-bd/ncm/IMP_2023.csv",
+        "sha256": "9b33eb6151390d50516e490b2b02d639f75af90c37baac15fa2f92a149b497bc",
+        "bytes": 152969373,
+        "linhas_origem": 2088669,
+        "linhas_recorte": 318775,
+        "coletado_em_utc": "2026-10-27T16:34:24.062743+00:00",
+        "urf": 817700,
+        "via": 4,
+        "fluxo": "importacao",
+        "referencia_inicial": "2023-01",
+        "referencia_final": "2023-12"
+      },
+      {
+        "url": "https://balanca.mdic.gov.br/balanca/bd/comexstat-bd/ncm/IMP_2024.csv",
+        "sha256": "d0e7cce0b93d2a6d80f8bf7cf898264dba8144f25679ff0a5fa669a3cdc505e0",
+        "bytes": 166729221,
+        "linhas_origem": 2273708,
+        "linhas_recorte": 342742,
+        "coletado_em_utc": "2026-10-27T16:34:43.092879+00:00",
+        "urf": 817700,
+        "via": 4,
+        "fluxo": "importacao",
+        "referencia_inicial": "2024-01",
+        "referencia_final": "2024-12"
       },
       {
         "url": "https://balanca.mdic.gov.br/balanca/bd/comexstat-bd/ncm/IMP_2025.csv",
@@ -65,7 +195,7 @@
         "referencia_final": "2026-09"
       }
     ],
-    "referencia_inicial": "2025-01",
+    "referencia_inicial": "2020-01",
     "referencia_final": "2026-09"
   },
   "viracopos": {
@@ -117,7 +247,7 @@
   },
   "comex": {
     "fonte_original": "https://www.gov.br/mdic/pt-br/assuntos/comercio-exterior/estatisticas/base-de-dados-bruta",
-    "coletado_em_utc": "2026-10-27T16:20:01.461474+00:00",
+    "coletado_em_utc": "2026-10-27T16:33:08.719806+00:00",
     "unidades": {
       "valor_fob_usd": "US$ FOB",
       "kg_liquido": "kg líquidos"
@@ -128,9 +258,74 @@
     "limitacoes": "Recorte aduaneiro de URF de embarque/desembarque declarado e via aérea; não equivale à carga física ANAC/SBKP. Peso líquido não inclui embalagem nem peso volumétrico. Classificações NCM/SH e dados podem sofrer revisão.",
     "status": "validado",
     "recorte_validado": true,
-    "referencia_inicial": "2025-01",
+    "referencia_inicial": "2020-01",
     "referencia_final": "2026-09",
     "arquivos": [
+      {
+        "url": "https://balanca.mdic.gov.br/balanca/bd/comexstat-bd/ncm/EXP_2020.csv",
+        "sha256": "a2f0a398b84874d46ca8040f054c588cabf3afe815422552c5358dfe238625aa",
+        "bytes": 89392892,
+        "linhas_origem": 1344556,
+        "linhas_recorte": 188465,
+        "coletado_em_utc": "2026-10-27T16:33:22.913246+00:00",
+        "urf": 817700,
+        "via": 4,
+        "fluxo": "exportacao",
+        "referencia_inicial": "2020-01",
+        "referencia_final": "2020-12"
+      },
+      {
+        "url": "https://balanca.mdic.gov.br/balanca/bd/comexstat-bd/ncm/EXP_2021.csv",
+        "sha256": "b8842af7f32cef5104eb24ce9c54b84f0815e428657db408bfd025850a76e15b",
+        "bytes": 98548263,
+        "linhas_origem": 1480295,
+        "linhas_recorte": 187625,
+        "coletado_em_utc": "2026-10-27T16:33:39.149129+00:00",
+        "urf": 817700,
+        "via": 4,
+        "fluxo": "exportacao",
+        "referencia_inicial": "2021-01",
+        "referencia_final": "2021-12"
+      },
+      {
+        "url": "https://balanca.mdic.gov.br/balanca/bd/comexstat-bd/ncm/EXP_2022.csv",
+        "sha256": "2d5148d6afb2749a4eb1f11807242d85166d186b4aa82b19b49a9e6c0256f8ea",
+        "bytes": 99641309,
+        "linhas_origem": 1495868,
+        "linhas_recorte": 199820,
+        "coletado_em_utc": "2026-10-27T16:33:56.627804+00:00",
+        "urf": 817700,
+        "via": 4,
+        "fluxo": "exportacao",
+        "referencia_inicial": "2022-01",
+        "referencia_final": "2022-12"
+      },
+      {
+        "url": "https://balanca.mdic.gov.br/balanca/bd/comexstat-bd/ncm/EXP_2023.csv",
+        "sha256": "3bfaeb2751ded80c4387ad2d4964f8fb7e4529c45810777d77a48a466e9c6b36",
+        "bytes": 103932897,
+        "linhas_origem": 1563659,
+        "linhas_recorte": 210081,
+        "coletado_em_utc": "2026-10-27T16:34:13.944432+00:00",
+        "urf": 817700,
+        "via": 4,
+        "fluxo": "exportacao",
+        "referencia_inicial": "2023-01",
+        "referencia_final": "2023-12"
+      },
+      {
+        "url": "https://balanca.mdic.gov.br/balanca/bd/comexstat-bd/ncm/EXP_2024.csv",
+        "sha256": "9dcddfcb2089709c6e738f4a7fd1e529e66f1ceae8c66dcc1550884277548b78",
+        "bytes": 106702953,
+        "linhas_origem": 1603796,
+        "linhas_recorte": 209459,
+        "coletado_em_utc": "2026-10-27T16:34:31.853847+00:00",
+        "urf": 817700,
+        "via": 4,
+        "fluxo": "exportacao",
+        "referencia_inicial": "2024-01",
+        "referencia_final": "2024-12"
+      },
       {
         "url": "https://balanca.mdic.gov.br/balanca/bd/comexstat-bd/ncm/EXP_2025.csv",
         "sha256": "34571d3fb125db0423f4a0785e7b40c26c815a90ccfa9783e457a1c34a96b96c",
@@ -156,6 +351,71 @@
         "fluxo": "exportacao",
         "referencia_inicial": "2026-01",
         "referencia_final": "2026-09"
+      },
+      {
+        "url": "https://balanca.mdic.gov.br/balanca/bd/comexstat-bd/ncm/IMP_2020.csv",
+        "sha256": "4acae16b2c57457332dff8249b7b58476a7b212cf3308061e3da5f1e6df21b17",
+        "bytes": 130405506,
+        "linhas_origem": 1784057,
+        "linhas_recorte": 306527,
+        "coletado_em_utc": "2026-10-27T16:33:31.911121+00:00",
+        "urf": 817700,
+        "via": 4,
+        "fluxo": "importacao",
+        "referencia_inicial": "2020-01",
+        "referencia_final": "2020-12"
+      },
+      {
+        "url": "https://balanca.mdic.gov.br/balanca/bd/comexstat-bd/ncm/IMP_2021.csv",
+        "sha256": "9f2448d99b8073c089ebf70b259888966e923a64946ca21ad18263038a19f251",
+        "bytes": 146808934,
+        "linhas_origem": 1999946,
+        "linhas_recorte": 341001,
+        "coletado_em_utc": "2026-10-27T16:33:49.245731+00:00",
+        "urf": 817700,
+        "via": 4,
+        "fluxo": "importacao",
+        "referencia_inicial": "2021-01",
+        "referencia_final": "2021-12"
+      },
+      {
+        "url": "https://balanca.mdic.gov.br/balanca/bd/comexstat-bd/ncm/IMP_2022.csv",
+        "sha256": "f4b5abe1617dda2c422665d5b1cb8d2eedffe440a7ef32566364d9b9d6082da1",
+        "bytes": 148650131,
+        "linhas_origem": 2023256,
+        "linhas_recorte": 332755,
+        "coletado_em_utc": "2026-10-27T16:34:06.373455+00:00",
+        "urf": 817700,
+        "via": 4,
+        "fluxo": "importacao",
+        "referencia_inicial": "2022-01",
+        "referencia_final": "2022-12"
+      },
+      {
+        "url": "https://balanca.mdic.gov.br/balanca/bd/comexstat-bd/ncm/IMP_2023.csv",
+        "sha256": "9b33eb6151390d50516e490b2b02d639f75af90c37baac15fa2f92a149b497bc",
+        "bytes": 152969373,
+        "linhas_origem": 2088669,
+        "linhas_recorte": 318775,
+        "coletado_em_utc": "2026-10-27T16:34:24.062743+00:00",
+        "urf": 817700,
+        "via": 4,
+        "fluxo": "importacao",
+        "referencia_inicial": "2023-01",
+        "referencia_final": "2023-12"
+      },
+      {
+        "url": "https://balanca.mdic.gov.br/balanca/bd/comexstat-bd/ncm/IMP_2024.csv",
+        "sha256": "d0e7cce0b93d2a6d80f8bf7cf898264dba8144f25679ff0a5fa669a3cdc505e0",
+        "bytes": 166729221,
+        "linhas_origem": 2273708,
+        "linhas_recorte": 342742,
+        "coletado_em_utc": "2026-10-27T16:34:43.092879+00:00",
+        "urf": 817700,
+        "via": 4,
+        "fluxo": "importacao",
+        "referencia_inicial": "2024-01",
+        "referencia_final": "2024-12"
       },
       {
         "url": "https://balanca.mdic.gov.br/balanca/bd/comexstat-bd/ncm/IMP_2025.csv",
@@ -215,7 +475,7 @@
   },
   "macro": {
     "fonte_original": "https://api.bcb.gov.br/dados/serie/bcdata.sgs.{codigo}/dados",
-    "coletado_em_utc": "2026-10-27T16:20:01.461474+00:00",
+    "coletado_em_utc": "2026-10-27T16:33:08.719806+00:00",
     "unidades": {
       "selic_meta_pct_aa": "% a.a.",
       "dolar_venda_medio_brl": "R$/US$",
@@ -226,32 +486,32 @@
     "tratamento": "SGS 432: último registro disponível no mês; SGS 1: média aritmética dos dias publicados; SGS 433: variação mensal. Somente meses encerrados. Reconsulta sobreposta de 12 meses; demais competências preservadas.",
     "limitacoes": "Disponibilidade por indicador pode diferir. Meses ausentes não são interpolados. Requisições limitadas a menos de 10 anos; backfill anterior requer consultas adicionais. Não implica causalidade.",
     "status": "validado",
-    "referencia_inicial": "2022-01",
+    "referencia_inicial": "2020-01",
     "referencia_final": "2026-09",
     "coletas_por_serie": {
       "dolar_venda_medio_brl": {
         "status": "ok",
         "competencia": "2026-09",
-        "coletado_em_utc": "2026-10-27T16:20:01.461474+00:00",
-        "url": "https://api.bcb.gov.br/dados/serie/bcdata.sgs.1/dados?formato=json&dataInicial=01%2F09%2F2025&dataFinal=30%2F09%2F2026",
-        "sha256": "2db2b05f96749de01c77ecc4380fa0142a035f4f957846aab5dbc78b40aafefb",
-        "registros": 273
+        "coletado_em_utc": "2026-10-27T16:33:08.719806+00:00",
+        "url": "https://api.bcb.gov.br/dados/serie/bcdata.sgs.1/dados?formato=json&dataInicial=01%2F01%2F2020&dataFinal=30%2F09%2F2026",
+        "sha256": "33509e7d08b1e7270adec875f51353bdc561fd0a215fc63c45ed2b582f69342a",
+        "registros": 1694
       },
       "selic_meta_pct_aa": {
         "status": "ok",
         "competencia": "2026-09",
-        "coletado_em_utc": "2026-10-27T16:20:01.461474+00:00",
-        "url": "https://api.bcb.gov.br/dados/serie/bcdata.sgs.432/dados?formato=json&dataInicial=01%2F09%2F2025&dataFinal=30%2F09%2F2026",
-        "sha256": "a18befc90fb9e4379aba8aff749cad8839992eb04e19a4ee9248054aba6c74b1",
-        "registros": 395
+        "coletado_em_utc": "2026-10-27T16:33:08.719806+00:00",
+        "url": "https://api.bcb.gov.br/dados/serie/bcdata.sgs.432/dados?formato=json&dataInicial=01%2F01%2F2020&dataFinal=30%2F09%2F2026",
+        "sha256": "53809a667051c50a15b57dd5d284a5497a5ebcbb00047f73599c353f9ec2860d",
+        "registros": 2465
       },
       "ipca_pct_mes": {
         "status": "ok",
         "competencia": "2026-09",
-        "coletado_em_utc": "2026-10-27T16:20:01.461474+00:00",
-        "url": "https://api.bcb.gov.br/dados/serie/bcdata.sgs.433/dados?formato=json&dataInicial=01%2F09%2F2025&dataFinal=30%2F09%2F2026",
-        "sha256": "c7a12b993ba31af06b245aed85b83d39036d88e88b8e45132ef79c31ed45a225",
-        "registros": 13
+        "coletado_em_utc": "2026-10-27T16:33:08.719806+00:00",
+        "url": "https://api.bcb.gov.br/dados/serie/bcdata.sgs.433/dados?formato=json&dataInicial=01%2F01%2F2020&dataFinal=30%2F09%2F2026",
+        "sha256": "76ef33b6820ac61e5fbab4a81861d504b27b0aa53f607d4a44f9de2ec094895d",
+        "registros": 81
       }
     }
   }
