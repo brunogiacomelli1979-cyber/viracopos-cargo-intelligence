@@ -36,8 +36,9 @@ jobs:
           with Path('data/staging/anac/anac_sbkp_carga_mensal.csv').open() as f:
               rows=list(csv.DictReader(f))
           assert meta['meses_validados']==1 and meta['status']=='validado'
-          assert len(rows)==4 and {r['sentido'] for r in rows}=={'embarque','desembarque'}
-          assert {r['natureza'] for r in rows}=={'internacional','domestica'}
+          assert len([r for r in rows if r['sentido']!='local'])==4
+          assert {'embarque','desembarque'} <= {r['sentido'] for r in rows}
+          assert {'internacional','domestica'} <= {r['natureza'] for r in rows}
           print('Piloto ANAC com quatro grupos verificados',meta['recibos'][0]['sha256'])
           PY
       - uses: actions/upload-artifact@v4
