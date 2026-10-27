@@ -83,10 +83,17 @@ def aggregate_csv(csv_bytes, month):
                 or int(item["nr_mes_referencia"]) != int(month[5:])):
             raise ValueError(f"ANAC: competência da linha difere do arquivo {month}")
         nature = norm(item["ds_natureza_etapa"])
-        if nature not in {"DOMESTICA", "INTERNACIONAL"}:
+        # A terminologia oficial ANAC é "Doméstico" / "Internacional".
+        # Também aceitar "Doméstica" em fixtures/documentos legados, mantendo
+        # a classificação harmonizada no resultado.
+        if nature in {"DOMESTICO", "DOMESTICA"}:
+            nature = "domestica"
+        elif nature == "INTERNACIONAL":
+            nature = "internacional"
+        else:
             raise ValueError(f"Natureza ANAC desconhecida: {nature}")
         direction = "embarque" if origin == "SBKP" else "desembarque"
-        key = (month, nature.lower(), direction)
+        key = (month, nature, direction)
         selected += 1
         weights = [weight(item[column], column) for column in FIELDS]
         if any(x is None for x in weights):
