@@ -1,0 +1,3 @@
+* text=auto eol=lf
+# O arquivo recebido precisa manter bytes e quebras originais em qualquer SO.
+docs/archive/initial/** -text

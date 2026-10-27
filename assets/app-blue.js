@@ -131,7 +131,7 @@ let scrollQueued=false;
 function updateNavigation(){const offset=document.querySelector('.site-header').getBoundingClientRect().bottom+24;const current=[...sections].reverse().find(section=>section.getBoundingClientRect().top<=offset)||sections[0];if(current)activate(current.id);scrollQueued=false;}
 window.addEventListener('scroll',()=>{if(!scrollQueued){scrollQueued=true;requestAnimationFrame(updateNavigation);}},{passive:true});
 window.addEventListener('resize',updateNavigation);updateNavigation();
-document.querySelectorAll('a[href^="#"]').forEach(link=>link.addEventListener('click',()=>{const id=link.getAttribute('href').slice(1); if(id) activate(id);}));
+document.querySelectorAll('a[href^="#"]').forEach(link=>link.addEventListener('click',event=>{const id=link.getAttribute('href').slice(1);if(id==='topo'){event.preventDefault();window.scrollTo({top:0,behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});activate('visao-geral');}else if(id)activate(id);}));
 const photoUrl='https://commons.wikimedia.org/wiki/Special:FilePath/Viracopos-Campinas_International_Airport_2017_003.jpg?width=1200';
 const testPhoto=new Image();
 testPhoto.onload=()=>{const credit=byId('hero-credit');if(credit){credit.innerHTML='FOTO: MIKE PEEL / CC BY-SA 4.0 ↗';}};
