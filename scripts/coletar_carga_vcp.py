@@ -87,14 +87,23 @@ def collect_rma(existing_rows=None, now=None, fetcher=get_bytes, start_year=2025
     html = fetcher(INDEX_URL).decode("utf-8")
     merged = {row["mes"]: dict(row) for row in (existing_rows or [])}
     versions = {}
+    errors = []
     for url in discover_rma(html, start_year):
-        content = fetcher(url)
-        rows, control = extract_rma(content)
+        try:
+            content = fetcher(url)
+            rows, control = extract_rma(content)
+        except Exception as error:
+            # Um PDF antigo indisponível não deve bloquear outro boletim válido.
+            # Nunca incluir valores de documentos que não passaram na validação.
+            errors.append({"url": url, "erro": str(error)})
+            continue
         rank = (max(row["mes"] for row in rows), len(rows))
         year = control["ano"]
         if year not in versions or rank > versions[year][0]:
             receipt = {"url": url, "sha256": hashlib.sha256(content).hexdigest(), "bytes": len(content), "coletado_em_utc": collected, **control}
             versions[year] = (rank, rows, receipt)
+    if not versions:
+        raise ValueError(f"RMA: nenhum boletim acessível e validado; falhas: {len(errors)}")
     receipts = []
     for year in sorted(versions):
         _, rows, receipt = versions[year]
@@ -119,6 +128,8 @@ def collect_rma(existing_rows=None, now=None, fetcher=get_bytes, start_year=2025
         "referencia_final": result[-1]["mes"] if result else None,
         "documentos": receipts,
     }
+    if errors:
+        metadata["avisos_coleta"] = errors
     return result, metadata
 
 
