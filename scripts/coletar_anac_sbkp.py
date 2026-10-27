@@ -72,6 +72,7 @@ def aggregate_csv(csv_bytes, month):
     missing = defaultdict(int)
     seen = set()
     selected = 0
+    local = 0
     for item in rows:
         origin = norm(item["sg_icao_origem"])
         dest = norm(item["sg_icao_destino"])
@@ -91,9 +92,11 @@ def aggregate_csv(csv_bytes, month):
             nature = "internacional"
         else:
             raise ValueError(f"Natureza ANAC desconhecida: {nature}")
-        direction = "embarque" if origin == "SBKP" else "desembarque"
+        direction = "local" if origin == dest == "SBKP" else ("embarque" if origin == "SBKP" else "desembarque")
         key = (month, nature, direction)
         selected += 1
+        if direction == "local":
+            local += 1
         weights = [weight(item[column], column) for column in FIELDS]
         if any(x is None for x in weights):
             missing[key] += 1
@@ -113,7 +116,7 @@ def aggregate_csv(csv_bytes, month):
                        "correio_t": float(mail/1000),
                        "carga_sem_correio_t": float((paid+free)/1000),
                        "etapas": steps})
-    return output, {"etapas_sbkp": selected, "grupos": len(output),
+    return output, {"etapas_sbkp": selected, "etapas_locais_sbkp": local, "grupos": len(output),
                     "sem_carga_inferida": False}
 
 
