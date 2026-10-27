@@ -34,6 +34,9 @@ jobs:
       - run: python scripts/validar_dados.py
       - run: python scripts/auditar_metodologia.py
       - run: python -m unittest discover -s tests -v
+      - name: Piloto oficial ANAC SBKP (somente PR da branch de desenvolvimento)
+        if: github.event_name == 'pull_request' && github.head_ref == 'feat/anac-carga-sbkp-2020-2024'
+        run: python scripts/coletar_anac_sbkp.py --start 2024-01 --end 2024-01 --strict-complete
       - run: node --test tests/dashboard.test.cjs
       - run: node --check assets/app-blue.js
       - run: python scripts/preparar_site.py
