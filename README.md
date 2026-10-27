@@ -57,7 +57,7 @@ AGENTS.md                   # regras permanentes
 requirements.txt            # somente biblioteca padrão
 ```
 
-Edite CSVs/metadados e regenere. Não edite as saídas à mão. CSVs têm cabeçalho estrito; ausência macro é célula vazia e demais conjuntos omitem meses sem dados. Números usam ponto decimal sem separador de milhar. Chave Comex: mês × fluxo × setor; demais: mensal. Novas importações exigem fonte, coleta/conferência documentada, recorte e unidade. Veja [indicadores](docs/indicadores.md) e [metodologia](docs/metodologia.md).
+Edite CSVs/metadados, template ou assets e regenere. CSS/JS recebem versão SHA-256 na URL para evitar cache antigo após deploy; a validação confere essa versão. Não edite as saídas à mão. CSVs têm cabeçalho estrito; ausência macro é célula vazia e demais conjuntos omitem meses sem dados. Números usam ponto decimal sem separador de milhar. Chave Comex: mês × fluxo × setor; demais: mensal. Novas importações exigem fonte, coleta/conferência documentada, recorte e unidade. Veja [indicadores](docs/indicadores.md) e [metodologia](docs/metodologia.md).
 
 ## Publicação e rotina mensal
 

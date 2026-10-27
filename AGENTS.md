@@ -34,4 +34,4 @@ node --test tests/dashboard.test.cjs
 node --check assets/app-blue.js
 python scripts/preparar_site.py
 ```
-Após alterar template/dados, regenerar com `python scripts/atualizar.py --offline`. Não usar offline para alegar coleta nova. Verificar filtros, lacunas, zero observado, menu/teclado, navegação ativa e valores dos gráficos. Registrar limitações de QA. Nunca alterar `docs/archive/initial/`; conferir manifesto SHA-256. Preservar histórico Git, sem force push. Antes de mudar Pages existente, inspecionar configuração e domínio.
+Após alterar template, dados ou assets, regenerar com `python scripts/atualizar.py --offline`; o HTML recebe hashes de versão de CSS/JS. Não usar offline para alegar coleta nova. Verificar filtros, lacunas, zero observado, menu/teclado, navegação ativa e valores dos gráficos. Registrar limitações de QA. Nunca alterar `docs/archive/initial/`; conferir manifesto SHA-256. Preservar histórico Git, sem force push. Antes de mudar Pages existente, inspecionar configuração e domínio.

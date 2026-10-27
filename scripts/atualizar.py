@@ -109,6 +109,10 @@ def build(offline=False, root=ROOT):
     template = (root / "index.template.html").read_text(encoding="utf-8")
     if template.count("{{DASHBOARD_JSON}}") != 1:
         raise ValueError("template precisa de um único marcador de dados")
+    html = template.replace("{{DASHBOARD_JSON}}", compact)
+    for asset in ("assets/style-blue.css", "assets/app-blue.js"):
+        version = hashlib.sha256((root / asset).read_bytes()).hexdigest()[:12]
+        html = html.replace(f'"{asset}"', f'"{asset}?v={version}"')
     # Validate everything before replacing outputs. Each individual replacement is atomic.
     if not offline:
         stream = io.StringIO(newline="")
@@ -118,7 +122,7 @@ def build(offline=False, root=ROOT):
         atomic_write(root / "data/macro.csv", stream.getvalue())
     atomic_write(root / "data/fontes.json", json.dumps(metadata, ensure_ascii=False, indent=2) + "\n")
     atomic_write(root / "data/dashboard.json", json.dumps(snapshot, ensure_ascii=False, indent=2, allow_nan=False) + "\n")
-    atomic_write(root / "index.html", template.replace("{{DASHBOARD_JSON}}", compact))
+    atomic_write(root / "index.html", html)
     logging.info("Snapshot gerado: %s", {name: len(rows) for name, rows in datasets.items()})
     return snapshot
 

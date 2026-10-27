@@ -33,7 +33,7 @@ class PipelineTests(unittest.TestCase):
         parser.feed((ROOT / 'index.html').read_text(encoding='utf-8'))
         self.assertEqual(len(parser.ids), len(set(parser.ids)))
         self.assertTrue(all(anchor in parser.ids for anchor in parser.anchors))
-        self.assertTrue(all((ROOT / path).is_file() for path in parser.assets))
+        self.assertTrue(all((ROOT / path.split('?')[0]).is_file() for path in parser.assets))
 
     def test_project_consistency(self):
         validate_project()
@@ -89,6 +89,7 @@ class PipelineTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
             shutil.copytree(ROOT / 'data', root / 'data')
+            shutil.copytree(ROOT / 'assets', root / 'assets')
             shutil.copy(ROOT / 'index.template.html', root / 'index.template.html')
             before = (root/'data/macro.csv').read_bytes()
             first = build(True, root)

@@ -1,5 +1,6 @@
 """Contratos dos CSVs e do snapshot; somente biblioteca padrão Python."""
 import csv
+import hashlib
 import json
 import math
 import re
@@ -86,6 +87,10 @@ def validate_project(root=ROOT):
     embedded = re.search(r'<script type="application/json" id="dados-incorporados">(.*?)</script>', html, re.S)
     if not embedded or json.loads(embedded[1]) != snapshot:
         raise ValueError("index.html diverge do snapshot")
+    for asset in ("assets/style-blue.css", "assets/app-blue.js"):
+        version = hashlib.sha256((root / asset).read_bytes()).hexdigest()[:12]
+        if f'"{asset}?v={version}"' not in html:
+            raise ValueError(f"HTML usa versão desatualizada de {asset}; regenere o site")
     return {name: len(rows) for name, rows in datasets.items()}
 
 
