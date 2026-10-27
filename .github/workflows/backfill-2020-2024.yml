@@ -57,7 +57,14 @@ jobs:
               covered={r['mes'] for r in mdic if r['fluxo']==flow}
               if expected-covered:
                   raise SystemExit(f'MDIC {flow} 2020–24 com lacunas: '+','.join(sorted(expected-covered)))
-          print('MDIC histórico 2020–2024 presente por mês e fluxo (requer validação de recibos no script).')
+          comex_meta=d['metadados']['comex']
+          receipt={(x['fluxo'], int(x['url'].rsplit('_',1)[-1][:4])):x for x in comex_meta['arquivos'] if 'url' in x}
+          for y in range(2020,2025):
+              for flow in ('importacao','exportacao'):
+                  x=receipt.get((flow,y))
+                  if not x or not x.get('sha256') or x.get('referencia_inicial')!=f'{y}-01' or x.get('referencia_final')!=f'{y}-12':
+                      raise SystemExit(f'Recibo original MDIC ausente ou incompleto: {y}/{flow}')
+          print('MDIC: 60 competências x 2 fluxos, 10 recibos anuais SHA-256 verificados.')
           PY
       - name: Registrar apenas arquivos de dados comprovados na branch
         shell: bash
