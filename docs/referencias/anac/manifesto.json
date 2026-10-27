@@ -1,7 +1,7 @@
 {
   "projeto": "Viracopos Cargo Intelligence",
   "etapa": "1_documentacao_apenas",
-  "capturado_em_utc": "2026-10-27T20:35:26.891462+00:00",
+  "capturado_em_utc": "2026-10-27T21:44:34.043117+00:00",
   "documentos": [
     {
       "id": "metadados_etapa_basica",
@@ -98,6 +98,18 @@
       "bytes": 83383,
       "sha256": "24ea5e5f73969bd09fe3faabb879b99f0acca515968175152b76b049463e3569",
       "tipo_resposta": "application/pdf"
+    },
+    {
+      "id": "metadados_movimentacao_anac_govbr",
+      "type": "html",
+      "essential": true,
+      "file": "docs/referencias/anac/originais/10_metadados_movimentacao_govbr.html",
+      "url": "https://www.gov.br/anac/pt-br/acesso-a-informacao/dados-abertos/areas-de-atuacao/operador-aeroportuario/dados-de-movimentacao-aeroportuaria/metadados-operador-aeroportuario-dados-de-movimentacao-aeroportuaria",
+      "status": "baixado",
+      "url_final": "https://www.gov.br/anac/pt-br/acesso-a-informacao/dados-abertos/areas-de-atuacao/operador-aeroportuario/dados-de-movimentacao-aeroportuaria/metadados-operador-aeroportuario-dados-de-movimentacao-aeroportuaria",
+      "bytes": 153993,
+      "sha256": "52ba4c4055e396576183a736a100face723008e3aeb09c353058ce1b9a4bd08f",
+      "tipo_resposta": "text/html;charset=utf-8"
     },
     {
       "id": "pagina_referencias_concessionaria_vcp",
