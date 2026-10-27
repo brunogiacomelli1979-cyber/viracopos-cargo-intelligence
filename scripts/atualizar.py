@@ -126,7 +126,9 @@ def collect(existing, metadata, now):
     return rows, statuses
 
 
-def build(offline=False, root=ROOT):
+def build(offline=False, root=ROOT, rma_start_year=2025):
+    if not isinstance(rma_start_year, int) or not 2010 <= rma_start_year <= datetime.now(timezone.utc).year:
+        raise ValueError('Ano inicial do RMA deve estar entre 2010 e o ano atual')
     now = datetime.now(timezone.utc)
     datasets = {name: read_csv(name, root) for name in SCHEMAS}
     metadata = json.loads((root / "data/fontes.json").read_text(encoding="utf-8"))
@@ -172,7 +174,7 @@ def build(offline=False, root=ROOT):
             source_statuses["brasil"] = {"status": "falha; histórico preservado", "erro": str(error), "tentativa_em_utc": now.isoformat()}
             logging.warning("MDIC Brasil indisponível: %s", error)
         try:
-            incoming, receipt = collect_rma(existing_rows=datasets["viracopos"], now=now)
+            incoming, receipt = collect_rma(existing_rows=datasets["viracopos"], now=now, start_year=rma_start_year)
             datasets["viracopos"] = validate_rows("viracopos", incoming)
             metadata["viracopos"] = receipt
             source_statuses["viracopos"] = {"status": "ok", "competencia": incoming[-1]["mes"], "coletado_em_utc": receipt["coletado_em_utc"]}
@@ -212,6 +214,7 @@ def build(offline=False, root=ROOT):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--offline", action="store_true")
+    parser.add_argument("--rma-start-year", type=int, default=2025, help="Ano inicial para busca de RMA; use por exemplo 2021 em backfill explícito")
     args = parser.parse_args()
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
-    build(args.offline)
+    build(args.offline, rma_start_year=args.rma_start_year)

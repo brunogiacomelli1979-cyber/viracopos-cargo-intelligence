@@ -59,3 +59,16 @@ Falha de fonte preserva seu histórico e registra erro/competência. Recibos de 
 O pacote original está em `docs/archive/initial/`, com manifesto SHA-256 protegido por `.gitattributes`; a interface v1 permanece recuperável pelo histórico Git. `index_blue.html` mantém a URL antiga por redirecionamento.
 
 Regras permanentes: [`AGENTS.md`](AGENTS.md). Próximos passos: aprofundar a base ANAC com seu recorte próprio, ampliar séries históricas, testar revisões anteriores ao ano corrente e evoluir a análise com validação temporal. Não há previsões definitivas nesta versão. [Backlog](docs/backlog.md).
+
+
+## Ampliação controlada da série RMA (backfill)
+
+A atualização automática mantém por padrão os boletins a partir de 2025, evitando releituras desnecessárias. Para tentar incorporar boletins anteriores, executar em um ambiente Python configurado:
+
+```sh
+python scripts/atualizar.py --rma-start-year 2021
+python scripts/validar_dados.py
+python -m unittest discover -s tests -v
+```
+
+O parâmetro controla somente o ano inicial da busca de PDFs RMA. **Não garante** que a concessionária tenha publicado ou mantenha acessíveis os relatórios mais antigos. A coleta respeita TLS, não preenche lacunas e preserva dados anteriores quando uma fonte falha. A flag é de execução manual; o cron não muda. Antes de versionar uma ampliação, conferir metadados, competências e total de controles publicados.
