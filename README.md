@@ -1,85 +1,61 @@
-# Viracopos Cargo Intelligence · VCP Insights
+# VCP Insights · Viracopos Cargo Intelligence
 
-Observatório independente de carga aérea, comércio exterior e contexto econômico. Projeto de portfólio sem afiliação ou endosso institucional do Aeroporto de Viracopos.
+Observatório independente de movimentação de carga, comércio exterior e economia. **[Abrir o painel](https://brunogiacomelli1979-cyber.github.io/viracopos-cargo-intelligence/)** · [Execuções e atualização](https://github.com/brunogiacomelli1979-cyber/viracopos-cargo-intelligence/actions)
 
-**[Abrir o observatório](https://brunogiacomelli1979-cyber.github.io/viracopos-cargo-intelligence/)** · [Repositório](https://github.com/brunogiacomelli1979-cyber/viracopos-cargo-intelligence) · [Primeira atualização completa verificada](https://github.com/brunogiacomelli1979-cyber/viracopos-cargo-intelligence/actions/runs/40523186877)
+## Versão 2
 
-A variante azul aprovada é a interface principal: **`index.html`**. Mantém azul-escuro, branco, amarelo, navegação horizontal fixa e índice lateral no desktop. `index_blue.html` encaminha à principal. O pacote recebido está preservado byte a byte em [`docs/archive/initial/`](docs/archive/initial/), com manifesto SHA-256; não integra a publicação Pages.
+Interface profissional com fundo claro, azul-marinho e amarelo, indicadores na primeira tela e navegação por áreas. Filtros de competência e janela são preservados ao trocar de seção. Gráficos permitem apontar ou usar as setas do teclado; tabelas expansíveis oferecem os valores exatos apresentados. A lateral desktop mostra a cobertura de cada base. O projeto não possui vínculo ou endosso do aeroporto ou dos órgãos citados.
 
-## Estado dos dados
+## Dados reais incorporados em 27/10/2026
 
-| Base | Estado auditado | Tratamento |
+| Base | Cobertura | Fonte e recorte |
 |---|---|---|
-| Brasil / MDIC | Set/2026: exportações 34,4 e importações 26,7 US$ bilhões | Conferidos no [painel oficial MDIC](https://www.gov.br/mdic/pt-br/assuntos/comercio-exterior/estatisticas); arredondamento da divulgação mantido |
-| SBKP / ANAC | Sem observações | Integração pendente, sem volumes simulados |
-| Comex / URF | Sem observações | Validar URF, transporte e agrupamento antes de coletar |
-| Macro / BCB | Coletor SGS 432, 1 e 433 implementado | Disponibilidade por série em `data/fontes.json` e `data/dashboard.json`; falhas preservam histórico |
+| Carga de Viracopos | 20 meses: jan/2025–ago/2026 | RMA oficial da concessionária; carga internacional, doméstica e courier separado |
+| Comex de Viracopos | 21 meses: jan/2025–set/2026; 3.792 registros | Microdados MDIC, URF **0817700** e via **04 aérea**, importações/exportações por capítulo SH2 |
+| Comércio nacional | 21 meses: jan/2025–set/2026 | Soma nacional dos mesmos microdados, sem filtro de URF/via; conferida contra a publicação consolidada |
+| Economia | 57 meses: jan/2022–set/2026 | BCB/SGS: Selic, dólar de venda médio e IPCA |
 
-A primeira coleta local em 27/10/2026 obteve câmbio com falhas de Selic/IPCA; a segunda coletou as **três séries com sucesso: 57 competências (jan/2022–set/2026)**. O reprocessamento de câmbio revisou 13 meses sobrepostos sem apagar o histórico. O teste local não comprova o agendamento no GitHub; consulte os metadados atuais e a [auditoria](docs/auditoria.md).
+**A fonte de carga é o RMA da concessionária, não ANAC.** O relatório publica internacional como importações + exportações, sem separar embarque e desembarque. Courier permanece separado e não é automaticamente somado ao internacional. O antigo CSV vazio foi substituído por um contrato fiel a essa fonte.
 
-## Executar e atualizar
+Carga operacional, peso líquido aduaneiro e valor FOB não são equivalentes. A competência inicial do painel é a mais recente compartilhada entre as bases disponíveis: agosto/2026 na carga inicial. Cada indicador mantém sua referência explícita. Não há dados simulados nem interpolação para meses não publicados.
 
-Python >=3.11; Node >=22 para testes. Nenhum pacote externo precisa ser instalado. O site funciona por duplo clique, com o mesmo snapshot do JSON incorporado.
+Proveniência, unidades, tratamentos, limitações, URLs consultadas e hashes em [`data/fontes.json`](data/fontes.json). Consulte [fontes](docs/fontes.md), [indicadores](docs/indicadores.md), [método](docs/metodologia.md) e [evolução v2](docs/evolucao-v2.md).
+
+## Executar
+
+Python >=3.11, Node >=22 para testes e curl com TLS validado. `pypdf` extrai os relatórios oficiais. O front-end continua HTML/CSS/JavaScript puro, compatível com GitHub Pages e abertura direta do HTML.
 
 ```sh
+python -m pip install -r requirements.txt
+# Recompilar os CSVs existentes, sem acessar fontes:
 python scripts/atualizar.py --offline
-# Coletar BCB pela internet:
+# Coletar SGS, MDIC e RMA, com fallback independente:
 python scripts/atualizar.py
-# Verificações:
+# Verificar e preparar os arquivos públicos:
 python scripts/validar_dados.py
 python -m unittest discover -s tests -v
 node --test tests/dashboard.test.cjs
 node --check assets/app-blue.js
-# Montar somente arquivos publicáveis e servir prévia:
 python scripts/preparar_site.py
 python -m http.server 8000 --directory _site
 ```
 
-Abra `http://localhost:8000`. Fontes web e foto remota são opcionais; há fontes de sistema e ilustração SVG local. O modo offline apenas recompila, sem coletar dados novos.
+Edite `index.template.html`, assets ou dados e regenere. `index.html`/`dashboard.json` são saídas; CSS/JS recebem hashes na URL para evitar cache de versões anteriores. `_site/` contém somente os arquivos públicos necessários. `data/staging/` é ignorada pelo Git e excluída da publicação: não redistribuímos os grandes microdados anuais nem PDFs intermediários.
 
-## Consulta histórica
+## Atualização mensal
 
-**ATÉ** define a competência final; **JANELA** limita meses do calendário. KPIs, gráficos e setores seguem esse período e mostram suas próprias competências. Lacunas não são interpoladas; fluxo Comex ausente não vira zero. Pontos SVG têm valores ao passar o cursor, com tabelas expansíveis para teclado/leitores de tela. Há link para pular ao conteúdo, foco visível, menu móvel com Escape e navegação ativa.
+`atualizar.yml`: dia **13 às 10:17 UTC / 07:17 de Brasília**, configurável; execução manual disponível. Mudanças nos coletores ou dependências também executam a coleta para validar o fluxo alterado.
 
-## Estrutura e edição
+1. BCB: reconsulta sobreposta de 12 meses por indicador.
+2. MDIC: lê os arquivos EXP/IMP do ano do último mês encerrado em streaming, valida tabelas URF/via/SH2 e substitui integralmente os grupos mês×fluxo revisados. Preserva anos anteriores; revisões históricas mais antigas exigem backfill explícito.
+3. Brasil: consolida todas as linhas dos mesmos arquivos. Se o acesso aos microdados falhar, tenta a tabela mensal oficial com arredondamento documentado.
+4. RMA: descobre boletins anuais no índice oficial, seleciona a versão mais completa de cada ano, extrai e reconcilia colunas e totais.
+5. Valida CSVs, metadados, JSON e HTML; executa testes, versiona somente os dados validados e publica o SHA validado.
 
-```
-index.html                  # saída gerada
-index.template.html         # editar interface aqui
-index_blue.html             # URL antiga compatível
-assets/                     # CSS, JS e SVGs aprovados
-data/                       # CSVs, fontes.json e dashboard.json
-scripts/                    # atualizar, validar e preparar_site
-tests/                      # contratos Python e regressões JavaScript
-docs/                       # auditoria, método, fontes e backlog
-.github/workflows/           # atualizar.yml e pages.yml
-AGENTS.md                   # regras permanentes
-requirements.txt            # somente biblioteca padrão
-```
+Falha de fonte preserva seu histórico e registra erro/competência. Recibos de anos anteriores são preservados. A atualização não pressupõe que o último mês já tenha sido publicado. Logs ficam no Actions e no artefato `log-coleta` por 30 dias. A execução manual verificada da v1 está registrada na auditoria; a v2 amplia as fontes. O primeiro disparo agendado está previsto para 13/11/2026 e ainda não ocorreu.
 
-Edite CSVs/metadados, template ou assets e regenere. CSS/JS recebem versão SHA-256 na URL para evitar cache antigo após deploy; a validação confere essa versão. Não edite as saídas à mão. CSVs têm cabeçalho estrito; ausência macro é célula vazia e demais conjuntos omitem meses sem dados. Números usam ponto decimal sem separador de milhar. Chave Comex: mês × fluxo × setor; demais: mensal. Novas importações exigem fonte, coleta/conferência documentada, recorte e unidade. Veja [indicadores](docs/indicadores.md) e [metodologia](docs/metodologia.md).
+## Preservação e evolução
 
-## Publicação e rotina mensal
+O pacote original está em `docs/archive/initial/`, com manifesto SHA-256 protegido por `.gitattributes`; a interface v1 permanece recuperável pelo histórico Git. `index_blue.html` mantém a URL antiga por redirecionamento.
 
-`pages.yml` valida o snapshot, executa testes e publica somente `_site/`. Pull requests passam pelos checks sem publicar. `atualizar.yml` coleta BCB, testa, versiona as saídas e chama a publicação com o SHA validado. Assim não depende de um push do `GITHUB_TOKEN` para disparar outra Action.
-
-Agenda: **dia 13, 10:17 UTC / 07:17 em Brasília**, configurável no cron. Fontes podem atrasar; executar manualmente quando necessário. Reconsulta 12 meses anteriores à última competência por indicador, preservando o restante. Primeira carga desde janeiro do ano correspondente a quatro anos antes do último mês encerrado. Logs ficam na execução e no artefato `log-coleta` por 30 dias.
-
-Em 27/10/2026, o ciclo real disparado manualmente no Actions concluiu **coleta das três séries, 15 testes, commit automático `fcd101b` e publicação**. O primeiro disparo por cron está previsto para 13/11/2026 e ainda não ocorreu. A rotina automática cobre BCB; ANAC, Comex e Brasil permanecem sem coletor automático.
-
-Configuração de um repositório novo, depois do envio:
-
-1. **Settings → Pages → GitHub Actions**; verificar antes configuração existente/domínio.
-2. Executar **Validar e publicar Pages** para o snapshot atual.
-3. Executar **Atualizar indicadores mensais**, conferindo coleta, testes, commit e deploy.
-4. Considerar automação operacional apenas após execução real; conferir também cada fonte, pois fallback é permitido.
-
-Referência: [workflow oficial Pages](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages). Site e repositório públicos: não incluir dados internos ou segredos.
-
-## Fontes e evolução
-
-Fontes primárias em [`docs/fontes.md`](docs/fontes.md), proveniência estruturada em `data/fontes.json`. Toneladas de carga física, FOB e kg líquidos medem fenômenos diferentes. Brasil inclui outras vias e aeroportos. Não tratar correlação como causalidade nem prever demanda sem histórico suficiente e validação temporal.
-
-Fotografia remota de Mike Peel, [Wikimedia Commons / CC BY-SA 4.0](https://commons.wikimedia.org/wiki/File:Viracopos-Campinas_International_Airport_2017_003.jpg), atribuída na interface quando carregada. Não é redistribuída; `assets/terminal-art.svg` é o fallback do protótipo. Não reproduzimos marca/logotipo oficial.
-
-Próximas fases e critérios de aceite em [`docs/backlog.md`](docs/backlog.md).
+Regras permanentes: [`AGENTS.md`](AGENTS.md). Próximos passos: aprofundar a base ANAC com seu recorte próprio, ampliar séries históricas, testar revisões anteriores ao ano corrente e evoluir a análise com validação temporal. Não há previsões definitivas nesta versão. [Backlog](docs/backlog.md).

@@ -1,1 +1,2 @@
-# Python >= 3.11. Somente biblioteca padrão; nenhum pacote externo.
+# Python >= 3.11. Extração verificável dos relatórios oficiais de carga.
+pypdf==6.10.0

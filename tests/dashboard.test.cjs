@@ -27,3 +27,22 @@ test('all history still respects selected final competence',()=>{
   const run=calculations();
   assert.deepEqual(run("janela=Infinity;subset([{mes:'2000-01'},{mes:'2026-10'}])"),[{mes:'2000-01'}]);
 });
+test('default reference prefers a month shared by every available source',()=>{
+  const run=calculations();
+  assert.equal(run("defaultReferenceMonth({viracopos:[{mes:'2025-12'},{mes:'2026-01'}],comex:[{mes:'2025-12'},{mes:'2026-01'}],brasil:[{mes:'2025-12'}],macro:[{mes:'2025-12'},{mes:'2026-09'}]})"),'2025-12');
+});
+test('sparse national context cannot select an empty core airport month',()=>{
+  const run=calculations();
+  assert.equal(run("defaultReferenceMonth({viracopos:[{mes:'2025-12'}],comex:[{mes:'2025-12'},{mes:'2026-09'}],brasil:[{mes:'2026-09'}],macro:[{mes:'2026-09'}]})"),'2025-12');
+});
+test('published default period provides all four real headline indicators',()=>{
+  const snapshot=JSON.parse(fs.readFileSync('data/dashboard.json','utf8'));
+  let month='';
+  const context=vm.createContext({app:snapshot,document:{getElementById:()=>({value:month})}});
+  vm.runInContext(prefix+'\n'+aggregation,context);
+  month=vm.runInContext('defaultReferenceMonth(app)',context);
+  assert.ok(month,'a shared reference must be available');
+  for(const expression of ["subset(app.viracopos).at(-1)?.carga_internacional_t", "subset(seriesFromComex()).at(-1)?.importacao", "subset(seriesFromComex()).at(-1)?.exportacao", "subset(app.brasil).at(-1)?.exportacoes_usd_bi"]){
+    assert.ok(Number.isFinite(vm.runInContext(expression,context)),expression+' must not be an empty placeholder');
+  }
+});

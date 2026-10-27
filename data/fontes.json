@@ -1,50 +1,223 @@
 {
   "brasil": {
-    "fonte_original": "https://www.gov.br/mdic/pt-br/assuntos/comercio-exterior/estatisticas",
-    "coletado_em_utc": null,
+    "fonte_original": "https://www.gov.br/mdic/pt-br/assuntos/comercio-exterior/estatisticas/base-de-dados-bruta",
+    "coletado_em_utc": "2026-10-27T15:18:50.706829+00:00",
     "unidades": {
       "exportacoes_usd_bi": "US$ bilhões FOB",
       "importacoes_usd_bi": "US$ bilhões FOB"
     },
     "periodicidade": "mensal",
-    "abrangencia": "Brasil; todas as vias de transporte",
-    "tratamento": "Valores recebidos no protótipo, conferidos no painel oficial MDIC em 27/10/2026. Coleta original desconhecida; instante UTC de conferência documental registrado separadamente.",
-    "limitacoes": "Uma competência; valores arredondados a uma casa decimal. Não representam Viracopos. Importação manual.",
+    "abrangencia": "Brasil; todas as vias de transporte e URFs",
+    "tratamento": "Soma de VL_FOB de todas as linhas dos mesmos arquivos anuais EXP/IMP oficiais MDIC, sem filtro URF, via ou setor; divisão por 1 bilhão. Histórico preservado por mês. A tabela nacional consolidada é fallback se a leitura dos microdados falhar.",
+    "limitacoes": "Totais nacionais não representam Viracopos. Dados podem ser revisados. Fallback de publicação consolidada pode ter arredondamento de US$ 0,1 milhão.",
     "status": "validado",
-    "referencia_inicial": "2026-09",
-    "referencia_final": "2026-09",
-    "verificado_em_utc": "2026-10-27T14:20:30.022078+00:00"
+    "arquivos": [
+      {
+        "url": "https://balanca.mdic.gov.br/balanca/bd/comexstat-bd/ncm/EXP_2025.csv",
+        "sha256": "34571d3fb125db0423f4a0785e7b40c26c815a90ccfa9783e457a1c34a96b96c",
+        "bytes": 113715007,
+        "linhas_origem": 1709746,
+        "linhas_recorte": 209530,
+        "coletado_em_utc": "2026-10-27T15:18:05.598109+00:00",
+        "urf": 817700,
+        "via": 4,
+        "fluxo": "exportacao",
+        "referencia_inicial": "2025-01",
+        "referencia_final": "2025-12"
+      },
+      {
+        "url": "https://balanca.mdic.gov.br/balanca/bd/comexstat-bd/ncm/EXP_2026.csv",
+        "sha256": "40223cc6f9fcd6bc8eb1b7b80aac659768d26efde5286903009fdde96d4a401b",
+        "bytes": 84646313,
+        "linhas_origem": 1272295,
+        "linhas_recorte": 151772,
+        "coletado_em_utc": "2026-10-27T15:16:58.666961+00:00",
+        "urf": 817700,
+        "via": 4,
+        "fluxo": "exportacao",
+        "referencia_inicial": "2026-01",
+        "referencia_final": "2026-09"
+      },
+      {
+        "url": "https://balanca.mdic.gov.br/balanca/bd/comexstat-bd/ncm/IMP_2025.csv",
+        "sha256": "b2bca7c775bf361ddb9fb3f3807e05504e9d5f7dd163e0c7a3b93e59aa81628c",
+        "bytes": 175549886,
+        "linhas_origem": 2396286,
+        "linhas_recorte": 322920,
+        "coletado_em_utc": "2026-10-27T15:18:50.706829+00:00",
+        "urf": 817700,
+        "via": 4,
+        "fluxo": "importacao",
+        "referencia_inicial": "2025-01",
+        "referencia_final": "2025-12"
+      },
+      {
+        "url": "https://balanca.mdic.gov.br/balanca/bd/comexstat-bd/ncm/IMP_2026.csv",
+        "sha256": "4913ac98024dbf44b667a8e3e6cda487efb9c1a5dbbf31fb07f45cfd182ffa04",
+        "bytes": 136096406,
+        "linhas_origem": 1858461,
+        "linhas_recorte": 200949,
+        "coletado_em_utc": "2026-10-27T15:17:34.991702+00:00",
+        "urf": 817700,
+        "via": 4,
+        "fluxo": "importacao",
+        "referencia_inicial": "2026-01",
+        "referencia_final": "2026-09"
+      }
+    ],
+    "conferencia_consolidados": {
+      "url": "https://balanca.mdic.gov.br/balanca/publicacoes_dados_consolidados/pg.html",
+      "competencias_conferidas": 13,
+      "tolerancia_usd": 51000,
+      "verificado_em_utc": "2026-10-27T15:22:16+00:00"
+    },
+    "referencia_inicial": "2025-01",
+    "referencia_final": "2026-09"
   },
   "viracopos": {
-    "fonte_original": "https://www.gov.br/anac/pt-br/assuntos/dados-e-estatisticas",
-    "coletado_em_utc": null,
+    "fonte_original": "https://www.viracopos.com/pt_br/institucional/estatisticas-e-publicacoes.htm",
+    "fonte_nome": "Aeroportos Brasil Viracopos / RMA",
+    "coletado_em_utc": "2026-10-27T15:17:18.790246+00:00",
     "unidades": {
-      "embarque_internacional_t": "toneladas",
-      "desembarque_internacional_t": "toneladas"
+      "carga_internacional_t": "toneladas",
+      "carga_domestica_t": "toneladas",
+      "courier_internacional_t": "toneladas"
     },
     "periodicidade": "mensal",
-    "abrangencia": "Planejado: SBKP; carga aérea internacional embarcada/desembarcada",
-    "tratamento": "Coletor ainda não implementado. Validar dicionário ANAC e conversão de unidades antes de importar.",
-    "limitacoes": "Sem observações. Não representa carga aduaneira nem armazenagem.",
-    "status": "pendente",
-    "referencia_inicial": null,
-    "referencia_final": null
+    "abrangencia": "Aeroporto Internacional de Viracopos, movimentação de carga publicada pela concessionária",
+    "tratamento": "Página 1 dos RMA anuais: Movimentação de Cargas / INT* (importações + exportações), DOM e Movimentação de Cargas Courier / INT*. Números com ponto de milhar convertidos para toneladas inteiras. Courier mantido separado; meses não publicados omitidos.",
+    "limitacoes": "Fonte da concessionária, não série ANAC. Não permite separar embarque/desembarque nem importação/exportação. Toneladas inteiras publicadas; totais podem diferir por arredondamento. Não somar automaticamente courier à carga comum; o documento apresenta colunas distintas sem explicitar sobreposição. Dados sujeitos a atualização sem aviso prévio.",
+    "status": "validado",
+    "referencia_inicial": "2025-01",
+    "referencia_final": "2026-08",
+    "documentos": [
+      {
+        "url": "https://www.viracopos.com/data/files/13/F7/A2/6E/FA84C9101B0E52C9F01849A8/RMA%202025%20DEZ.pdf",
+        "sha256": "32e0da2d9e536a996507f9b34a7422632513eee1b2cbe37d69c2230a3ac33572",
+        "bytes": 271738,
+        "coletado_em_utc": "2026-10-27T15:17:18.790246+00:00",
+        "ano": 2025,
+        "pagina": 1,
+        "meses": 12,
+        "controle_publicado_t": {
+          "carga_domestica_t": 87064,
+          "carga_internacional_t": 184647,
+          "courier_internacional_t": 9705
+        }
+      },
+      {
+        "url": "https://www.viracopos.com/data/files/8C/12/E0/C6/265C0A10F5D2680AD41849A8/RMA%202026%20AGO.pdf",
+        "sha256": "2324a8b2fbd9d2a407f2c67475b6430f1b5a042ffef273b856f289cccf11af62",
+        "bytes": 369244,
+        "coletado_em_utc": "2026-10-27T15:17:18.790246+00:00",
+        "ano": 2026,
+        "pagina": 1,
+        "meses": 8,
+        "controle_publicado_t": {
+          "carga_domestica_t": 61357,
+          "carga_internacional_t": 133876,
+          "courier_internacional_t": 7542
+        }
+      }
+    ]
   },
   "comex": {
-    "fonte_original": "https://comexstat.mdic.gov.br/pt/geral",
-    "coletado_em_utc": null,
+    "fonte_original": "https://www.gov.br/mdic/pt-br/assuntos/comercio-exterior/estatisticas/base-de-dados-bruta",
+    "coletado_em_utc": "2026-10-27T15:18:50.706829+00:00",
     "unidades": {
       "valor_fob_usd": "US$ FOB",
       "kg_liquido": "kg líquidos"
     },
-    "periodicidade": "mensal × fluxo × setor",
-    "abrangencia": "Recorte URF de Viracopos ainda não validado",
-    "tratamento": "Coletor ainda não implementado. Definir URF, via de transporte e classificação setorial estável.",
-    "limitacoes": "Sem observações. URF não equivale automaticamente ao fluxo físico de SBKP.",
-    "recorte_validado": false,
-    "status": "pendente",
-    "referencia_inicial": null,
-    "referencia_final": null
+    "periodicidade": "mensal × fluxo × capítulo SH2",
+    "abrangencia": "URF 0817700 Aeroporto Internacional de Viracopos; via 04 aérea; importação/exportação",
+    "tratamento": "Soma exata de VL_FOB e KG_LIQUIDO dos CSVs NCM/MDIC por CO_ANO, CO_MES, fluxo e prefixo SH2. Filtros CO_URF=817700 e CO_VIA=4 validados nas tabelas oficiais. Reprocessa ano corrente; revisão substitui todo o grupo mês×fluxo e preserva histórico anterior.",
+    "limitacoes": "Recorte aduaneiro de URF de embarque/desembarque declarado e via aérea; não equivale à carga física ANAC/SBKP. Peso líquido não inclui embalagem nem peso volumétrico. Classificações NCM/SH e dados podem sofrer revisão.",
+    "status": "validado",
+    "recorte_validado": true,
+    "referencia_inicial": "2025-01",
+    "referencia_final": "2026-09",
+    "arquivos": [
+      {
+        "url": "https://balanca.mdic.gov.br/balanca/bd/comexstat-bd/ncm/EXP_2025.csv",
+        "sha256": "34571d3fb125db0423f4a0785e7b40c26c815a90ccfa9783e457a1c34a96b96c",
+        "bytes": 113715007,
+        "linhas_origem": 1709746,
+        "linhas_recorte": 209530,
+        "coletado_em_utc": "2026-10-27T15:18:05.598109+00:00",
+        "urf": 817700,
+        "via": 4,
+        "fluxo": "exportacao",
+        "referencia_inicial": "2025-01",
+        "referencia_final": "2025-12"
+      },
+      {
+        "url": "https://balanca.mdic.gov.br/balanca/bd/comexstat-bd/ncm/EXP_2026.csv",
+        "sha256": "40223cc6f9fcd6bc8eb1b7b80aac659768d26efde5286903009fdde96d4a401b",
+        "bytes": 84646313,
+        "linhas_origem": 1272295,
+        "linhas_recorte": 151772,
+        "coletado_em_utc": "2026-10-27T15:16:58.666961+00:00",
+        "urf": 817700,
+        "via": 4,
+        "fluxo": "exportacao",
+        "referencia_inicial": "2026-01",
+        "referencia_final": "2026-09"
+      },
+      {
+        "url": "https://balanca.mdic.gov.br/balanca/bd/comexstat-bd/ncm/IMP_2025.csv",
+        "sha256": "b2bca7c775bf361ddb9fb3f3807e05504e9d5f7dd163e0c7a3b93e59aa81628c",
+        "bytes": 175549886,
+        "linhas_origem": 2396286,
+        "linhas_recorte": 322920,
+        "coletado_em_utc": "2026-10-27T15:18:50.706829+00:00",
+        "urf": 817700,
+        "via": 4,
+        "fluxo": "importacao",
+        "referencia_inicial": "2025-01",
+        "referencia_final": "2025-12"
+      },
+      {
+        "url": "https://balanca.mdic.gov.br/balanca/bd/comexstat-bd/ncm/IMP_2026.csv",
+        "sha256": "4913ac98024dbf44b667a8e3e6cda487efb9c1a5dbbf31fb07f45cfd182ffa04",
+        "bytes": 136096406,
+        "linhas_origem": 1858461,
+        "linhas_recorte": 200949,
+        "coletado_em_utc": "2026-10-27T15:17:34.991702+00:00",
+        "urf": 817700,
+        "via": 4,
+        "fluxo": "importacao",
+        "referencia_inicial": "2026-01",
+        "referencia_final": "2026-09"
+      }
+    ],
+    "fontes_tabelas": [
+      {
+        "url": "https://balanca.mdic.gov.br/balanca/bd/tabelas/VIA.csv",
+        "sha256": "e8ab4418e369cefc80facd21f27e0bb9c6184974b01b36a85fa463a1affa7698",
+        "bytes": 369
+      },
+      {
+        "url": "https://balanca.mdic.gov.br/balanca/bd/tabelas/URF.csv",
+        "sha256": "1a20764b160cb8d75a659ae49aa69aedc1476c72b3f639dec1c4fa55accfc2bb",
+        "bytes": 10714
+      },
+      {
+        "url": "https://balanca.mdic.gov.br/balanca/bd/tabelas/NCM_SH.csv",
+        "sha256": "cd1758b2917ff24fde5fd892208765ae150098cfe1c7868fd82ab8354549e116",
+        "bytes": 7675822
+      }
+    ],
+    "recorte": {
+      "urf": {
+        "CO_URF": "0817700",
+        "NO_URF": "0817700 - AEROPORTO INTERNACIONAL DE VIRACOPOS"
+      },
+      "via": {
+        "CO_VIA": "04",
+        "NO_VIA": "AEREA"
+      },
+      "classificacao": "capítulo SH2; prefixo NCM com descrição oficial NCM_SH"
+    }
   },
   "macro": {
     "fonte_original": "https://api.bcb.gov.br/dados/serie/bcdata.sgs.{codigo}/dados",

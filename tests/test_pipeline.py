@@ -8,11 +8,42 @@ from pathlib import Path
 from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
-from atualizar import aggregate, collect, build
+from atualizar import aggregate, collect, build, merge_receipts
 from validar_dados import ROOT, validate_rows, validate_project
+from coletar_brasil import parse_brazil
 
 
 class PipelineTests(unittest.TestCase):
+    def test_receipts_keep_prior_year_and_replace_revised_url(self):
+        previous = [{'url':'https://example.org/2025.csv','sha256':'old-2025'}, {'url':'https://example.org/2026.csv','sha256':'old-2026'}]
+        result = merge_receipts(previous, [{'url':'https://example.org/2026.csv','sha256':'revised-2026'}])
+        self.assertEqual(result, [previous[0], {'url':'https://example.org/2026.csv','sha256':'revised-2026'}])
+
+    def test_online_failures_preserve_every_validated_dataset(self):
+        import shutil
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            for directory in ('data', 'assets'):
+                shutil.copytree(ROOT / directory, root / directory, ignore=shutil.ignore_patterns('staging'))
+            shutil.copy(ROOT / 'index.template.html', root / 'index.template.html')
+            before = json.loads((root/'data/dashboard.json').read_text(encoding='utf-8'))
+            def unchanged(rows, metadata, now):
+                return rows, {'status':'mock unavailable'}
+            with patch('atualizar.collect',side_effect=unchanged), patch('atualizar.collect_comex',side_effect=OSError('offline')), patch('atualizar.collect_brazil',side_effect=OSError('offline')), patch('atualizar.collect_rma',side_effect=OSError('offline')):
+                after = build(False, root)
+            for name in ('brasil','viracopos','comex','macro'):
+                self.assertEqual(after[name], before[name])
+            validate_project(root)
+
+    def test_mdic_monthly_units_and_totals(self):
+        html = '<table><tr><th>Data</th><th>Exportações</th><th>Importações</th><th>Saldo</th><th>Corrente</th></tr><tr><td>01/2020</td><td>10.000,0</td><td>3.000,0</td><td>7.000,0</td><td>13.000,0</td></tr></table>'.encode('utf-8')
+        self.assertEqual(parse_brazil(html), [{'mes':'2020-01', 'exportacoes_usd_bi':10.0, 'importacoes_usd_bi':3.0}])
+
+    def test_mdic_rejects_unreconciled_totals(self):
+        html = '<table><tr><th>Data</th><th>Exportações</th><th>Importações</th><th>Saldo</th><th>Corrente</th></tr><tr><td>01/2020</td><td>10,0</td><td>3,0</td><td>7,0</td><td>12,0</td></tr></table>'.encode('utf-8')
+        with self.assertRaisesRegex(ValueError, 'não reconciliam'):
+            parse_brazil(html)
+
     def test_html_links_assets_and_unique_ids(self):
         from html.parser import HTMLParser
         class PageParser(HTMLParser):

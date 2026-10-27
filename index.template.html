@@ -3,239 +3,65 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#0b2440">
-<meta name="description" content="Observatório independente de Viracopos com navegação fixa, visual institucional e leitura rápida dos indicadores logísticos.">
-<title>VCP Insights / Viracopos Cargo Intelligence</title>
+<meta name="theme-color" content="#102b4e">
+<meta name="description" content="Inteligência de carga aérea de Viracopos, comércio exterior e economia. Dados oficiais, séries históricas e fontes abertas em um observatório independente.">
+<title>VCP Insights — Inteligência de carga e comércio exterior</title>
 <link rel="stylesheet" href="assets/style-blue.css">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 </head>
-<body>
-<a class="skip-link" href="#visao-geral">Pular para o conteúdo</a>
-<noscript><p class="data-notice">Ative JavaScript para usar os filtros e gráficos. Os dados estão disponíveis nos arquivos CSV da pasta data.</p></noscript>
-<div class="top-ribbon"><span>VCP / SBKP · OBSERVATÓRIO INDEPENDENTE</span><span><i></i> competências mensais · cobertura em expansão</span></div>
-<header class="site-header" id="topo">
-  <div class="header-inner">
-    <a class="brand" href="#topo" aria-label="Ir para o topo">
-      <span class="brand-mark" aria-hidden="true"><b></b><b></b><b></b></span>
-      <span class="brand-text">VCP<span>/</span>INSIGHTS<small>CARGO INTELLIGENCE</small></span>
-    </a>
-    <nav id="main-nav" class="main-nav" aria-label="Navegação principal">
-      <a href="#visao-geral" class="nav-link active">Visão Geral</a>
-      <a href="#carga-aerea" class="nav-link">Carga Aérea</a>
-      <a href="#comex" class="nav-link">Comex</a>
-      <a href="#macroeconomia" class="nav-link">Macroeconomia</a>
-      <a href="#setores" class="nav-link">Setores</a>
-      <a href="#metodo" class="nav-link">Fontes</a>
-    </nav>
-    <div class="header-tools">
-      <a class="header-cta" href="#metodo">FONTES & MÉTODO</a>
-      <button class="mobile-toggle" aria-controls="main-nav" aria-label="Abrir menu" aria-expanded="false">☰</button>
-    </div>
-  </div>
+<body id="topo">
+<a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+<header class="site-header">
+  <a class="brand" href="#visao-geral" aria-label="VCP Insights, visão geral"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span><span>VCP<span class="brand-light">INSIGHTS</span><small>CARGO INTELLIGENCE</small></span></a>
+  <nav class="main-nav" id="main-nav" aria-label="Navegação principal">
+    <a class="nav-link active" href="#visao-geral" aria-current="page">Visão geral</a><a class="nav-link" href="#carga-aerea">Carga aérea</a><a class="nav-link" href="#comex">Comércio exterior</a><a class="nav-link" href="#macroeconomia">Economia</a><a class="nav-link" href="#setores">Setores</a><a class="nav-link" href="#metodo">Fontes</a>
+  </nav>
+  <div class="header-tools"><span class="independent"><i></i> Observatório independente</span><button class="mobile-toggle" aria-label="Abrir menu" aria-controls="main-nav" aria-expanded="false">☰</button></div>
 </header>
-
-<main class="page-shell">
-  <aside class="side-rail" aria-label="Índice rápido">
-    <div class="side-rail-card">
-      <p class="rail-title">NAVEGAÇÃO</p>
-      <a href="#visao-geral" class="rail-link active">01 · Visão Geral</a>
-      <a href="#carga-aerea" class="rail-link">02 · Carga Aérea</a>
-      <a href="#comex" class="rail-link">03 · Comex</a>
-      <a href="#macroeconomia" class="rail-link">04 · Macro</a>
-      <a href="#setores" class="rail-link">05 · Setores</a>
-      <a href="#metodo" class="rail-link">06 · Fontes</a>
-      <a href="#topo" class="rail-top">↑ voltar ao topo</a>
-    </div>
+<div class="workspace">
+  <aside class="side-rail" aria-label="Contexto e cobertura">
+    <div class="airport-id"><span class="airport-icon" aria-hidden="true">↗</span><div><strong>Viracopos</strong><span>Campinas, São Paulo</span></div><b>VCP</b></div>
+    <p class="aside-label">ABRANGÊNCIA</p><div class="scope-card"><span>CARGA AÉREA</span><strong>SBKP</strong><p>Movimentação do aeroporto<br>Internacional e doméstica</p></div>
+    <p class="aside-label">COBERTURA DAS BASES</p><div id="coverage-list" class="coverage-list"></div>
+    <div class="aside-bottom"><span class="aside-label">DADOS ABERTOS</span><p>Fontes oficiais.<br>Leitura independente.</p><a href="data/dashboard.json" download="vcp-insights.json">Baixar base completa <span aria-hidden="true">↓</span></a></div>
   </aside>
+  <main id="conteudo" class="content-area" tabindex="-1">
+    <div class="page-heading"><div><div class="breadcrumb">OBSERVATÓRIO <span>/</span> VIRACOPOS</div><h1 id="page-title">Visão geral</h1><p id="page-description">Carga aérea, comércio exterior e economia no mesmo horizonte.</p></div><div class="build-badge"><span class="status-dot"></span><div><strong id="status-chip">Dados oficiais</strong><small id="last-build">Carregando bases…</small></div></div></div>
+    <div class="filter-bar"><div class="filter-caption"><span aria-hidden="true">☷</span><strong>Período de análise</strong></div><div class="filter-fields"><label for="competencia">Até <select id="competencia"></select></label><label for="janela">Histórico <select id="janela"><option value="12">12 meses</option><option value="24">24 meses</option><option value="36">36 meses</option><option value="all">Todo o histórico</option></select></label></div><span id="period-summary" class="period-summary"></span></div>
+    <p id="data-status" class="sr-only" role="status" aria-live="polite"></p>
+    <noscript><p class="notice">Ative JavaScript para consultar os indicadores. As bases CSV e JSON estão disponíveis na pasta data.</p></noscript>
 
-  <div class="content-area">
-    <section class="hero-block section-anchor" id="visao-geral">
-      <div class="hero-copy">
-        <p class="eyebrow"><span class="eyebrow-line"></span> VIRACOPOS CARGO INTELLIGENCE</p>
-        <h1>Dados que ajudam a<br><span>ler o movimento</span><br>de Viracopos.</h1>
-        <p class="hero-text">Um observatório visual para acompanhar carga aérea, comércio exterior, macroeconomia e pistas para previsão de demanda logística.</p>
-        <div class="hero-actions">
-          <a href="#carga-aerea" class="btn-primary">VER INDICADORES</a>
-          <a href="#metodo" class="btn-secondary">COMO O PAINEL É MONTADO</a>
-        </div>
-        <div class="hero-mini-stats">
-          <div><strong id="hero-competencia">Última competência: —</strong><span>base consolidada</span></div>
-          <div><strong id="status-chip">● Painel em implantação</strong><span>cobertura em expansão</span></div>
-        </div>
-      </div>
-      <div class="hero-panel">
-        <div class="hero-visual">
-          <div class="hero-photo"></div>
-          <div class="hero-grid"></div>
-          <div class="hero-overlay-tag">VCP / SBKP</div>
-          <div class="hero-overlay-code">CARGO</div>
-        </div>
-        <div class="hero-caption">
-          <span>Observatório independente inspirado na linguagem institucional do ecossistema aeroportuário</span>
-          <a id="hero-credit" href="https://commons.wikimedia.org/wiki/File:Viracopos-Campinas_International_Airport_2017_003.jpg" target="_blank" rel="noopener">Ilustração autoral · fotografia de referência ↗</a>
-        </div>
-      </div>
-    </section>
-
-    <section class="kpi-section section-anchor">
-      <div class="section-head compact">
-        <div>
-          <p class="section-kicker">PANORAMA DO MÊS</p>
-          <h2>Leitura rápida do cenário atual</h2>
-        </div>
-        <div class="period-picker compact-picker">
-          <label for="competencia">ATÉ</label><select id="competencia"></select>
-          <label for="janela">JANELA</label>
-          <select id="janela"><option value="12">12 meses</option><option value="24">24 meses</option><option value="36">36 meses</option><option value="all">Todo o histórico</option></select>
-        </div>
-      </div>
-      <p id="data-status" class="sr-only" role="status" aria-live="polite"></p>
+    <section class="view active" id="visao-geral" aria-label="Visão geral">
       <div class="kpi-grid">
-        <article class="kpi-card accent"><span class="kpi-label">Carga internacional</span><strong id="kpi-carga">—</strong><small>toneladas</small><p id="kpi-carga-mes">Aguardando dados ANAC</p></article>
-        <article class="kpi-card"><span class="kpi-label">Importação · URF</span><strong id="kpi-imp">—</strong><small>US$ mi</small><p id="kpi-imp-mes">Aguardando dados MDIC</p></article>
-        <article class="kpi-card"><span class="kpi-label">Exportação · URF</span><strong id="kpi-exp">—</strong><small>US$ mi</small><p id="kpi-exp-mes">Aguardando dados MDIC</p></article>
-        <article class="kpi-card"><span class="kpi-label">Brasil · corrente de comércio</span><strong id="kpi-brasil">—</strong><small>US$ bi</small><p id="kpi-brasil-mes">Aguardando dados MDIC</p></article>
+        <article class="kpi-card featured"><div class="kpi-label">Carga aérea internacional <span aria-hidden="true">↗</span></div><div class="kpi-number"><strong id="kpi-carga">—</strong><span>t</span></div><p id="kpi-carga-mes">Carregando carga aérea</p><div id="kpi-carga-delta" class="kpi-delta"></div></article>
+        <article class="kpi-card"><div class="kpi-label">Importações · Viracopos <span aria-hidden="true">↙</span></div><div class="kpi-number"><strong id="kpi-imp">—</strong><span>US$ mi</span></div><p id="kpi-imp-mes">Carregando Comex</p><div id="kpi-imp-delta" class="kpi-delta"></div></article>
+        <article class="kpi-card"><div class="kpi-label">Exportações · Viracopos <span aria-hidden="true">↗</span></div><div class="kpi-number"><strong id="kpi-exp">—</strong><span>US$ mi</span></div><p id="kpi-exp-mes">Carregando Comex</p><div id="kpi-exp-delta" class="kpi-delta"></div></article>
+        <article class="kpi-card"><div class="kpi-label">Corrente de comércio · Brasil <span aria-hidden="true">⇄</span></div><div class="kpi-number"><strong id="kpi-brasil">—</strong><span>US$ bi</span></div><p id="kpi-brasil-mes">Carregando MDIC</p><div id="kpi-brasil-delta" class="kpi-delta"></div></article>
       </div>
+      <div class="dashboard-grid"><article class="panel panel-wide"><div class="panel-heading"><div><span class="eyebrow">MOVIMENTAÇÃO DO AEROPORTO · RMA</span><h2>Carga internacional e doméstica</h2><p>Volumes mensais publicados pela concessionária, em toneladas</p></div><a class="text-link" href="#carga-aerea">Explorar série ↗</a></div><div class="legend"><span><i class="swatch blue"></i>Internacional</span><span><i class="swatch gold"></i>Doméstica</span></div><div id="grafico-overview" class="chart" aria-label="Carga internacional e doméstica mensal de Viracopos"></div><p class="panel-footnote">RMA da concessionária. Courier é consultado separadamente; o recorte aduaneiro tem outra abrangência.</p></article>
+      <article class="panel"><div class="panel-heading"><div><span class="eyebrow">COMÉRCIO EXTERIOR · URF</span><h2>Composição do fluxo</h2><p id="trade-month">Última competência disponível</p></div></div><div id="trade-composition"></div><div class="context-note">Valor FOB em US$ milhões. Não representa receita aeroportuária nem volume físico da ANAC.</div><a class="text-link" href="#comex">Analisar comércio exterior ↗</a></article></div>
+      <div class="dashboard-grid lower-grid"><article class="panel panel-wide"><div class="panel-heading"><div><span class="eyebrow">CONTEXTO ECONÔMICO · BRASIL</span><h2>Indicadores que acompanham o mercado</h2></div><a class="text-link" href="#macroeconomia">Ver histórico ↗</a></div><div id="macro-overview" class="macro-overview"></div></article><article class="panel"><div class="panel-heading"><div><span class="eyebrow">IMPORTAÇÕES · VALOR FOB</span><h2>Principais setores</h2><p id="sector-overview-month"></p></div></div><div id="sector-overview" class="sector-bars"></div><a class="text-link" href="#setores">Abrir análise setorial ↗</a></article></div>
     </section>
 
-    <section class="data-section section-anchor" id="carga-aerea">
-      <div class="section-head">
-        <div>
-          <p class="section-kicker">01 · CARGA AÉREA</p>
-          <h2>O pulso operacional do terminal</h2>
-        </div>
-        <p>Volumes embarcados e desembarcados mostram a dinâmica física do aeroporto — sem confundir tonelagem com valor FOB.</p>
-      </div>
-      <div class="panel-grid two-cols">
-        <article class="panel-card chart-card">
-          <div class="card-head">
-            <div><span class="card-tag">ANAC / série histórica</span><h3>Movimentação internacional</h3><p>Embarque e desembarque mensal em Viracopos</p></div>
-            <span class="card-unit">toneladas / mês</span>
-          </div>
-          <div class="legend"><span><i class="swatch teal"></i> Desembarque</span><span><i class="swatch yellow"></i> Embarque</span></div>
-          <div id="grafico-carga" class="chart" aria-label="Gráfico de carga aérea"></div>
-          <div class="card-note">Leitura recomendada: comparar mesmo mês entre anos antes de concluir se há alta ou queda estrutural.</div>
-        </article>
-        <article class="panel-card insight-card">
-          <span class="insight-tag">INTERPRETAÇÃO</span>
-          <h3>Como ler esta seção</h3>
-          <ul>
-            <li><strong>Sazonalidade:</strong> alguns picos podem ser recorrentes.</li>
-            <li><strong>Persistência:</strong> é preciso verificar se o movimento se mantém por vários meses.</li>
-            <li><strong>Contexto:</strong> variações podem dialogar com câmbio, indústria e comércio exterior.</li>
-          </ul>
-          <div class="insight-box">Este painel foi desenhado para consulta rápida: os atalhos no topo e na lateral evitam rolagem excessiva.</div>
-        </article>
-      </div>
+    <section class="view" id="carga-aerea" aria-label="Carga aérea" hidden>
+      <div id="cargo-summary" class="mini-kpis"></div><article class="panel"><div class="panel-heading"><div><span class="eyebrow">SÉRIE HISTÓRICA · RMA VIRACOPOS</span><h2>Movimentação de cargas</h2><p>Volumes internacionais e domésticos, em toneladas por mês</p></div></div><div class="legend"><span><i class="swatch blue"></i>Internacional</span><span><i class="swatch gold"></i>Doméstica</span></div><div id="grafico-carga" class="chart chart-large" aria-label="Gráfico de carga internacional e doméstica"></div><p id="cargo-scope" class="panel-footnote">Consulte o recorte e as unidades em Fontes.</p></article>
     </section>
-
-    <section class="data-section section-anchor" id="comex">
-      <div class="section-head">
-        <div>
-          <p class="section-kicker">02 · COMÉRCIO EXTERIOR</p>
-          <h2>Valor negociado e contexto do fluxo</h2>
-        </div>
-        <p>Os gráficos abaixo ajudam a cruzar a atividade do terminal com o comportamento do comércio exterior brasileiro e do recorte aduaneiro.</p>
-      </div>
-      <div class="panel-grid two-even">
-        <article class="panel-card chart-card">
-          <div class="card-head">
-            <div><span class="card-tag">MDIC / recorte aduaneiro</span><h3>Importação × exportação</h3><p>Valor FOB mensal do recorte validado</p></div>
-            <span class="card-unit">US$ milhões</span>
-          </div>
-          <div class="legend"><span><i class="swatch teal"></i> Importação</span><span><i class="swatch yellow"></i> Exportação</span></div>
-          <div id="grafico-comex" class="chart" aria-label="Gráfico de comércio exterior por recorte aduaneiro"></div>
-          <div class="card-note">Recorte de URF não mede diretamente a operação física do aeroporto.</div>
-        </article>
-        <article class="panel-card chart-card">
-          <div class="card-head">
-            <div><span class="card-tag">MDIC / Brasil</span><h3>Fluxo nacional de comércio</h3><p>Importações e exportações brasileiras por mês</p></div>
-            <span class="card-unit">US$ bilhões</span>
-          </div>
-          <div class="legend"><span><i class="swatch teal"></i> Exportação</span><span><i class="swatch yellow"></i> Importação</span></div>
-          <div id="grafico-brasil" class="chart" aria-label="Gráfico de comércio exterior nacional"></div>
-          <div class="card-note">Indicador contextual nacional, útil para leitura macro da demanda.</div>
-        </article>
-      </div>
+    <section class="view" id="comex" aria-label="Comércio exterior" hidden>
+      <article class="panel"><div class="panel-heading"><div><span class="eyebrow">VIRACOPOS · RECORTE ADUANEIRO</span><h2>Importação e exportação</h2><p>Valor FOB mensal, em US$ milhões</p></div></div><div class="legend"><span><i class="swatch blue"></i>Importação</span><span><i class="swatch gold"></i>Exportação</span></div><div id="grafico-comex" class="chart" aria-label="Comércio exterior do recorte aduaneiro de Viracopos"></div><p class="panel-footnote">Registros aduaneiros filtrados pelo recorte informado em Fontes. Peso líquido e FOB não equivalem à carga física da ANAC.</p></article>
+      <article class="panel"><div class="panel-heading"><div><span class="eyebrow">CONTEXTO NACIONAL · TODAS AS VIAS</span><h2>Comércio exterior brasileiro</h2><p>Exportações e importações mensais, em US$ bilhões FOB</p></div></div><div class="legend"><span><i class="swatch blue"></i>Exportação</span><span><i class="swatch gold"></i>Importação</span></div><div id="grafico-brasil" class="chart" aria-label="Comércio exterior nacional"></div></article>
     </section>
-
-    <section class="data-section section-anchor" id="macroeconomia">
-      <div class="section-head">
-        <div>
-          <p class="section-kicker">03 · MACROECONOMIA</p>
-          <h2>Variáveis que podem antecipar movimento</h2>
-        </div>
-        <p>Juros, dólar e inflação afetam decisão econômica e podem servir de sinal antecedente quando analisados com cuidado.</p>
-      </div>
-      <article class="panel-card macro-card">
-        <div class="card-head macro-head">
-          <div><span class="card-tag">BANCO CENTRAL / SGS</span><h3 id="macro-title">Evolução da taxa Selic</h3><p id="macro-desc">Meta Selic no último dia do mês</p></div>
-          <div class="segment" role="group" aria-label="Escolher indicador econômico">
-            <button class="seg active" data-metric="selic_meta_pct_aa" aria-pressed="true">SELIC</button>
-            <button class="seg" data-metric="dolar_venda_medio_brl" aria-pressed="false">DÓLAR</button>
-            <button class="seg" data-metric="ipca_pct_mes" aria-pressed="false">IPCA</button>
-          </div>
-        </div>
-        <div class="macro-reading"><strong id="macro-valor">—</strong><span id="macro-meta">Aguardando sincronização da API do BCB</span></div>
-        <div id="grafico-macro" class="chart chart-macro" aria-label="Gráfico do indicador macroeconômico"></div>
-      </article>
+    <section class="view" id="macroeconomia" aria-label="Macroeconomia" hidden>
+      <article class="panel"><div class="panel-heading"><div><span class="eyebrow">BANCO CENTRAL · SGS</span><h2 id="macro-title">Taxa Selic</h2><p id="macro-desc">Meta no último registro do mês</p></div><div class="segment" role="group" aria-label="Escolher indicador econômico"><button data-metric="selic_meta_pct_aa" aria-pressed="true" class="active">Selic</button><button data-metric="dolar_venda_medio_brl" aria-pressed="false">Dólar</button><button data-metric="ipca_pct_mes" aria-pressed="false">IPCA</button></div></div><div class="macro-reading"><strong id="macro-valor">—</strong><span id="macro-meta"></span></div><div id="grafico-macro" class="chart chart-large" aria-label="Série do indicador macroeconômico selecionado"></div><p class="panel-footnote">Indicadores nacionais para contexto econômico. Associação temporal não demonstra causalidade sobre a demanda de Viracopos.</p></article>
     </section>
-
-    <section class="data-section section-anchor" id="setores">
-      <div class="section-head">
-        <div>
-          <p class="section-kicker">04 · LEITURA SETORIAL</p>
-          <h2>Quais grupos puxam o comércio</h2>
-        </div>
-        <p>A abertura por setor ajuda a identificar mudanças de composição e pode orientar hipóteses sobre a natureza da demanda.</p>
-      </div>
-      <article class="panel-card table-card">
-        <div class="card-head">
-          <div><span class="card-tag">COMEX STAT / agrupamentos</span><h3>Participação por setor</h3><p>Valor FOB, peso líquido e participação do fluxo selecionado</p></div>
-          <div class="flow-picker"><label for="fluxo">FLUXO</label><select id="fluxo"><option value="importacao">Importação</option><option value="exportacao">Exportação</option></select></div>
-        </div>
-        <div class="table-scroll"><table><thead><tr><th>SETOR / AGRUPAMENTO</th><th>COMPETÊNCIA</th><th class="numeric">VALOR FOB</th><th class="numeric">PESO LÍQUIDO</th><th class="numeric">PARTICIPAÇÃO</th></tr></thead><tbody id="tabela-setores"><tr><td colspan="5">Aguardando arquivo de comércio exterior por setor.</td></tr></tbody></table></div>
-      </article>
+    <section class="view" id="setores" aria-label="Setores" hidden>
+      <article class="panel"><div class="panel-heading"><div><span class="eyebrow">COMEX · COMPOSIÇÃO SETORIAL</span><h2>Participação por setor</h2><p id="sector-table-description">Última competência do fluxo no período selecionado</p></div><label class="flow-picker" for="fluxo">Fluxo <select id="fluxo"><option value="importacao">Importação</option><option value="exportacao">Exportação</option></select></label></div><div id="sector-detail-bars" class="sector-bars detail-bars"></div><div class="table-scroll"><table><caption class="sr-only">Valor FOB, peso líquido e participação por setor</caption><thead><tr><th scope="col">Setor / agrupamento</th><th scope="col">Competência</th><th scope="col" class="numeric">Valor FOB</th><th scope="col" class="numeric">Peso líquido</th><th scope="col" class="numeric">Participação</th></tr></thead><tbody id="tabela-setores"></tbody></table></div><p class="panel-footnote">Peso líquido aduaneiro convertido de kg para toneladas. A participação considera o total dos setores do fluxo na competência indicada.</p></article>
     </section>
-
-    <section class="data-section section-anchor" id="metodo">
-      <div class="section-head">
-        <div>
-          <p class="section-kicker">05 · FONTES E CONTINUIDADE</p>
-          <h2>Transparência metodológica</h2>
-        </div>
-        <p>O projeto explicita o que já está automatizado, o que ainda aguarda integração e como cada indicador deve ser interpretado.</p>
-      </div>
-      <div class="panel-grid two-even">
-        <article class="panel-card source-card">
-          <span class="insight-tag">FONTES PÚBLICAS</span>
-          <h3>Base verificável</h3>
-          <p>Sem números ilustrativos. Somente dados públicos e documentados entram no painel.</p>
-          <div class="source-links">
-            <a href="https://www.gov.br/mdic/pt-br/assuntos/comercio-exterior/estatisticas/base-de-dados-bruta" target="_blank" rel="noopener">MDIC · Comex Stat ↗</a>
-            <a href="https://www.anac.gov.br/acesso-a-informacao/dados-abertos/areas-de-atuacao/operador-aeroportuario/dados-de-movimentacao-aeroportuaria/60-dados-de-movimentacao-aeroportuaria" target="_blank" rel="noopener">ANAC · Movimentação aeroportuária ↗</a>
-            <a href="https://dadosabertos.bcb.gov.br/" target="_blank" rel="noopener">Banco Central · SGS ↗</a>
-          </div>
-        </article>
-        <article class="panel-card update-card">
-          <span class="insight-tag">ROTINA DE ATUALIZAÇÃO</span>
-          <h3>Coleta e cobertura das séries</h3>
-          <p>A coleta econômica consulta o BCB. As séries ANAC e Comex de Viracopos aguardam integração. A competência e a disponibilidade de cada base estão abaixo.</p>
-          <div id="source-status" class="source-status"></div>
-          <div class="steps"><div><b>1</b><span>coletar</span></div><div><b>2</b><span>validar</span></div><div><b>3</b><span>publicar</span></div></div>
-          <p class="build-time" id="last-build">Compilação: —</p>
-        </article>
-      </div>
+    <section class="view" id="metodo" aria-label="Fontes e método" hidden>
+      <div class="source-intro"><span class="status-dot"></span><p>Observatório independente com dados públicos oficiais. Cada base preserva sua competência, unidade e abrangência.</p></div><div id="source-status" class="source-grid"></div><article class="panel method-panel"><h2>Como interpretar as bases</h2><div class="method-grid"><div><h3>Movimentação de carga</h3><p>Volumes internacionais e domésticos publicados no RMA de Viracopos. O relatório reúne importações e exportações; não fornece sentidos de embarque/desembarque. Courier é mantido separado.</p></div><div><h3>Comércio exterior</h3><p>Valor FOB e peso líquido de registros aduaneiros. URF e via de transporte são filtros próprios e não equivalem ao recorte operacional do RMA.</p></div><div><h3>Economia</h3><p>Séries nacionais do Banco Central. Meses sem observações não são interpolados; dados anteriores permanecem disponíveis em caso de falha.</p></div></div><p class="panel-footnote">Atualização mensal. Consulte o histórico de execução e a metodologia no repositório.</p><a class="text-link" href="https://github.com/brunogiacomelli1979-cyber/viracopos-cargo-intelligence" target="_blank" rel="noopener">Código, metodologia e histórico ↗</a></article>
     </section>
-
-    <footer class="site-footer">
-      <div class="footer-brand">VCP<span>/</span>INSIGHTS<small>OBSERVATÓRIO INDEPENDENTE DE CARGAS</small></div>
-      <p>Projeto independente, sem vínculo institucional ou endosso da concessionária Aeroportos Brasil Viracopos.</p>
-      <a href="#topo">voltar ao topo ↑</a>
-    </footer>
-  </div>
-</main>
-
+    <footer class="site-footer"><span><strong>VCP Insights</strong> · Inteligência com dados abertos</span><span>Projeto independente, sem vínculo ou endosso do Aeroporto de Viracopos.</span></footer>
+  </main>
+</div>
 <script type="application/json" id="dados-incorporados">{{DASHBOARD_JSON}}</script>
 <script src="assets/app-blue.js" defer></script>
 </body>

@@ -10,7 +10,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMAS = {
     "brasil": ["mes", "exportacoes_usd_bi", "importacoes_usd_bi"],
-    "viracopos": ["mes", "embarque_internacional_t", "desembarque_internacional_t"],
+    "viracopos": ["mes", "carga_internacional_t", "carga_domestica_t", "courier_internacional_t"],
     "comex": ["mes", "fluxo", "setor", "valor_fob_usd", "kg_liquido"],
     "macro": ["mes", "selic_meta_pct_aa", "dolar_venda_medio_brl", "ipca_pct_mes"],
 }

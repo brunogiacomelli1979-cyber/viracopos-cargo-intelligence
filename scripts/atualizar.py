@@ -1,4 +1,4 @@
-"""Coleta SGS incremental com sobreposição de 12 meses e fallback por série."""
+"""Consolidação de SGS, microdados MDIC e relatórios RMA, com histórico e fallback."""
 import argparse
 import csv
 import hashlib
@@ -9,11 +9,34 @@ import os
 import tempfile
 from datetime import date, datetime, timedelta, timezone
 from urllib.parse import urlencode
-from urllib.request import Request, urlopen
 
 from validar_dados import ROOT, SCHEMAS, read_csv, validate_metadata, validate_rows
+from coletar_brasil import collect_brazil
+from coletar_carga_vcp import collect_rma
+from coletar_comex import collect_comex
+from fontes_http import get_bytes
 
 SERIES = {"selic_meta_pct_aa": 432, "dolar_venda_medio_brl": 1, "ipca_pct_mes": 433}
+
+
+def merge_receipts(previous, incoming):
+    documents = {item["url"]: item for item in previous}
+    documents.update({item["url"]: item for item in incoming})
+    return [documents[url] for url in sorted(documents)]
+
+
+def brazil_raw_metadata(comex_metadata, previous=None):
+    previous = previous or {}
+    return {
+        "fonte_original": comex_metadata["fonte_original"],
+        "coletado_em_utc": comex_metadata["coletado_em_utc"],
+        "unidades": {"exportacoes_usd_bi": "US$ bilhões FOB", "importacoes_usd_bi": "US$ bilhões FOB"},
+        "periodicidade": "mensal", "abrangencia": "Brasil; todas as vias de transporte e URFs",
+        "tratamento": "Soma de VL_FOB de todas as linhas dos mesmos arquivos anuais EXP/IMP oficiais MDIC, sem filtro URF, via ou setor; divisão por 1 bilhão. Histórico preservado por mês. A tabela nacional consolidada é fallback se a leitura dos microdados falhar.",
+        "limitacoes": "Totais nacionais não representam Viracopos. Dados podem ser revisados. Fallback de publicação consolidada pode ter arredondamento de US$ 0,1 milhão.",
+        "status": "validado",
+        "arquivos": merge_receipts(previous.get("arquivos", []), comex_metadata.get("arquivos", [])),
+    }
 
 
 def atomic_write(path, content):
@@ -31,9 +54,7 @@ def atomic_write(path, content):
 def fetch_series(code, start, end):
     query = urlencode({"formato": "json", "dataInicial": start.strftime("%d/%m/%Y"), "dataFinal": end.strftime("%d/%m/%Y")})
     url = f"https://api.bcb.gov.br/dados/serie/bcdata.sgs.{code}/dados?{query}"
-    request = Request(url, headers={"User-Agent": "VCP-Insights/1.1 (public research)"})
-    with urlopen(request, timeout=30) as response:
-        raw = response.read()
+    raw = get_bytes(url, timeout=30)
     data = json.loads(raw)
     if not isinstance(data, list) or not data:
         raise ValueError("SGS sem observações")
@@ -98,13 +119,57 @@ def build(offline=False, root=ROOT):
     previous_path = root / "data/dashboard.json"
     previous_snapshot = json.loads(previous_path.read_text(encoding="utf-8")) if previous_path.exists() else {}
     statuses = previous_snapshot.get("coleta_bcb", {"status": "não executada"})
+    source_statuses = previous_snapshot.get("coleta_fontes", {})
     if not offline:
         datasets["macro"], statuses = collect(datasets["macro"], metadata, now)
+        national_updated = False
+        try:
+            incoming, receipt = collect_comex(existing_rows=datasets["comex"], now=now)
+            national = validate_rows("brasil", receipt.pop("_brasil_rows"))
+            if not national:
+                raise ValueError("MDIC sem competência nacional comum aos dois fluxos")
+            incoming = validate_rows("comex", incoming)
+            receipt["arquivos"] = merge_receipts(metadata["comex"].get("arquivos", metadata["comex"].get("documentos", [])), receipt.get("arquivos", []))
+            months = {row["mes"]: row for row in datasets["brasil"]}
+            months.update({row["mes"]: row for row in national})
+            datasets["brasil"] = validate_rows("brasil", list(months.values()))
+            datasets["comex"] = incoming
+            metadata["comex"] = receipt
+            metadata["brasil"] = brazil_raw_metadata(receipt, metadata["brasil"])
+            for name in ("comex", "brasil"):
+                source_statuses[name] = {"status": "ok", "competencia": datasets[name][-1]["mes"], "coletado_em_utc": receipt["coletado_em_utc"]}
+            national_updated = True
+            logging.info("MDIC Comex: %s linhas e Brasil: %s meses", len(incoming), len(national))
+        except Exception as error:
+            source_statuses["comex"] = {"status": "falha; histórico preservado", "erro": str(error), "tentativa_em_utc": now.isoformat()}
+            logging.warning("MDIC Comex indisponível: %s", error)
+        try:
+            if not national_updated:
+                incoming, receipt = collect_brazil()
+                months = {row["mes"]: row for row in datasets["brasil"]}
+                months.update({row["mes"]: row for row in incoming})
+                datasets["brasil"] = validate_rows("brasil", list(months.values()))
+                receipt["arquivos"] = metadata["brasil"].get("arquivos", [])
+                metadata["brasil"] = receipt
+                source_statuses["brasil"] = {"status": "ok (fallback consolidado)", "competencia": incoming[-1]["mes"], "coletado_em_utc": receipt["coletado_em_utc"]}
+                logging.info("MDIC Brasil (fallback): %s meses, última competência %s", len(incoming), incoming[-1]["mes"])
+        except Exception as error:
+            source_statuses["brasil"] = {"status": "falha; histórico preservado", "erro": str(error), "tentativa_em_utc": now.isoformat()}
+            logging.warning("MDIC Brasil indisponível: %s", error)
+        try:
+            incoming, receipt = collect_rma(existing_rows=datasets["viracopos"], now=now)
+            datasets["viracopos"] = validate_rows("viracopos", incoming)
+            metadata["viracopos"] = receipt
+            source_statuses["viracopos"] = {"status": "ok", "competencia": incoming[-1]["mes"], "coletado_em_utc": receipt["coletado_em_utc"]}
+            logging.info("RMA Viracopos: %s meses, última competência %s", len(incoming), incoming[-1]["mes"])
+        except Exception as error:
+            source_statuses["viracopos"] = {"status": "falha; histórico preservado", "erro": str(error), "tentativa_em_utc": now.isoformat()}
+            logging.warning("RMA Viracopos indisponível: %s", error)
     validate_metadata(metadata, datasets)
     for name, rows in datasets.items():
         metadata[name]["referencia_inicial"] = rows[0]["mes"] if rows else None
         metadata[name]["referencia_final"] = rows[-1]["mes"] if rows else None
-    snapshot = {"versao": "1.1.0", "gerado_em_utc": now.isoformat(), "modo_compilacao": "offline" if offline else "online", "contexto": "Carga física, valor FOB e peso líquido têm coberturas distintas.", "coleta_bcb": statuses, "metadados": metadata, **datasets}
+    snapshot = {"versao": "2.0.0", "gerado_em_utc": now.isoformat(), "modo_compilacao": "offline" if offline else "online", "contexto": "Carga física, valor FOB e peso líquido têm coberturas distintas.", "coleta_bcb": statuses, "coleta_fontes": source_statuses, "metadados": metadata, **datasets}
     compact = json.dumps(snapshot, ensure_ascii=False, allow_nan=False, separators=(",", ":")).replace("<", "\\u003c")
     template = (root / "index.template.html").read_text(encoding="utf-8")
     if template.count("{{DASHBOARD_JSON}}") != 1:
@@ -115,11 +180,13 @@ def build(offline=False, root=ROOT):
         html = html.replace(f'"{asset}"', f'"{asset}?v={version}"')
     # Validate everything before replacing outputs. Each individual replacement is atomic.
     if not offline:
-        stream = io.StringIO(newline="")
-        writer = csv.DictWriter(stream, fieldnames=SCHEMAS["macro"], lineterminator="\n")
-        writer.writeheader()
-        writer.writerows(datasets["macro"])
-        atomic_write(root / "data/macro.csv", stream.getvalue())
+        for name, rows in datasets.items():
+            stream = io.StringIO(newline="")
+            writer = csv.DictWriter(stream, fieldnames=SCHEMAS[name], lineterminator="\n")
+            writer.writeheader()
+            writer.writerows(rows)
+            filename = "comex_viracopos" if name == "comex" else name
+            atomic_write(root / "data" / f"{filename}.csv", stream.getvalue())
     atomic_write(root / "data/fontes.json", json.dumps(metadata, ensure_ascii=False, indent=2) + "\n")
     atomic_write(root / "data/dashboard.json", json.dumps(snapshot, ensure_ascii=False, indent=2, allow_nan=False) + "\n")
     atomic_write(root / "index.html", html)
