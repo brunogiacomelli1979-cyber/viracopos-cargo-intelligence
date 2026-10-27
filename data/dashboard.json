@@ -1,13 +1,13 @@
 {
   "versao": "2.0.0",
-  "gerado_em_utc": "2026-10-27T15:49:58.209281+00:00",
+  "gerado_em_utc": "2026-10-27T16:18:26.810684+00:00",
   "modo_compilacao": "online",
   "contexto": "Carga física, valor FOB e peso líquido têm coberturas distintas.",
   "coleta_bcb": {
     "selic_meta_pct_aa": {
       "status": "ok",
       "competencia": "2026-09",
-      "coletado_em_utc": "2026-10-27T15:49:58.209281+00:00",
+      "coletado_em_utc": "2026-10-27T16:18:26.810684+00:00",
       "url": "https://api.bcb.gov.br/dados/serie/bcdata.sgs.432/dados?formato=json&dataInicial=01%2F09%2F2025&dataFinal=30%2F09%2F2026",
       "sha256": "a18befc90fb9e4379aba8aff749cad8839992eb04e19a4ee9248054aba6c74b1",
       "registros": 395
@@ -15,7 +15,7 @@
     "dolar_venda_medio_brl": {
       "status": "ok",
       "competencia": "2026-09",
-      "coletado_em_utc": "2026-10-27T15:49:58.209281+00:00",
+      "coletado_em_utc": "2026-10-27T16:18:26.810684+00:00",
       "url": "https://api.bcb.gov.br/dados/serie/bcdata.sgs.1/dados?formato=json&dataInicial=01%2F09%2F2025&dataFinal=30%2F09%2F2026",
       "sha256": "2db2b05f96749de01c77ecc4380fa0142a035f4f957846aab5dbc78b40aafefb",
       "registros": 273
@@ -23,7 +23,7 @@
     "ipca_pct_mes": {
       "status": "ok",
       "competencia": "2026-09",
-      "coletado_em_utc": "2026-10-27T15:49:58.209281+00:00",
+      "coletado_em_utc": "2026-10-27T16:18:26.810684+00:00",
       "url": "https://api.bcb.gov.br/dados/serie/bcdata.sgs.433/dados?formato=json&dataInicial=01%2F09%2F2025&dataFinal=30%2F09%2F2026",
       "sha256": "c7a12b993ba31af06b245aed85b83d39036d88e88b8e45132ef79c31ed45a225",
       "registros": 13
@@ -33,23 +33,23 @@
     "comex": {
       "status": "ok",
       "competencia": "2026-09",
-      "coletado_em_utc": "2026-10-27T15:49:58.209281+00:00"
+      "coletado_em_utc": "2026-10-27T16:18:26.810684+00:00"
     },
     "brasil": {
       "status": "ok",
       "competencia": "2026-09",
-      "coletado_em_utc": "2026-10-27T15:49:58.209281+00:00"
+      "coletado_em_utc": "2026-10-27T16:18:26.810684+00:00"
     },
     "viracopos": {
       "status": "falha; histórico preservado",
       "erro": "HTTPS indisponível: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1010)>; curl: curl: (60) SSL certificate problem: unable to get local issuer certificate\nMore details here: https://curl.se/docs/sslcerts.html\n\ncurl failed to verify the legitimacy of the server and therefore could not\nestablish a secure connection to it. To learn more about this situation and\nhow to fix it, please visit the web page mentioned above.",
-      "tentativa_em_utc": "2026-10-27T15:49:58.209281+00:00"
+      "tentativa_em_utc": "2026-10-27T16:18:26.810684+00:00"
     }
   },
   "metadados": {
     "brasil": {
       "fonte_original": "https://www.gov.br/mdic/pt-br/assuntos/comercio-exterior/estatisticas/base-de-dados-bruta",
-      "coletado_em_utc": "2026-10-27T15:49:58.209281+00:00",
+      "coletado_em_utc": "2026-10-27T16:18:26.810684+00:00",
       "unidades": {
         "exportacoes_usd_bi": "US$ bilhões FOB",
         "importacoes_usd_bi": "US$ bilhões FOB"
@@ -79,7 +79,7 @@
           "bytes": 84646313,
           "linhas_origem": 1272295,
           "linhas_recorte": 151772,
-          "coletado_em_utc": "2026-10-27T15:50:13.975237+00:00",
+          "coletado_em_utc": "2026-10-27T16:18:43.019339+00:00",
           "urf": 817700,
           "via": 4,
           "fluxo": "exportacao",
@@ -105,7 +105,7 @@
           "bytes": 136096406,
           "linhas_origem": 1858461,
           "linhas_recorte": 200949,
-          "coletado_em_utc": "2026-10-27T15:50:23.444260+00:00",
+          "coletado_em_utc": "2026-10-27T16:18:53.785074+00:00",
           "urf": 817700,
           "via": 4,
           "fluxo": "importacao",
@@ -165,7 +165,7 @@
     },
     "comex": {
       "fonte_original": "https://www.gov.br/mdic/pt-br/assuntos/comercio-exterior/estatisticas/base-de-dados-bruta",
-      "coletado_em_utc": "2026-10-27T15:49:58.209281+00:00",
+      "coletado_em_utc": "2026-10-27T16:18:26.810684+00:00",
       "unidades": {
         "valor_fob_usd": "US$ FOB",
         "kg_liquido": "kg líquidos"
@@ -198,7 +198,7 @@
           "bytes": 84646313,
           "linhas_origem": 1272295,
           "linhas_recorte": 151772,
-          "coletado_em_utc": "2026-10-27T15:50:13.975237+00:00",
+          "coletado_em_utc": "2026-10-27T16:18:43.019339+00:00",
           "urf": 817700,
           "via": 4,
           "fluxo": "exportacao",
@@ -224,7 +224,7 @@
           "bytes": 136096406,
           "linhas_origem": 1858461,
           "linhas_recorte": 200949,
-          "coletado_em_utc": "2026-10-27T15:50:23.444260+00:00",
+          "coletado_em_utc": "2026-10-27T16:18:53.785074+00:00",
           "urf": 817700,
           "via": 4,
           "fluxo": "importacao",
@@ -263,7 +263,7 @@
     },
     "macro": {
       "fonte_original": "https://api.bcb.gov.br/dados/serie/bcdata.sgs.{codigo}/dados",
-      "coletado_em_utc": "2026-10-27T15:49:58.209281+00:00",
+      "coletado_em_utc": "2026-10-27T16:18:26.810684+00:00",
       "unidades": {
         "selic_meta_pct_aa": "% a.a.",
         "dolar_venda_medio_brl": "R$/US$",
@@ -280,7 +280,7 @@
         "dolar_venda_medio_brl": {
           "status": "ok",
           "competencia": "2026-09",
-          "coletado_em_utc": "2026-10-27T15:49:58.209281+00:00",
+          "coletado_em_utc": "2026-10-27T16:18:26.810684+00:00",
           "url": "https://api.bcb.gov.br/dados/serie/bcdata.sgs.1/dados?formato=json&dataInicial=01%2F09%2F2025&dataFinal=30%2F09%2F2026",
           "sha256": "2db2b05f96749de01c77ecc4380fa0142a035f4f957846aab5dbc78b40aafefb",
           "registros": 273
@@ -288,7 +288,7 @@
         "selic_meta_pct_aa": {
           "status": "ok",
           "competencia": "2026-09",
-          "coletado_em_utc": "2026-10-27T15:49:58.209281+00:00",
+          "coletado_em_utc": "2026-10-27T16:18:26.810684+00:00",
           "url": "https://api.bcb.gov.br/dados/serie/bcdata.sgs.432/dados?formato=json&dataInicial=01%2F09%2F2025&dataFinal=30%2F09%2F2026",
           "sha256": "a18befc90fb9e4379aba8aff749cad8839992eb04e19a4ee9248054aba6c74b1",
           "registros": 395
@@ -296,7 +296,7 @@
         "ipca_pct_mes": {
           "status": "ok",
           "competencia": "2026-09",
-          "coletado_em_utc": "2026-10-27T15:49:58.209281+00:00",
+          "coletado_em_utc": "2026-10-27T16:18:26.810684+00:00",
           "url": "https://api.bcb.gov.br/dados/serie/bcdata.sgs.433/dados?formato=json&dataInicial=01%2F09%2F2025&dataFinal=30%2F09%2F2026",
           "sha256": "c7a12b993ba31af06b245aed85b83d39036d88e88b8e45132ef79c31ed45a225",
           "registros": 13
