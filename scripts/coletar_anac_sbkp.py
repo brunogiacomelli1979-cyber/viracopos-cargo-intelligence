@@ -124,10 +124,16 @@ def collect_month(month, fetcher=get_bytes):
     if len(raw) > MAX_ZIP_BYTES or len(raw) < 100 or raw[:2] != b"PK":
         raise ValueError("Resposta da ANAC não é ZIP plausível")
     with zipfile.ZipFile(io.BytesIO(raw)) as zf:
-        parts = [info for info in zf.infolist()
-                 if not info.is_dir() and info.filename.lower().endswith(".csv")]
+        entries = [info for info in zf.infolist() if not info.is_dir()]
+        # O pacote oficial pode conter arquivo texto delimitado em vez de .csv.
+        # Aceitar somente um arquivo de dados, sem inferir formato do conteúdo.
+        parts = [info for info in entries
+                 if info.filename.lower().endswith((".csv", ".txt"))]
         if len(parts) != 1:
-            raise ValueError(f"ZIP ANAC: esperado um CSV, encontrados {len(parts)}")
+            names = [info.filename for info in entries[:12]]
+            raise ValueError(
+                f"ZIP ANAC: esperado um CSV/TXT, encontrados {len(parts)}; "
+                f"entradas do ZIP: {names}")
         info = parts[0]
         if info.file_size > MAX_EXPANDED_BYTES:
             raise ValueError("Arquivo ANAC expandido excede limite")
