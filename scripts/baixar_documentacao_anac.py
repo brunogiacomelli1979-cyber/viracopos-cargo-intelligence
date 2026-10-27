@@ -63,6 +63,12 @@ SOURCES = [
         "url": "https://www.anac.gov.br/assuntos/legislacao/legislacao-1/portarias/2019/portaria-no-3902-sas-20-12-2019/@@display-file/arquivo_norma/PA2019-3902.pdf",
     },
     {
+        "id": "metadados_movimentacao_anac_govbr", "type": "html",
+        "essential": True, "file": "10_metadados_movimentacao_govbr.html",
+        "check": "QT_CARGA",
+        "url": "https://www.gov.br/anac/pt-br/acesso-a-informacao/dados-abertos/areas-de-atuacao/operador-aeroportuario/dados-de-movimentacao-aeroportuaria/metadados-operador-aeroportuario-dados-de-movimentacao-aeroportuaria",
+    },
+    {
         "id": "pagina_referencias_concessionaria_vcp", "type": "html",
         "essential": False, "file": "09_pagina_referencias_concessionaria.html",
         "check": "Viracopos",
