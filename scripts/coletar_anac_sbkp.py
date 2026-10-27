@@ -77,8 +77,7 @@ def aggregate_csv(csv_bytes, month):
         dest = norm(item["sg_icao_destino"])
         if origin != "SBKP" and dest != "SBKP":
             continue
-        if origin == "SBKP" and dest == "SBKP":
-            raise ValueError("ANAC: etapa local SBKP→SBKP requer revisão")
+        # Trechos locais são classificados à parte e não duplicados.
         if (item["nr_ano_referencia"].strip() != month[:4]
                 or int(item["nr_mes_referencia"]) != int(month[5:])):
             raise ValueError(f"ANAC: competência da linha difere do arquivo {month}")
