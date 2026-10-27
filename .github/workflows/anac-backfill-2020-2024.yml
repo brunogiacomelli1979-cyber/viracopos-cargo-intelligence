@@ -1,0 +1,89 @@
+name: Recuperar carga ANAC SBKP 2020-2024
+on:
+  push:
+    branches: [feat/anac-carga-sbkp-2020-2024]
+    paths:
+      - '.github/workflows/anac-backfill-2020-2024.yml'
+      - 'scripts/validar_anac_historico.py'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: anac-sbkp-backfill
+  cancel-in-progress: false
+
+jobs:
+  collect:
+    name: ANAC SBKP ano ${{ matrix.year }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    strategy:
+      fail-fast: false
+      matrix:
+        year: [2020, 2021, 2022, 2023, 2024]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/anac-carga-sbkp-2020-2024
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Download e extração mês a mês com proveniência
+        run: python scripts/coletar_anac_sbkp.py --start ${{ matrix.year }}-01 --end ${{ matrix.year }}-12 --strict-complete --output-dir data/staging/anac-downloads/anac-sbkp-${{ matrix.year }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: anac-sbkp-${{ matrix.year }}
+          path: data/staging/anac-downloads/anac-sbkp-${{ matrix.year }}/
+          retention-days: 30
+
+  validate:
+    name: Conciliar 60 competências ANAC
+    needs: collect
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/anac-carga-sbkp-2020-2024
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: anac-sbkp-*
+          path: data/staging/anac-downloads/
+      - name: Normalizar pastas dos artefatos
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          base=Path('data/staging/anac-downloads')
+          for year in range(2020,2025):
+              p=base/f'anac-sbkp-{year}'
+              assert (p/'anac_sbkp_fontes.json').is_file(), f'Falta recibo anual {year}'
+              assert (p/'anac_sbkp_carga_mensal.csv').is_file(), f'Falta série anual {year}'
+          PY
+      - name: Verificar 60 meses, classificação, totais e recibos
+        run: python scripts/validar_anac_historico.py
+      - name: Commitar somente série ANAC completa na branch de desenvolvimento
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/anac_sbkp_2020_2024.csv data/anac_sbkp_fontes_2020_2024.json data/anac_sbkp_auditoria_2020_2024.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'data: adicionar 60 meses ANAC SBKP validados'
+            git push origin HEAD:feat/anac-carga-sbkp-2020-2024
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: anac-sbkp-resultado-consolidado
+          path: |
+            data/anac_sbkp_2020_2024.csv
+            data/anac_sbkp_fontes_2020_2024.json
+            data/anac_sbkp_auditoria_2020_2024.json
+          retention-days: 30
