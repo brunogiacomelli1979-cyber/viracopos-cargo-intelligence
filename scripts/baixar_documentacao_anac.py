@@ -25,9 +25,10 @@ SOURCES = [
         "url": "https://www.anac.gov.br/acesso-a-informacao/dados-abertos/areas-de-atuacao/voos-e-operacoes-aereas/dados-estatisticos-do-transporte-aereo/48-dados-estatisticos-do-transporte-aereo",
     },
     {
-        "id": "resolucao_191_2011", "type": "pdf", "essential": True,
-        "file": "02_resolucao_191_2011.pdf",
-        "url": "https://pergamum.anac.gov.br/arquivos/RA2011-0191.pdf",
+        "id": "resolucao_191_2011", "type": "html", "essential": True,
+        "file": "02_resolucao_191_2011.html",
+        "check": "RESOLUÇÃO",
+        "url": "https://www.anac.gov.br/assuntos/legislacao/legislacao-1/resolucoes/resolucoes-2011/resolucao-no-191-de-16-06-2011",
     },
     {
         "id": "portaria_3506_2019_compilada", "type": "pdf", "essential": True,
