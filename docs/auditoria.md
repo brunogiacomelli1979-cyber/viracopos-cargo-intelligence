@@ -22,6 +22,7 @@ Todos os arquivos recebidos foram lidos. Cópia byte a byte em `docs/archive/ini
 | Tooltip SVG apenas com ponteiro | Valores difíceis de consultar com teclado | Tabelas expansíveis e área do gráfico com foco/rolagem |
 | Menu antes das ferramentas no celular | Ordem de leitura e posicionamento inconsistentes | Menu após ferramentas; estado acessível, Escape e fechamento ao navegar |
 | Seção ativa dependia só do último callback do observer | Podia ficar desatualizada em seções altas | Posição de todas as seções, atualizada com requestAnimationFrame; aria-current |
+| Dois deslocamentos de âncora se somavam | Título ficava distante do cabeçalho e seção anterior permanecia ativa | Um único deslocamento responsivo; atalho ao topo com rolagem explícita |
 | Sem contratos/proveniência | CSV malformado ou duplicado poderia publicar | Validação de datas, chaves, números, metadados e igualdade CSV/JSON/HTML |
 | Automação somente descrita | Estado operacional incorreto | Scripts e Actions implementados, com fallback por série e deploy após checks |
 
