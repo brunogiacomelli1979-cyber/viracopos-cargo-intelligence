@@ -1,7 +1,7 @@
 {
   "projeto": "Viracopos Cargo Intelligence",
   "etapa": "1_documentacao_apenas",
-  "capturado_em_utc": "2026-10-27T20:34:25.098876+00:00",
+  "capturado_em_utc": "2026-10-27T20:35:26.891462+00:00",
   "documentos": [
     {
       "id": "metadados_etapa_basica",
@@ -17,12 +17,15 @@
     },
     {
       "id": "resolucao_191_2011",
-      "type": "pdf",
+      "type": "html",
       "essential": true,
-      "file": "02_resolucao_191_2011.pdf",
-      "url": "https://pergamum.anac.gov.br/arquivos/RA2011-0191.pdf",
-      "status": "pendente",
-      "erro": "Resposta não contém PDF completo"
+      "file": "docs/referencias/anac/originais/02_resolucao_191_2011.html",
+      "url": "https://www.anac.gov.br/assuntos/legislacao/legislacao-1/resolucoes/resolucoes-2011/resolucao-no-191-de-16-06-2011",
+      "status": "baixado",
+      "url_final": "https://www.anac.gov.br/assuntos/legislacao/legislacao-1/resolucoes/resolucoes-2011/resolucao-no-191-de-16-06-2011",
+      "bytes": 105203,
+      "sha256": "38cf2bbe4e35c02c98ebc4e6f71ca48df74dec23fc42e0dd7edb3cb99cc49b15",
+      "tipo_resposta": "text/html;charset=utf-8"
     },
     {
       "id": "portaria_3506_2019_compilada",
@@ -106,8 +109,6 @@
       "erro": "<urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1010)>"
     }
   ],
-  "essenciais_pendentes": [
-    "resolucao_191_2011"
-  ],
+  "essenciais_pendentes": [],
   "nota": "Captura do arquivo público original, sem interpretar nulos nem modificar datasets."
 }
