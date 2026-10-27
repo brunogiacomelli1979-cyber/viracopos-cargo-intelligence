@@ -38,6 +38,7 @@ jobs:
         run: |
           python scripts/validar_dados.py
           python scripts/auditar_metodologia.py
+          python scripts/verificar_backfill_historico.py
           python -m unittest discover -s tests -v
           node --test tests/dashboard.test.cjs
       - name: Exigir históricos completos antes de versionar
