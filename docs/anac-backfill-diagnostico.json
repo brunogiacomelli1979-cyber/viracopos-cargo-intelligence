@@ -1,0 +1,145 @@
+{
+  "objetivo": "Auditoria de coleta ANAC SBKP 2020–2024",
+  "fonte": "ANAC Etapa Básica — SBKP",
+  "gerado_em_utc": "2026-10-27T20:07:29.892363+00:00",
+  "anos": {
+    "2020": {
+      "status": "incompleto",
+      "meses_ok": [
+        "2020-01",
+        "2020-03",
+        "2020-04",
+        "2020-05",
+        "2020-06",
+        "2020-07",
+        "2020-08",
+        "2020-09",
+        "2020-11",
+        "2020-12"
+      ],
+      "meses_faltantes": [
+        "2020-02",
+        "2020-10"
+      ],
+      "falhas": [
+        {
+          "competencia": "2020-02",
+          "erro": "ANAC: pesos não informados em 4 etapas SBKP do mês 2020-02; investigar antes de consolidar"
+        },
+        {
+          "competencia": "2020-10",
+          "erro": "ANAC: pesos não informados em 1 etapas SBKP do mês 2020-10; investigar antes de consolidar"
+        }
+      ],
+      "csv_agregado_presente": true,
+      "etapas_sbkp_de_meses_ok": 56077
+    },
+    "2021": {
+      "status": "incompleto",
+      "meses_ok": [
+        "2021-01",
+        "2021-02",
+        "2021-03",
+        "2021-04",
+        "2021-05",
+        "2021-06",
+        "2021-07",
+        "2021-09",
+        "2021-10",
+        "2021-11",
+        "2021-12"
+      ],
+      "meses_faltantes": [
+        "2021-08"
+      ],
+      "falhas": [
+        {
+          "competencia": "2021-08",
+          "erro": "ANAC: pesos não informados em 4 etapas SBKP do mês 2021-08; investigar antes de consolidar"
+        }
+      ],
+      "csv_agregado_presente": true,
+      "etapas_sbkp_de_meses_ok": 93819
+    },
+    "2022": {
+      "status": "validado",
+      "meses_ok": [
+        "2022-01",
+        "2022-02",
+        "2022-03",
+        "2022-04",
+        "2022-05",
+        "2022-06",
+        "2022-07",
+        "2022-08",
+        "2022-09",
+        "2022-10",
+        "2022-11",
+        "2022-12"
+      ],
+      "meses_faltantes": [],
+      "falhas": [],
+      "csv_agregado_presente": true,
+      "etapas_sbkp_de_meses_ok": 126461
+    },
+    "2023": {
+      "status": "incompleto",
+      "meses_ok": [
+        "2023-01",
+        "2023-02",
+        "2023-03",
+        "2023-04",
+        "2023-05",
+        "2023-06",
+        "2023-08",
+        "2023-09",
+        "2023-10",
+        "2023-11",
+        "2023-12"
+      ],
+      "meses_faltantes": [
+        "2023-07"
+      ],
+      "falhas": [
+        {
+          "competencia": "2023-07",
+          "erro": "ANAC: pesos não informados em 2 etapas SBKP do mês 2023-07; investigar antes de consolidar"
+        }
+      ],
+      "csv_agregado_presente": true,
+      "etapas_sbkp_de_meses_ok": 113351
+    },
+    "2024": {
+      "status": "validado",
+      "meses_ok": [
+        "2024-01",
+        "2024-02",
+        "2024-03",
+        "2024-04",
+        "2024-05",
+        "2024-06",
+        "2024-07",
+        "2024-08",
+        "2024-09",
+        "2024-10",
+        "2024-11",
+        "2024-12"
+      ],
+      "meses_faltantes": [],
+      "falhas": [],
+      "csv_agregado_presente": true,
+      "etapas_sbkp_de_meses_ok": 119380
+    }
+  },
+  "anos_validados": [
+    2022,
+    2024
+  ],
+  "anos_pendentes": [
+    2020,
+    2021,
+    2023
+  ],
+  "publicacao_habilitada": false,
+  "nota": "Relatório técnico apenas. Não substituir série RMA nem divulgar valores incompletos."
+}
