@@ -5,6 +5,7 @@ on:
     paths:
       - '.github/workflows/anac-backfill-2020-2024.yml'
       - 'scripts/validar_anac_historico.py'
+      - 'scripts/diagnosticar_anac_backfill.py'
   workflow_dispatch:
 
 permissions:
@@ -37,6 +38,44 @@ jobs:
         with:
           name: anac-sbkp-${{ matrix.year }}
           path: data/staging/anac-downloads/anac-sbkp-${{ matrix.year }}/
+          retention-days: 30
+
+  diagnose:
+    name: Registrar lacunas de 2020–2024
+    needs: collect
+    if: always()
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/anac-carga-sbkp-2020-2024
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          pattern: anac-sbkp-*
+          path: data/staging/anac-downloads/
+      - name: Produzir relatório de cobertura e falhas por competência
+        run: python scripts/diagnosticar_anac_backfill.py
+      - name: Salvar relatório na branch isolada
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add docs/anac-backfill-diagnostico.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'audit: registrar falhas de coleta ANAC por competência'
+            git push origin HEAD:feat/anac-carga-sbkp-2020-2024
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: anac-backfill-diagnostico
+          path: docs/anac-backfill-diagnostico.json
           retention-days: 30
 
   validate:
