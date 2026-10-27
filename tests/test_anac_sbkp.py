@@ -35,6 +35,21 @@ class AnacTest(unittest.TestCase):
     def test_missing_column_rejected(self):
         with self.assertRaisesRegex(ValueError,"Esquema ANAC"):
             aggregate_csv(b"sg_icao_origem;sg_icao_destino\nSBKP;SBGR\n","2024-01")
+    def test_zip_with_txt_table_is_supported(self):
+        buffer=io.BytesIO()
+        with zipfile.ZipFile(buffer,"w") as archive:
+            archive.writestr("basica2024-01.txt",sample())
+        rows, receipt=collect_month("2024-01",fetcher=lambda url,timeout: buffer.getvalue())
+        self.assertEqual(len(rows),2)
+        self.assertEqual(receipt["competencia"],"2024-01")
+
+    def test_zip_unknown_entry_is_described(self):
+        buffer=io.BytesIO()
+        with zipfile.ZipFile(buffer,"w") as archive:
+            archive.writestr("unexpected.data",sample())
+        with self.assertRaisesRegex(ValueError,"unexpected.data"):
+            collect_month("2024-01",fetcher=lambda url,timeout:buffer.getvalue())
+
     def test_zip_and_source_hashes(self):
         buffer=io.BytesIO()
         with zipfile.ZipFile(buffer,"w") as archive:
