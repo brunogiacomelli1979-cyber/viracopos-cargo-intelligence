@@ -1,0 +1,91 @@
+{
+  "brasil": {
+    "fonte_original": "https://www.gov.br/mdic/pt-br/assuntos/comercio-exterior/estatisticas",
+    "coletado_em_utc": null,
+    "unidades": {
+      "exportacoes_usd_bi": "US$ bilhões FOB",
+      "importacoes_usd_bi": "US$ bilhões FOB"
+    },
+    "periodicidade": "mensal",
+    "abrangencia": "Brasil; todas as vias de transporte",
+    "tratamento": "Valores recebidos no protótipo, conferidos no painel oficial MDIC em 27/10/2026. Coleta original desconhecida; instante UTC de conferência documental registrado separadamente.",
+    "limitacoes": "Uma competência; valores arredondados a uma casa decimal. Não representam Viracopos. Importação manual.",
+    "status": "validado",
+    "referencia_inicial": "2026-09",
+    "referencia_final": "2026-09",
+    "verificado_em_utc": "2026-10-27T14:20:30.022078+00:00"
+  },
+  "viracopos": {
+    "fonte_original": "https://www.gov.br/anac/pt-br/assuntos/dados-e-estatisticas",
+    "coletado_em_utc": null,
+    "unidades": {
+      "embarque_internacional_t": "toneladas",
+      "desembarque_internacional_t": "toneladas"
+    },
+    "periodicidade": "mensal",
+    "abrangencia": "Planejado: SBKP; carga aérea internacional embarcada/desembarcada",
+    "tratamento": "Coletor ainda não implementado. Validar dicionário ANAC e conversão de unidades antes de importar.",
+    "limitacoes": "Sem observações. Não representa carga aduaneira nem armazenagem.",
+    "status": "pendente",
+    "referencia_inicial": null,
+    "referencia_final": null
+  },
+  "comex": {
+    "fonte_original": "https://comexstat.mdic.gov.br/pt/geral",
+    "coletado_em_utc": null,
+    "unidades": {
+      "valor_fob_usd": "US$ FOB",
+      "kg_liquido": "kg líquidos"
+    },
+    "periodicidade": "mensal × fluxo × setor",
+    "abrangencia": "Recorte URF de Viracopos ainda não validado",
+    "tratamento": "Coletor ainda não implementado. Definir URF, via de transporte e classificação setorial estável.",
+    "limitacoes": "Sem observações. URF não equivale automaticamente ao fluxo físico de SBKP.",
+    "recorte_validado": false,
+    "status": "pendente",
+    "referencia_inicial": null,
+    "referencia_final": null
+  },
+  "macro": {
+    "fonte_original": "https://api.bcb.gov.br/dados/serie/bcdata.sgs.{codigo}/dados",
+    "coletado_em_utc": "2026-10-27T14:34:08.147584+00:00",
+    "unidades": {
+      "selic_meta_pct_aa": "% a.a.",
+      "dolar_venda_medio_brl": "R$/US$",
+      "ipca_pct_mes": "% mensal"
+    },
+    "periodicidade": "mensal (SGS 432 e 1: originais diárias; 433: mensal)",
+    "abrangencia": "Brasil",
+    "tratamento": "SGS 432: último registro disponível no mês; SGS 1: média aritmética dos dias publicados; SGS 433: variação mensal. Somente meses encerrados. Reconsulta sobreposta de 12 meses; demais competências preservadas.",
+    "limitacoes": "Disponibilidade por indicador pode diferir. Meses ausentes não são interpolados. Requisições limitadas a menos de 10 anos; backfill anterior requer consultas adicionais. Não implica causalidade.",
+    "status": "validado",
+    "referencia_inicial": "2022-01",
+    "referencia_final": "2026-09",
+    "coletas_por_serie": {
+      "dolar_venda_medio_brl": {
+        "status": "ok",
+        "competencia": "2026-09",
+        "coletado_em_utc": "2026-10-27T14:34:08.147584+00:00",
+        "url": "https://api.bcb.gov.br/dados/serie/bcdata.sgs.1/dados?formato=json&dataInicial=01%2F09%2F2025&dataFinal=30%2F09%2F2026",
+        "sha256": "2db2b05f96749de01c77ecc4380fa0142a035f4f957846aab5dbc78b40aafefb",
+        "registros": 273
+      },
+      "selic_meta_pct_aa": {
+        "status": "ok",
+        "competencia": "2026-09",
+        "coletado_em_utc": "2026-10-27T14:34:08.147584+00:00",
+        "url": "https://api.bcb.gov.br/dados/serie/bcdata.sgs.432/dados?formato=json&dataInicial=01%2F01%2F2022&dataFinal=30%2F09%2F2026",
+        "sha256": "4fdfc6e4c16a3d0bbe71b19defcc9e596a8bab43a520b744bae398158df57fa3",
+        "registros": 1734
+      },
+      "ipca_pct_mes": {
+        "status": "ok",
+        "competencia": "2026-09",
+        "coletado_em_utc": "2026-10-27T14:34:08.147584+00:00",
+        "url": "https://api.bcb.gov.br/dados/serie/bcdata.sgs.433/dados?formato=json&dataInicial=01%2F01%2F2022&dataFinal=30%2F09%2F2026",
+        "sha256": "9b8b0a742d454333d6eacb1c2ed1795acdcd71444770d268f543d878ce752699",
+        "registros": 57
+      }
+    }
+  }
+}

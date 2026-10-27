@@ -1,0 +1,1 @@
+# Python >= 3.11. Somente biblioteca padrão; nenhum pacote externo.

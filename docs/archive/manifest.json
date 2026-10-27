@@ -1,0 +1,46 @@
+[
+  {
+    "path": "index_blue.html",
+    "sha256": "ef62f24808e68cc75865dc9cc46c2b92937ee3ed5f2afb665101c4d63fe27566"
+  },
+  {
+    "path": "README.md",
+    "sha256": "9f22833b5a27a3875ee331a481dbebd06adf90d9b072dbf382d6f2e13f6e4985"
+  },
+  {
+    "path": "assets\\app-blue.js",
+    "sha256": "550b096487d67817cb62de348b280af3238174031f85e2097c3ed2687dd2d5c2"
+  },
+  {
+    "path": "assets\\favicon.svg",
+    "sha256": "60442c90485b630eb447bd72023eea93437c79371ffe713bbf3fadb6b72b1585"
+  },
+  {
+    "path": "assets\\style-blue.css",
+    "sha256": "bbb8cbfeef889881afa22537d631dbd3b126ee656a90f54521a4b475f128017c"
+  },
+  {
+    "path": "assets\\terminal-art.svg",
+    "sha256": "43b3f2f52be764e3b421a546d76fcde22e3499db34a66fa1520f10baff9d2ebc"
+  },
+  {
+    "path": "data\\brasil.csv",
+    "sha256": "9b0a23f722a857a056e498811c876a30d158a2738da89020219507a4e1b3bfb9"
+  },
+  {
+    "path": "data\\comex_viracopos.csv",
+    "sha256": "7ed0c3e634f67e5a075a238bcbc036d111af5023308090f104ff6089a51e9202"
+  },
+  {
+    "path": "data\\dashboard.json",
+    "sha256": "10bd1f4ac456657c787677fef4c7049e1bb827510221f7ccbda7d1e9800ce22e"
+  },
+  {
+    "path": "data\\macro.csv",
+    "sha256": "5abca18a6fd379f3b00e1444a886893a2ac1627e765c445a183c43c5174d9499"
+  },
+  {
+    "path": "data\\viracopos.csv",
+    "sha256": "f77c6bd441213762045a2961ca0fd05a48af2c3a11687ab9574dbd6d3915baaf"
+  }
+]

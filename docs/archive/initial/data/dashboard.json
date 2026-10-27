@@ -1,0 +1,31 @@
+{
+  "versao": "1.0.0",
+  "gerado_em_utc": "2026-10-27T13:25:03+00:00",
+  "contexto": "Dados públicos. Conjuntos têm critérios e coberturas distintos; não são intercambiáveis.",
+  "notas_fontes": {
+    "brasil": "MDIC/Secex — valores FOB em US$ bilhões, arredondados na divulgação",
+    "viracopos": "ANAC/RIMA — toneladas de carga aérea internacional embarcada/desembarcada em SBKP",
+    "comex": "MDIC/Comex Stat — recorte por URF validado antes de incorporar, valor FOB e kg líquido",
+    "macro": "BCB/SGS 432 meta Selic (último dia do mês); 1 câmbio de venda (média dos dias); 433 IPCA (variação mensal)"
+  },
+  "fontes": {
+    "mdic": "https://www.gov.br/mdic/pt-br/assuntos/comercio-exterior/estatisticas/base-de-dados-bruta",
+    "anac": "https://www.anac.gov.br/acesso-a-informacao/dados-abertos/areas-de-atuacao/operador-aeroportuario/dados-de-movimentacao-aeroportuaria/60-dados-de-movimentacao-aeroportuaria",
+    "bcb": "https://dadosabertos.bcb.gov.br/",
+    "comex": "https://comexstat.mdic.gov.br/pt/geral"
+  },
+  "coleta_bcb": {
+    "status": "não executado (modo offline)",
+    "meses": 0
+  },
+  "brasil": [
+    {
+      "mes": "2026-09",
+      "exportacoes_usd_bi": 34.4,
+      "importacoes_usd_bi": 26.7
+    }
+  ],
+  "viracopos": [],
+  "comex": [],
+  "macro": []
+}

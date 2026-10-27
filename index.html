@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b2440">
+<meta name="description" content="Observatório independente de Viracopos com navegação fixa, visual institucional e leitura rápida dos indicadores logísticos.">
+<title>VCP Insights / Viracopos Cargo Intelligence</title>
+<link rel="stylesheet" href="assets/style-blue.css">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+<a class="skip-link" href="#visao-geral">Pular para o conteúdo</a>
+<noscript><p class="data-notice">Ative JavaScript para usar os filtros e gráficos. Os dados estão disponíveis nos arquivos CSV da pasta data.</p></noscript>
+<div class="top-ribbon"><span>VCP / SBKP · OBSERVATÓRIO INDEPENDENTE</span><span><i></i> competências mensais · cobertura em expansão</span></div>
+<header class="site-header" id="topo">
+  <div class="header-inner">
+    <a class="brand" href="#topo" aria-label="Ir para o topo">
+      <span class="brand-mark" aria-hidden="true"><b></b><b></b><b></b></span>
+      <span class="brand-text">VCP<span>/</span>INSIGHTS<small>CARGO INTELLIGENCE</small></span>
+    </a>
+    <nav id="main-nav" class="main-nav" aria-label="Navegação principal">
+      <a href="#visao-geral" class="nav-link active">Visão Geral</a>
+      <a href="#carga-aerea" class="nav-link">Carga Aérea</a>
+      <a href="#comex" class="nav-link">Comex</a>
+      <a href="#macroeconomia" class="nav-link">Macroeconomia</a>
+      <a href="#setores" class="nav-link">Setores</a>
+      <a href="#metodo" class="nav-link">Fontes</a>
+    </nav>
+    <div class="header-tools">
+      <a class="header-cta" href="#metodo">FONTES & MÉTODO</a>
+      <button class="mobile-toggle" aria-controls="main-nav" aria-label="Abrir menu" aria-expanded="false">☰</button>
+    </div>
+  </div>
+</header>
+
+<main class="page-shell">
+  <aside class="side-rail" aria-label="Índice rápido">
+    <div class="side-rail-card">
+      <p class="rail-title">NAVEGAÇÃO</p>
+      <a href="#visao-geral" class="rail-link active">01 · Visão Geral</a>
+      <a href="#carga-aerea" class="rail-link">02 · Carga Aérea</a>
+      <a href="#comex" class="rail-link">03 · Comex</a>
+      <a href="#macroeconomia" class="rail-link">04 · Macro</a>
+      <a href="#setores" class="rail-link">05 · Setores</a>
+      <a href="#metodo" class="rail-link">06 · Fontes</a>
+      <a href="#topo" class="rail-top">↑ voltar ao topo</a>
+    </div>
+  </aside>
+
+  <div class="content-area">
+    <section class="hero-block section-anchor" id="visao-geral">
+      <div class="hero-copy">
+        <p class="eyebrow"><span class="eyebrow-line"></span> VIRACOPOS CARGO INTELLIGENCE</p>
+        <h1>Dados que ajudam a<br><span>ler o movimento</span><br>de Viracopos.</h1>
+        <p class="hero-text">Um observatório visual para acompanhar carga aérea, comércio exterior, macroeconomia e pistas para previsão de demanda logística.</p>
+        <div class="hero-actions">
+          <a href="#carga-aerea" class="btn-primary">VER INDICADORES</a>
+          <a href="#metodo" class="btn-secondary">COMO O PAINEL É MONTADO</a>
+        </div>
+        <div class="hero-mini-stats">
+          <div><strong id="hero-competencia">Última competência: —</strong><span>base consolidada</span></div>
+          <div><strong id="status-chip">● Painel em implantação</strong><span>cobertura em expansão</span></div>
+        </div>
+      </div>
+      <div class="hero-panel">
+        <div class="hero-visual">
+          <div class="hero-photo"></div>
+          <div class="hero-grid"></div>
+          <div class="hero-overlay-tag">VCP / SBKP</div>
+          <div class="hero-overlay-code">CARGO</div>
+        </div>
+        <div class="hero-caption">
+          <span>Observatório independente inspirado na linguagem institucional do ecossistema aeroportuário</span>
+          <a id="hero-credit" href="https://commons.wikimedia.org/wiki/File:Viracopos-Campinas_International_Airport_2017_003.jpg" target="_blank" rel="noopener">Ilustração autoral · fotografia de referência ↗</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="kpi-section section-anchor">
+      <div class="section-head compact">
+        <div>
+          <p class="section-kicker">PANORAMA DO MÊS</p>
+          <h2>Leitura rápida do cenário atual</h2>
+        </div>
+        <div class="period-picker compact-picker">
+          <label for="competencia">ATÉ</label><select id="competencia"></select>
+          <label for="janela">JANELA</label>
+          <select id="janela"><option value="12">12 meses</option><option value="24">24 meses</option><option value="36">36 meses</option><option value="all">Todo o histórico</option></select>
+        </div>
+      </div>
+      <p id="data-status" class="sr-only" role="status" aria-live="polite"></p>
+      <div class="kpi-grid">
+        <article class="kpi-card accent"><span class="kpi-label">Carga internacional</span><strong id="kpi-carga">—</strong><small>toneladas</small><p id="kpi-carga-mes">Aguardando dados ANAC</p></article>
+        <article class="kpi-card"><span class="kpi-label">Importação · URF</span><strong id="kpi-imp">—</strong><small>US$ mi</small><p id="kpi-imp-mes">Aguardando dados MDIC</p></article>
+        <article class="kpi-card"><span class="kpi-label">Exportação · URF</span><strong id="kpi-exp">—</strong><small>US$ mi</small><p id="kpi-exp-mes">Aguardando dados MDIC</p></article>
+        <article class="kpi-card"><span class="kpi-label">Brasil · corrente de comércio</span><strong id="kpi-brasil">—</strong><small>US$ bi</small><p id="kpi-brasil-mes">Aguardando dados MDIC</p></article>
+      </div>
+    </section>
+
+    <section class="data-section section-anchor" id="carga-aerea">
+      <div class="section-head">
+        <div>
+          <p class="section-kicker">01 · CARGA AÉREA</p>
+          <h2>O pulso operacional do terminal</h2>
+        </div>
+        <p>Volumes embarcados e desembarcados mostram a dinâmica física do aeroporto — sem confundir tonelagem com valor FOB.</p>
+      </div>
+      <div class="panel-grid two-cols">
+        <article class="panel-card chart-card">
+          <div class="card-head">
+            <div><span class="card-tag">ANAC / série histórica</span><h3>Movimentação internacional</h3><p>Embarque e desembarque mensal em Viracopos</p></div>
+            <span class="card-unit">toneladas / mês</span>
+          </div>
+          <div class="legend"><span><i class="swatch teal"></i> Desembarque</span><span><i class="swatch yellow"></i> Embarque</span></div>
+          <div id="grafico-carga" class="chart" aria-label="Gráfico de carga aérea"></div>
+          <div class="card-note">Leitura recomendada: comparar mesmo mês entre anos antes de concluir se há alta ou queda estrutural.</div>
+        </article>
+        <article class="panel-card insight-card">
+          <span class="insight-tag">INTERPRETAÇÃO</span>
+          <h3>Como ler esta seção</h3>
+          <ul>
+            <li><strong>Sazonalidade:</strong> alguns picos podem ser recorrentes.</li>
+            <li><strong>Persistência:</strong> é preciso verificar se o movimento se mantém por vários meses.</li>
+            <li><strong>Contexto:</strong> variações podem dialogar com câmbio, indústria e comércio exterior.</li>
+          </ul>
+          <div class="insight-box">Este painel foi desenhado para consulta rápida: os atalhos no topo e na lateral evitam rolagem excessiva.</div>
+        </article>
+      </div>
+    </section>
+
+    <section class="data-section section-anchor" id="comex">
+      <div class="section-head">
+        <div>
+          <p class="section-kicker">02 · COMÉRCIO EXTERIOR</p>
+          <h2>Valor negociado e contexto do fluxo</h2>
+        </div>
+        <p>Os gráficos abaixo ajudam a cruzar a atividade do terminal com o comportamento do comércio exterior brasileiro e do recorte aduaneiro.</p>
+      </div>
+      <div class="panel-grid two-even">
+        <article class="panel-card chart-card">
+          <div class="card-head">
+            <div><span class="card-tag">MDIC / recorte aduaneiro</span><h3>Importação × exportação</h3><p>Valor FOB mensal do recorte validado</p></div>
+            <span class="card-unit">US$ milhões</span>
+          </div>
+          <div class="legend"><span><i class="swatch teal"></i> Importação</span><span><i class="swatch yellow"></i> Exportação</span></div>
+          <div id="grafico-comex" class="chart" aria-label="Gráfico de comércio exterior por recorte aduaneiro"></div>
+          <div class="card-note">Recorte de URF não mede diretamente a operação física do aeroporto.</div>
+        </article>
+        <article class="panel-card chart-card">
+          <div class="card-head">
+            <div><span class="card-tag">MDIC / Brasil</span><h3>Fluxo nacional de comércio</h3><p>Importações e exportações brasileiras por mês</p></div>
+            <span class="card-unit">US$ bilhões</span>
+          </div>
+          <div class="legend"><span><i class="swatch teal"></i> Exportação</span><span><i class="swatch yellow"></i> Importação</span></div>
+          <div id="grafico-brasil" class="chart" aria-label="Gráfico de comércio exterior nacional"></div>
+          <div class="card-note">Indicador contextual nacional, útil para leitura macro da demanda.</div>
+        </article>
+      </div>
+    </section>
+
+    <section class="data-section section-anchor" id="macroeconomia">
+      <div class="section-head">
+        <div>
+          <p class="section-kicker">03 · MACROECONOMIA</p>
+          <h2>Variáveis que podem antecipar movimento</h2>
+        </div>
+        <p>Juros, dólar e inflação afetam decisão econômica e podem servir de sinal antecedente quando analisados com cuidado.</p>
+      </div>
+      <article class="panel-card macro-card">
+        <div class="card-head macro-head">
+          <div><span class="card-tag">BANCO CENTRAL / SGS</span><h3 id="macro-title">Evolução da taxa Selic</h3><p id="macro-desc">Meta Selic no último dia do mês</p></div>
+          <div class="segment" role="group" aria-label="Escolher indicador econômico">
+            <button class="seg active" data-metric="selic_meta_pct_aa" aria-pressed="true">SELIC</button>
+            <button class="seg" data-metric="dolar_venda_medio_brl" aria-pressed="false">DÓLAR</button>
+            <button class="seg" data-metric="ipca_pct_mes" aria-pressed="false">IPCA</button>
+          </div>
+        </div>
+        <div class="macro-reading"><strong id="macro-valor">—</strong><span id="macro-meta">Aguardando sincronização da API do BCB</span></div>
+        <div id="grafico-macro" class="chart chart-macro" aria-label="Gráfico do indicador macroeconômico"></div>
+      </article>
+    </section>
+
+    <section class="data-section section-anchor" id="setores">
+      <div class="section-head">
+        <div>
+          <p class="section-kicker">04 · LEITURA SETORIAL</p>
+          <h2>Quais grupos puxam o comércio</h2>
+        </div>
+        <p>A abertura por setor ajuda a identificar mudanças de composição e pode orientar hipóteses sobre a natureza da demanda.</p>
+      </div>
+      <article class="panel-card table-card">
+        <div class="card-head">
+          <div><span class="card-tag">COMEX STAT / agrupamentos</span><h3>Participação por setor</h3><p>Valor FOB, peso líquido e participação do fluxo selecionado</p></div>
+          <div class="flow-picker"><label for="fluxo">FLUXO</label><select id="fluxo"><option value="importacao">Importação</option><option value="exportacao">Exportação</option></select></div>
+        </div>
+        <div class="table-scroll"><table><thead><tr><th>SETOR / AGRUPAMENTO</th><th>COMPETÊNCIA</th><th class="numeric">VALOR FOB</th><th class="numeric">PESO LÍQUIDO</th><th class="numeric">PARTICIPAÇÃO</th></tr></thead><tbody id="tabela-setores"><tr><td colspan="5">Aguardando arquivo de comércio exterior por setor.</td></tr></tbody></table></div>
+      </article>
+    </section>
+
+    <section class="data-section section-anchor" id="metodo">
+      <div class="section-head">
+        <div>
+          <p class="section-kicker">05 · FONTES E CONTINUIDADE</p>
+          <h2>Transparência metodológica</h2>
+        </div>
+        <p>O projeto explicita o que já está automatizado, o que ainda aguarda integração e como cada indicador deve ser interpretado.</p>
+      </div>
+      <div class="panel-grid two-even">
+        <article class="panel-card source-card">
+          <span class="insight-tag">FONTES PÚBLICAS</span>
+          <h3>Base verificável</h3>
+          <p>Sem números ilustrativos. Somente dados públicos e documentados entram no painel.</p>
+          <div class="source-links">
+            <a href="https://www.gov.br/mdic/pt-br/assuntos/comercio-exterior/estatisticas/base-de-dados-bruta" target="_blank" rel="noopener">MDIC · Comex Stat ↗</a>
+            <a href="https://www.anac.gov.br/acesso-a-informacao/dados-abertos/areas-de-atuacao/operador-aeroportuario/dados-de-movimentacao-aeroportuaria/60-dados-de-movimentacao-aeroportuaria" target="_blank" rel="noopener">ANAC · Movimentação aeroportuária ↗</a>
+            <a href="https://dadosabertos.bcb.gov.br/" target="_blank" rel="noopener">Banco Central · SGS ↗</a>
+          </div>
+        </article>
+        <article class="panel-card update-card">
+          <span class="insight-tag">ROTINA DE ATUALIZAÇÃO</span>
+          <h3>Coleta e cobertura das séries</h3>
+          <p>A coleta econômica consulta o BCB. As séries ANAC e Comex de Viracopos aguardam integração. A competência e a disponibilidade de cada base estão abaixo.</p>
+          <div id="source-status" class="source-status"></div>
+          <div class="steps"><div><b>1</b><span>coletar</span></div><div><b>2</b><span>validar</span></div><div><b>3</b><span>publicar</span></div></div>
+          <p class="build-time" id="last-build">Compilação: —</p>
+        </article>
+      </div>
+    </section>
+
+    <footer class="site-footer">
+      <div class="footer-brand">VCP<span>/</span>INSIGHTS<small>OBSERVATÓRIO INDEPENDENTE DE CARGAS</small></div>
+      <p>Projeto independente, sem vínculo institucional ou endosso da concessionária Aeroportos Brasil Viracopos.</p>
+      <a href="#topo">voltar ao topo ↑</a>
+    </footer>
+  </div>
+</main>
+
+<script type="application/json" id="dados-incorporados">{"versao":"1.1.0","gerado_em_utc":"2026-10-27T14:34:08.147584+00:00","modo_compilacao":"online","contexto":"Carga física, valor FOB e peso líquido têm coberturas distintas.","coleta_bcb":{"selic_meta_pct_aa":{"status":"ok","competencia":"2026-09","coletado_em_utc":"2026-10-27T14:34:08.147584+00:00","url":"https://api.bcb.gov.br/dados/serie/bcdata.sgs.432/dados?formato=json&dataInicial=01%2F01%2F2022&dataFinal=30%2F09%2F2026","sha256":"4fdfc6e4c16a3d0bbe71b19defcc9e596a8bab43a520b744bae398158df57fa3","registros":1734},"dolar_venda_medio_brl":{"status":"ok","competencia":"2026-09","coletado_em_utc":"2026-10-27T14:34:08.147584+00:00","url":"https://api.bcb.gov.br/dados/serie/bcdata.sgs.1/dados?formato=json&dataInicial=01%2F09%2F2025&dataFinal=30%2F09%2F2026","sha256":"2db2b05f96749de01c77ecc4380fa0142a035f4f957846aab5dbc78b40aafefb","registros":273},"ipca_pct_mes":{"status":"ok","competencia":"2026-09","coletado_em_utc":"2026-10-27T14:34:08.147584+00:00","url":"https://api.bcb.gov.br/dados/serie/bcdata.sgs.433/dados?formato=json&dataInicial=01%2F01%2F2022&dataFinal=30%2F09%2F2026","sha256":"9b8b0a742d454333d6eacb1c2ed1795acdcd71444770d268f543d878ce752699","registros":57}},"metadados":{"brasil":{"fonte_original":"https://www.gov.br/mdic/pt-br/assuntos/comercio-exterior/estatisticas","coletado_em_utc":null,"unidades":{"exportacoes_usd_bi":"US$ bilhões FOB","importacoes_usd_bi":"US$ bilhões FOB"},"periodicidade":"mensal","abrangencia":"Brasil; todas as vias de transporte","tratamento":"Valores recebidos no protótipo, conferidos no painel oficial MDIC em 27/10/2026. Coleta original desconhecida; instante UTC de conferência documental registrado separadamente.","limitacoes":"Uma competência; valores arredondados a uma casa decimal. Não representam Viracopos. Importação manual.","status":"validado","referencia_inicial":"2026-09","referencia_final":"2026-09","verificado_em_utc":"2026-10-27T14:20:30.022078+00:00"},"viracopos":{"fonte_original":"https://www.gov.br/anac/pt-br/assuntos/dados-e-estatisticas","coletado_em_utc":null,"unidades":{"embarque_internacional_t":"toneladas","desembarque_internacional_t":"toneladas"},"periodicidade":"mensal","abrangencia":"Planejado: SBKP; carga aérea internacional embarcada/desembarcada","tratamento":"Coletor ainda não implementado. Validar dicionário ANAC e conversão de unidades antes de importar.","limitacoes":"Sem observações. Não representa carga aduaneira nem armazenagem.","status":"pendente","referencia_inicial":null,"referencia_final":null},"comex":{"fonte_original":"https://comexstat.mdic.gov.br/pt/geral","coletado_em_utc":null,"unidades":{"valor_fob_usd":"US$ FOB","kg_liquido":"kg líquidos"},"periodicidade":"mensal × fluxo × setor","abrangencia":"Recorte URF de Viracopos ainda não validado","tratamento":"Coletor ainda não implementado. Definir URF, via de transporte e classificação setorial estável.","limitacoes":"Sem observações. URF não equivale automaticamente ao fluxo físico de SBKP.","recorte_validado":false,"status":"pendente","referencia_inicial":null,"referencia_final":null},"macro":{"fonte_original":"https://api.bcb.gov.br/dados/serie/bcdata.sgs.{codigo}/dados","coletado_em_utc":"2026-10-27T14:34:08.147584+00:00","unidades":{"selic_meta_pct_aa":"% a.a.","dolar_venda_medio_brl":"R$/US$","ipca_pct_mes":"% mensal"},"periodicidade":"mensal (SGS 432 e 1: originais diárias; 433: mensal)","abrangencia":"Brasil","tratamento":"SGS 432: último registro disponível no mês; SGS 1: média aritmética dos dias publicados; SGS 433: variação mensal. Somente meses encerrados. Reconsulta sobreposta de 12 meses; demais competências preservadas.","limitacoes":"Disponibilidade por indicador pode diferir. Meses ausentes não são interpolados. Requisições limitadas a menos de 10 anos; backfill anterior requer consultas adicionais. Não implica causalidade.","status":"validado","referencia_inicial":"2022-01","referencia_final":"2026-09","coletas_por_serie":{"dolar_venda_medio_brl":{"status":"ok","competencia":"2026-09","coletado_em_utc":"2026-10-27T14:34:08.147584+00:00","url":"https://api.bcb.gov.br/dados/serie/bcdata.sgs.1/dados?formato=json&dataInicial=01%2F09%2F2025&dataFinal=30%2F09%2F2026","sha256":"2db2b05f96749de01c77ecc4380fa0142a035f4f957846aab5dbc78b40aafefb","registros":273},"selic_meta_pct_aa":{"status":"ok","competencia":"2026-09","coletado_em_utc":"2026-10-27T14:34:08.147584+00:00","url":"https://api.bcb.gov.br/dados/serie/bcdata.sgs.432/dados?formato=json&dataInicial=01%2F01%2F2022&dataFinal=30%2F09%2F2026","sha256":"4fdfc6e4c16a3d0bbe71b19defcc9e596a8bab43a520b744bae398158df57fa3","registros":1734},"ipca_pct_mes":{"status":"ok","competencia":"2026-09","coletado_em_utc":"2026-10-27T14:34:08.147584+00:00","url":"https://api.bcb.gov.br/dados/serie/bcdata.sgs.433/dados?formato=json&dataInicial=01%2F01%2F2022&dataFinal=30%2F09%2F2026","sha256":"9b8b0a742d454333d6eacb1c2ed1795acdcd71444770d268f543d878ce752699","registros":57}}}},"brasil":[{"mes":"2026-09","exportacoes_usd_bi":34.4,"importacoes_usd_bi":26.7}],"viracopos":[],"comex":[],"macro":[{"mes":"2022-01","selic_meta_pct_aa":9.25,"dolar_venda_medio_brl":5.534105,"ipca_pct_mes":0.54},{"mes":"2022-02","selic_meta_pct_aa":10.75,"dolar_venda_medio_brl":5.196579,"ipca_pct_mes":1.01},{"mes":"2022-03","selic_meta_pct_aa":11.75,"dolar_venda_medio_brl":4.968382,"ipca_pct_mes":1.62},{"mes":"2022-04","selic_meta_pct_aa":11.75,"dolar_venda_medio_brl":4.758016,"ipca_pct_mes":1.06},{"mes":"2022-05","selic_meta_pct_aa":12.75,"dolar_venda_medio_brl":4.95505,"ipca_pct_mes":0.47},{"mes":"2022-06","selic_meta_pct_aa":13.25,"dolar_venda_medio_brl":5.04921,"ipca_pct_mes":0.67},{"mes":"2022-07","selic_meta_pct_aa":13.25,"dolar_venda_medio_brl":5.368071,"ipca_pct_mes":-0.68},{"mes":"2022-08","selic_meta_pct_aa":13.75,"dolar_venda_medio_brl":5.143287,"ipca_pct_mes":-0.36},{"mes":"2022-09","selic_meta_pct_aa":13.75,"dolar_venda_medio_brl":5.236957,"ipca_pct_mes":-0.29},{"mes":"2022-10","selic_meta_pct_aa":13.75,"dolar_venda_medio_brl":5.2503,"ipca_pct_mes":0.59},{"mes":"2022-11","selic_meta_pct_aa":13.75,"dolar_venda_medio_brl":5.27465,"ipca_pct_mes":0.41},{"mes":"2022-12","selic_meta_pct_aa":13.75,"dolar_venda_medio_brl":5.242432,"ipca_pct_mes":0.62},{"mes":"2023-01","selic_meta_pct_aa":13.75,"dolar_venda_medio_brl":5.200682,"ipca_pct_mes":0.53},{"mes":"2023-02","selic_meta_pct_aa":13.75,"dolar_venda_medio_brl":5.171689,"ipca_pct_mes":0.84},{"mes":"2023-03","selic_meta_pct_aa":13.75,"dolar_venda_medio_brl":5.211461,"ipca_pct_mes":0.71},{"mes":"2023-04","selic_meta_pct_aa":13.75,"dolar_venda_medio_brl":5.019733,"ipca_pct_mes":0.61},{"mes":"2023-05","selic_meta_pct_aa":13.75,"dolar_venda_medio_brl":4.982836,"ipca_pct_mes":0.23},{"mes":"2023-06","selic_meta_pct_aa":13.75,"dolar_venda_medio_brl":4.851567,"ipca_pct_mes":-0.08},{"mes":"2023-07","selic_meta_pct_aa":13.75,"dolar_venda_medio_brl":4.800833,"ipca_pct_mes":0.12},{"mes":"2023-08","selic_meta_pct_aa":13.25,"dolar_venda_medio_brl":4.903543,"ipca_pct_mes":0.23},{"mes":"2023-09","selic_meta_pct_aa":12.75,"dolar_venda_medio_brl":4.93699,"ipca_pct_mes":0.26},{"mes":"2023-10","selic_meta_pct_aa":12.75,"dolar_venda_medio_brl":5.064843,"ipca_pct_mes":0.24},{"mes":"2023-11","selic_meta_pct_aa":12.25,"dolar_venda_medio_brl":4.89834,"ipca_pct_mes":0.28},{"mes":"2023-12","selic_meta_pct_aa":11.75,"dolar_venda_medio_brl":4.897245,"ipca_pct_mes":0.56},{"mes":"2024-01","selic_meta_pct_aa":11.75,"dolar_venda_medio_brl":4.914395,"ipca_pct_mes":0.42},{"mes":"2024-02","selic_meta_pct_aa":11.25,"dolar_venda_medio_brl":4.964389,"ipca_pct_mes":0.83},{"mes":"2024-03","selic_meta_pct_aa":10.75,"dolar_venda_medio_brl":4.980135,"ipca_pct_mes":0.16},{"mes":"2024-04","selic_meta_pct_aa":10.75,"dolar_venda_medio_brl":5.129095,"ipca_pct_mes":0.38},{"mes":"2024-05","selic_meta_pct_aa":10.5,"dolar_venda_medio_brl":5.133048,"ipca_pct_mes":0.46},{"mes":"2024-06","selic_meta_pct_aa":10.5,"dolar_venda_medio_brl":5.388975,"ipca_pct_mes":0.21},{"mes":"2024-07","selic_meta_pct_aa":10.5,"dolar_venda_medio_brl":5.542048,"ipca_pct_mes":0.38},{"mes":"2024-08","selic_meta_pct_aa":10.5,"dolar_venda_medio_brl":5.552614,"ipca_pct_mes":-0.02},{"mes":"2024-09","selic_meta_pct_aa":10.75,"dolar_venda_medio_brl":5.541567,"ipca_pct_mes":0.44},{"mes":"2024-10","selic_meta_pct_aa":10.75,"dolar_venda_medio_brl":5.624109,"ipca_pct_mes":0.56},{"mes":"2024-11","selic_meta_pct_aa":11.25,"dolar_venda_medio_brl":5.807058,"ipca_pct_mes":0.39},{"mes":"2024-12","selic_meta_pct_aa":12.25,"dolar_venda_medio_brl":6.097029,"ipca_pct_mes":0.52},{"mes":"2025-01","selic_meta_pct_aa":13.25,"dolar_venda_medio_brl":6.021773,"ipca_pct_mes":0.16},{"mes":"2025-02","selic_meta_pct_aa":13.25,"dolar_venda_medio_brl":5.765645,"ipca_pct_mes":1.31},{"mes":"2025-03","selic_meta_pct_aa":14.25,"dolar_venda_medio_brl":5.746811,"ipca_pct_mes":0.56},{"mes":"2025-04","selic_meta_pct_aa":14.25,"dolar_venda_medio_brl":5.783675,"ipca_pct_mes":0.43},{"mes":"2025-05","selic_meta_pct_aa":14.75,"dolar_venda_medio_brl":5.667386,"ipca_pct_mes":0.26},{"mes":"2025-06","selic_meta_pct_aa":15.0,"dolar_venda_medio_brl":5.547055,"ipca_pct_mes":0.24},{"mes":"2025-07","selic_meta_pct_aa":15.0,"dolar_venda_medio_brl":5.528491,"ipca_pct_mes":0.26},{"mes":"2025-08","selic_meta_pct_aa":15.0,"dolar_venda_medio_brl":5.446924,"ipca_pct_mes":-0.11},{"mes":"2025-09","selic_meta_pct_aa":15.0,"dolar_venda_medio_brl":5.367409,"ipca_pct_mes":0.48},{"mes":"2025-10","selic_meta_pct_aa":15.0,"dolar_venda_medio_brl":5.385526,"ipca_pct_mes":0.09},{"mes":"2025-11","selic_meta_pct_aa":15.0,"dolar_venda_medio_brl":5.340853,"ipca_pct_mes":0.18},{"mes":"2025-12","selic_meta_pct_aa":15.0,"dolar_venda_medio_brl":5.453091,"ipca_pct_mes":0.33},{"mes":"2026-01","selic_meta_pct_aa":15.0,"dolar_venda_medio_brl":5.338024,"ipca_pct_mes":0.33},{"mes":"2026-02","selic_meta_pct_aa":15.0,"dolar_venda_medio_brl":5.200617,"ipca_pct_mes":0.7},{"mes":"2026-03","selic_meta_pct_aa":14.75,"dolar_venda_medio_brl":5.231586,"ipca_pct_mes":0.88},{"mes":"2026-04","selic_meta_pct_aa":14.5,"dolar_venda_medio_brl":5.033075,"ipca_pct_mes":0.67},{"mes":"2026-05","selic_meta_pct_aa":14.5,"dolar_venda_medio_brl":4.9837,"ipca_pct_mes":0.58},{"mes":"2026-06","selic_meta_pct_aa":14.25,"dolar_venda_medio_brl":5.127571,"ipca_pct_mes":0.16},{"mes":"2026-07","selic_meta_pct_aa":14.25,"dolar_venda_medio_brl":5.113948,"ipca_pct_mes":0.07},{"mes":"2026-08","selic_meta_pct_aa":14.0,"dolar_venda_medio_brl":5.153162,"ipca_pct_mes":-0.32},{"mes":"2026-09","selic_meta_pct_aa":13.75,"dolar_venda_medio_brl":5.144724,"ipca_pct_mes":0.82}]}</script>
+<script src="assets/app-blue.js" defer></script>
+</body>
+</html>
