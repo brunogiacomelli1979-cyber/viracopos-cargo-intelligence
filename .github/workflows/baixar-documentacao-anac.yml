@@ -4,6 +4,7 @@ on:
     branches: [docs/anac-referencias-oficiais-20261027]
     paths:
       - 'scripts/baixar_documentacao_anac.py'
+      - 'scripts/validar_acervo_anac.py'
       - '.github/workflows/baixar-documentacao-anac.yml'
   workflow_dispatch:
 
@@ -24,6 +25,8 @@ jobs:
         id: collect
         continue-on-error: true
         run: python scripts/baixar_documentacao_anac.py
+      - name: Validar SHA-256 e formatos dos originais
+        run: python scripts/validar_acervo_anac.py
       - name: Arquivar somente documentação e manifesto na branch isolada
         shell: bash
         run: |
