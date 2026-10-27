@@ -7,8 +7,10 @@ import json
 import logging
 import os
 import tempfile
+import time
 from datetime import date, datetime, timedelta, timezone
 from urllib.parse import urlencode
+from urllib.error import HTTPError
 
 from validar_dados import ROOT, SCHEMAS, read_csv, validate_metadata, validate_rows
 from coletar_brasil import collect_brazil
@@ -54,11 +56,24 @@ def atomic_write(path, content):
 def fetch_series(code, start, end):
     query = urlencode({"formato": "json", "dataInicial": start.strftime("%d/%m/%Y"), "dataFinal": end.strftime("%d/%m/%Y")})
     url = f"https://api.bcb.gov.br/dados/serie/bcdata.sgs.{code}/dados?{query}"
-    raw = get_bytes(url, timeout=30)
-    data = json.loads(raw)
-    if not isinstance(data, list) or not data:
-        raise ValueError("SGS sem observações")
-    return data, {"url": url, "sha256": hashlib.sha256(raw).hexdigest(), "registros": len(data)}
+    # A API pode devolver HTML temporário com HTTP 200 ou falhar intermitentemente.
+    # Retentativas não removem observações anteriores nem contornam TLS.
+    for attempt in range(3):
+        try:
+            raw = get_bytes(url, timeout=30)
+            data = json.loads(raw)
+            if not isinstance(data, list) or not data:
+                raise ValueError("SGS sem observações em formato JSON válido")
+            if any(not isinstance(row, dict) or not {"data", "valor"} <= row.keys() for row in data):
+                raise ValueError("SGS com registros em formato inesperado")
+            return data, {"url": url, "sha256": hashlib.sha256(raw).hexdigest(), "registros": len(data)}
+        except (OSError, ValueError) as error:
+            if isinstance(error, HTTPError) and error.code not in (408, 429, 500, 502, 503, 504):
+                raise  # erros permanentes de consulta não justificam novas tentativas
+            if attempt == 2:
+                raise
+            logging.warning("SGS %s: resposta inválida/tentativa %s de 3: %s", code, attempt + 1, error)
+            time.sleep(2 ** attempt)
 
 
 def aggregate(field, data, start, end):
