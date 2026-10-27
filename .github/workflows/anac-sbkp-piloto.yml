@@ -39,7 +39,9 @@ jobs:
           assert len([r for r in rows if r['sentido']!='local'])==4
           assert {'embarque','desembarque'} <= {r['sentido'] for r in rows}
           assert {'internacional','domestica'} <= {r['natureza'] for r in rows}
-          print('Piloto ANAC com quatro grupos verificados',meta['recibos'][0]['sha256'])
+          assert sum(int(r['etapas']) for r in rows)==meta['recibos'][0]['etapas_sbkp']
+          assert sum(int(r['etapas']) for r in rows if r['sentido']=='local')==meta['recibos'][0]['etapas_locais_sbkp']
+          print('Piloto ANAC, incluindo voos locais, validado',meta['recibos'][0]['sha256'])
           PY
       - uses: actions/upload-artifact@v4
         if: always()
