@@ -1,0 +1,50 @@
+name: Arquivar documentação oficial ANAC
+on:
+  push:
+    branches: [docs/anac-referencias-oficiais-20261027]
+    paths:
+      - 'scripts/baixar_documentacao_anac.py'
+      - 'scripts/validar_acervo_anac.py'
+      - '.github/workflows/baixar-documentacao-anac.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+jobs:
+  download:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: docs/anac-referencias-oficiais-20261027
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Baixar documentação e registrar erros sem mascarar falhas
+        id: collect
+        continue-on-error: true
+        run: python scripts/baixar_documentacao_anac.py
+      - name: Validar SHA-256 e formatos dos originais
+        run: python scripts/validar_acervo_anac.py
+      - name: Arquivar somente documentação e manifesto na branch isolada
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add docs/referencias/anac/manifesto.json docs/referencias/anac/originais/ || true
+          if ! git diff --cached --quiet; then
+            git commit -m 'docs: arquivar originais ANAC e manifesto de proveniência'
+            git push origin HEAD:docs/anac-referencias-oficiais-20261027
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: documentos-oficiais-anac
+          path: docs/referencias/anac/
+          retention-days: 30
+      - name: Exigir todos os documentos essenciais
+        if: steps.collect.outcome != 'success'
+        run: |
+          echo 'Acervo documental incompleto: consultar o manifesto para identificar fontes pendentes.'
+          exit 1

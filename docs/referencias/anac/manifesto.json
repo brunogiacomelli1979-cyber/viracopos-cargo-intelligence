@@ -1,0 +1,126 @@
+{
+  "projeto": "Viracopos Cargo Intelligence",
+  "etapa": "1_documentacao_apenas",
+  "capturado_em_utc": "2026-10-27T21:44:34.043117+00:00",
+  "documentos": [
+    {
+      "id": "metadados_etapa_basica",
+      "type": "html",
+      "essential": true,
+      "file": "docs/referencias/anac/originais/01_metadados_etapa_basica.html",
+      "url": "https://www.anac.gov.br/acesso-a-informacao/dados-abertos/areas-de-atuacao/voos-e-operacoes-aereas/dados-estatisticos-do-transporte-aereo/48-dados-estatisticos-do-transporte-aereo",
+      "status": "baixado",
+      "url_final": "https://www.anac.gov.br/acesso-a-informacao/dados-abertos/areas-de-atuacao/voos-e-operacoes-aereas/dados-estatisticos-do-transporte-aereo/48-dados-estatisticos-do-transporte-aereo",
+      "bytes": 69909,
+      "sha256": "e75d3ff5836fb902ca679e8d145d45e2605472969a2bb71bd0512de26b3e04bd",
+      "tipo_resposta": "text/html;charset=utf-8"
+    },
+    {
+      "id": "resolucao_191_2011",
+      "type": "html",
+      "essential": true,
+      "file": "docs/referencias/anac/originais/02_resolucao_191_2011.html",
+      "url": "https://www.anac.gov.br/assuntos/legislacao/legislacao-1/resolucoes/resolucoes-2011/resolucao-no-191-de-16-06-2011",
+      "status": "baixado",
+      "url_final": "https://www.anac.gov.br/assuntos/legislacao/legislacao-1/resolucoes/resolucoes-2011/resolucao-no-191-de-16-06-2011",
+      "bytes": 105203,
+      "sha256": "38cf2bbe4e35c02c98ebc4e6f71ca48df74dec23fc42e0dd7edb3cb99cc49b15",
+      "tipo_resposta": "text/html;charset=utf-8"
+    },
+    {
+      "id": "portaria_3506_2019_compilada",
+      "type": "pdf",
+      "essential": true,
+      "file": "docs/referencias/anac/originais/03_portaria_3506_2019_compilada.pdf",
+      "url": "https://www.anac.gov.br/assuntos/legislacao/legislacao-1/portarias/2019/portaria-no-3506-sas-11-11-2019/@@display-file/arquivo_norma/PA2019-3506.pdf",
+      "status": "baixado",
+      "url_final": "https://www.anac.gov.br/assuntos/legislacao/legislacao-1/portarias/2019/portaria-no-3506-sas-11-11-2019/@@display-file/arquivo_norma/PA2019-3506.pdf",
+      "bytes": 407339,
+      "sha256": "c96d827dad1e35f15f7084208e3ffbcab1d0f19ed2229757c9db343d9dc41cea",
+      "tipo_resposta": "application/pdf"
+    },
+    {
+      "id": "portaria_3507_2019_compilada",
+      "type": "pdf",
+      "essential": true,
+      "file": "docs/referencias/anac/originais/04_portaria_3507_2019_compilada.pdf",
+      "url": "https://www.anac.gov.br/assuntos/legislacao/legislacao-1/portarias/2019/portaria-no-3507-sas-11-11-2019/@@display-file/arquivo_norma/PA2019-3507%20-%20Compilado%20at%C3%A9%20PA2019-3902.pdf",
+      "status": "baixado",
+      "url_final": "https://www.anac.gov.br/assuntos/legislacao/legislacao-1/portarias/2019/portaria-no-3507-sas-11-11-2019/@@display-file/arquivo_norma/PA2019-3507%20-%20Compilado%20at%C3%A9%20PA2019-3902.pdf",
+      "bytes": 242595,
+      "sha256": "d7bf9d2de8f891005dc5ec128c096cf983804de01b89f48d7286e467f7b85fa7",
+      "tipo_resposta": "application/pdf"
+    },
+    {
+      "id": "resolucao_464_2018",
+      "type": "html",
+      "essential": true,
+      "file": "docs/referencias/anac/originais/05_resolucao_464_2018.html",
+      "url": "https://www.anac.gov.br/assuntos/legislacao/legislacao-1/resolucoes/2018/resolucao-no-464-22-02-2018",
+      "status": "baixado",
+      "url_final": "https://www.anac.gov.br/assuntos/legislacao/legislacao-1/resolucoes/2018/resolucao-no-464-22-02-2018",
+      "bytes": 132654,
+      "sha256": "9c2a6b1edaa4796873db83eb10830b332076912188f84d40f525ce5d530e8ff9",
+      "tipo_resposta": "text/html;charset=utf-8"
+    },
+    {
+      "id": "portaria_1017_2018_compilada_2176_2019",
+      "type": "pdf",
+      "essential": true,
+      "file": "docs/referencias/anac/originais/06_portaria_1017_2018_compilada.pdf",
+      "url": "https://www.anac.gov.br/assuntos/legislacao/legislacao-1/portarias/2018/portaria-no-1017-sra-sia-26-03-2018/@@display-file/arquivo_norma/PA2018-1017%20-%20Compilado%20at%C3%A9%20PA2019-2176.pdf",
+      "status": "baixado",
+      "url_final": "https://www.anac.gov.br/assuntos/legislacao/legislacao-1/portarias/2018/portaria-no-1017-sra-sia-26-03-2018/@@display-file/arquivo_norma/PA2018-1017%20-%20Compilado%20at%C3%A9%20PA2019-2176.pdf",
+      "bytes": 314097,
+      "sha256": "39363ec79f120853d8c073bb9e9478d1593c70f3b864f0c16ff386ee56f730f2",
+      "tipo_resposta": "application/pdf"
+    },
+    {
+      "id": "metadados_movimentacao_aeroportuaria",
+      "type": "html",
+      "essential": true,
+      "file": "docs/referencias/anac/originais/07_metadados_movimentacao_aeroportuaria.html",
+      "url": "https://www.anac.gov.br/acesso-a-informacao/dados-abertos/areas-de-atuacao/operador-aeroportuario/dados-de-movimentacao-aeroportuaria/60-dados-de-movimentacao-aeroportuaria",
+      "status": "baixado",
+      "url_final": "https://www.anac.gov.br/acesso-a-informacao/dados-abertos/areas-de-atuacao/operador-aeroportuario/dados-de-movimentacao-aeroportuaria/60-dados-de-movimentacao-aeroportuaria",
+      "bytes": 76346,
+      "sha256": "f7cbb8caaf6fcd6cfbdb8c72f7baec9e9ec814b7c0f5b543e170f53de9f09b43",
+      "tipo_resposta": "text/html;charset=utf-8"
+    },
+    {
+      "id": "portaria_3902_2019_alteracao",
+      "type": "pdf",
+      "essential": false,
+      "file": "docs/referencias/anac/originais/08_portaria_3902_2019_alteracao.pdf",
+      "url": "https://www.anac.gov.br/assuntos/legislacao/legislacao-1/portarias/2019/portaria-no-3902-sas-20-12-2019/@@display-file/arquivo_norma/PA2019-3902.pdf",
+      "status": "baixado",
+      "url_final": "https://www.anac.gov.br/assuntos/legislacao/legislacao-1/portarias/2019/portaria-no-3902-sas-20-12-2019/@@display-file/arquivo_norma/PA2019-3902.pdf",
+      "bytes": 83383,
+      "sha256": "24ea5e5f73969bd09fe3faabb879b99f0acca515968175152b76b049463e3569",
+      "tipo_resposta": "application/pdf"
+    },
+    {
+      "id": "metadados_movimentacao_anac_govbr",
+      "type": "html",
+      "essential": true,
+      "file": "docs/referencias/anac/originais/10_metadados_movimentacao_govbr.html",
+      "url": "https://www.gov.br/anac/pt-br/acesso-a-informacao/dados-abertos/areas-de-atuacao/operador-aeroportuario/dados-de-movimentacao-aeroportuaria/metadados-operador-aeroportuario-dados-de-movimentacao-aeroportuaria",
+      "status": "baixado",
+      "url_final": "https://www.gov.br/anac/pt-br/acesso-a-informacao/dados-abertos/areas-de-atuacao/operador-aeroportuario/dados-de-movimentacao-aeroportuaria/metadados-operador-aeroportuario-dados-de-movimentacao-aeroportuaria",
+      "bytes": 153993,
+      "sha256": "52ba4c4055e396576183a736a100face723008e3aeb09c353058ce1b9a4bd08f",
+      "tipo_resposta": "text/html;charset=utf-8"
+    },
+    {
+      "id": "pagina_referencias_concessionaria_vcp",
+      "type": "html",
+      "essential": false,
+      "file": "09_pagina_referencias_concessionaria.html",
+      "url": "https://www.viracopos.com/pt_br/institucional/estatisticas-e-publicacoes.htm",
+      "status": "pendente",
+      "erro": "<urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1010)>"
+    }
+  ],
+  "essenciais_pendentes": [],
+  "nota": "Captura do arquivo público original, sem interpretar nulos nem modificar datasets."
+}
