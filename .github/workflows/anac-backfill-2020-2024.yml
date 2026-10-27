@@ -6,6 +6,7 @@ on:
       - '.github/workflows/anac-backfill-2020-2024.yml'
       - 'scripts/validar_anac_historico.py'
       - 'scripts/diagnosticar_anac_backfill.py'
+      - 'scripts/auditar_nulos_anac.py'
   workflow_dispatch:
 
 permissions:
@@ -76,6 +77,26 @@ jobs:
         with:
           name: anac-backfill-diagnostico
           path: docs/anac-backfill-diagnostico.json
+          retention-days: 30
+
+  inspect_missing:
+    name: Auditar campos ausentes ANAC
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/anac-carga-sbkp-2020-2024
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Revisar quatro meses de pesos ausentes com arquivos oficiais
+        run: python scripts/auditar_nulos_anac.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: anac-campos-ausentes-auditoria
+          path: docs/anac-auditoria-campos-ausentes.json
           retention-days: 30
 
   validate:
