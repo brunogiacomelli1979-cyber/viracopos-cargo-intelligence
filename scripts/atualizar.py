@@ -144,7 +144,7 @@ def build(offline=False, root=ROOT, rma_start_year=2025, mdic_years=None, macro_
     statuses = previous_snapshot.get("coleta_bcb", {"status": "não executada"})
     source_statuses = previous_snapshot.get("coleta_fontes", {})
     if not offline:
-        datasets["macro"], statuses = collect(datasets["macro"], metadata, now, start_year=macro_start_year)
+        datasets["macro"], statuses = (collect(datasets["macro"], metadata, now, start_year=macro_start_year) if macro_start_year is not None else collect(datasets["macro"], metadata, now))
         national_updated = False
         try:
             incoming, receipt = collect_comex(existing_rows=datasets["comex"], now=now, years=mdic_years)
