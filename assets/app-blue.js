@@ -56,7 +56,7 @@ function lineChart(target, rawRows, series, message, opts={}) {
   const add=(tag,attrs={},txt)=>{const node=document.createElementNS(ns,tag);Object.entries(attrs).forEach(([k,v])=>node.setAttribute(k,String(v)));if(txt!==undefined)node.textContent=txt;svg.appendChild(node);return node;};
   for(let i=0;i<5;i++){const gy=y0+(y1-y0)*i/4;add('line',{x1:x0,y1:gy,x2:x1,y2:gy,stroke:opts.dark?'#295277':'#295277','stroke-dasharray':'3,6'});const v=high-(high-low)*i/4;add('text',{x:x0-11,y:gy+4,'text-anchor':'end',fill:'#a8c0d3','font-size':'12'},opts.axisValue?opts.axisValue(v):fmt(v,0));}
   const labelIndices=[...new Set(Array.from({length:Math.min(data.length,6)},(_,i)=>Math.round(i*(data.length-1)/Math.max(1,Math.min(data.length,6)-1))))];
-  labelIndices.forEach(i=>add('text',{x:x(i),y:h-5,'text-anchor':'middle',fill:'#a8c0d3','font-size':'12'},showMonth(data[i].mes)));
+  labelIndices.forEach(i=>add('text',{x:x(i),y:h-5,'text-anchor':i===0?'start':i===data.length-1?'end':'middle',fill:'#a8c0d3','font-size':'12'},showMonth(data[i].mes)));
   series.forEach(s=>{
     const pts=data.map((r,i)=>Number.isFinite(r[s.key])?{i, value:r[s.key],mes:r.mes}:null);
     let d='';let prev=false;pts.forEach(point=>{if(!point){prev=false;return;}d+=(prev?' L':' M')+x(point.i).toFixed(1)+','+y(point.value).toFixed(1);prev=true;});
