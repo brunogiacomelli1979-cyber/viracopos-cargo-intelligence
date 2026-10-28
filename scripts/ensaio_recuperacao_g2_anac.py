@@ -147,7 +147,8 @@ def drill(source, backup_root, recovery_parent, month, sha256, *, mode="simulado
             "reprocessamento": replay_seconds},
         "preflight_dispositivos": devices,
         "copia_restaurada_temporaria_removida_apos_auditoria": True,
-        "backup_persistido_no_destino": True,
+        "snapshot_salvo_no_destino_informado": True,
+        "durabilidade_fisica_comprovada": False,
         "g2_operacional_aprovado": False,
         "pendencias_externas": [
             "comprovar dispositivos fisicamente independentes ou backup offsite",
@@ -172,9 +173,7 @@ def main():
     parser.add_argument("--modo", choices=("simulado", "pre_homologacao"), default="simulado")
     parser.add_argument("--evidencia", type=Path)
     args = parser.parse_args()
-    result = drill(args.cofre, args.backups, args.recuperacao_parent,
-                   args.competencia, args.sha256, mode=args.modo)
-    data = json.dumps(result, indent=2, ensure_ascii=False, sort_keys=True) + "\n"
+    location = None
     if args.evidencia:
         location = args.evidencia.resolve()
         _outside_git(location)
@@ -182,6 +181,10 @@ def main():
             raise ValueError("Relatorio ja existente: nao sobrescrever evidencia de recuperacao")
         if not location.parent.is_dir():
             raise ValueError("Diretorio pai da evidencia nao existe")
+    result = drill(args.cofre, args.backups, args.recuperacao_parent,
+                   args.competencia, args.sha256, mode=args.modo)
+    data = json.dumps(result, indent=2, ensure_ascii=False, sort_keys=True) + "\n"
+    if location is not None:
         with location.open("x", encoding="utf-8") as output:
             output.write(data)
             output.flush()
