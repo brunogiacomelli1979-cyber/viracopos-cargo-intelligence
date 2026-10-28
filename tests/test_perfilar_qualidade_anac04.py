@@ -87,7 +87,12 @@ class DataQualityProfileTests(unittest.TestCase):
                     "ausente": item["carga"]["movimentos_com_carga_ausente"],
                     "colisoes_calco": item["chaves_operacionais_candidatas"].get("calco", {}).get("colisoes_adicionais"),
                     "colisoes_toque": item["chaves_operacionais_candidatas"].get("toque", {}).get("colisoes_adicionais"),
-                    "datas_calco_fora": item["datas_operacionais"].get("DT_CALCO", {}).get("fora_da_competencia", 0),
+                    "cobertura_chave_toque": item["chaves_operacionais_candidatas"].get("toque", {}).get("pct_cobertura"),
+                    "duplicatas_exatas": item["duplicatas_exatas_adicionais"],
+                    "correio": item["correio"],
+                    "servicos": item["service_type"],
+                    "datas_calco": item["datas_operacionais"].get("DT_CALCO", {}),
+                    "datas_toque": item["datas_operacionais"].get("DT_TOQUE", {}),
                 } for month, item in result["perfis"].items()
             }
         }, ensure_ascii=False, sort_keys=True))
