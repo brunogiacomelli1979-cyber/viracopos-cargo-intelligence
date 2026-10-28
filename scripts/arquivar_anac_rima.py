@@ -13,6 +13,8 @@ import hashlib
 import io
 import json
 import re
+import shutil
+import tempfile
 import ssl
 import sys
 import time
@@ -180,25 +182,52 @@ def atomic_write(path, content):
         temp.unlink(missing_ok=True)
 
 
+def _verify_snapshot(root, entry):
+    """Confere bytes antes de reutilizar arquivo atual ou histórico."""
+    base = root.parent.parent.parent.resolve()
+    path = (base / entry["caminho_sbkp"]).resolve()
+    if not path.is_relative_to((base / "data/anac/rima").resolve()):
+        raise ValueError("Caminho da versão fora do acervo RIMA")
+    if not path.is_file():
+        raise ValueError("Versão arquivada não existe")
+    data = path.read_bytes()
+    if (hashlib.sha256(data).hexdigest() != entry["sha256_sbkp_gzip"]
+            or len(data) != entry["bytes_sbkp_gzip"]):
+        raise ValueError("Versão arquivada não corresponde ao manifesto")
+    return path
+
+
 def store_month(root, manifest, month, raw, url, collected_utc):
+    """Salva novo snapshot imutável; preserva o arquivo anterior e seu recibo."""
+    month = month_string(month)
+    if month < FIRST_MONTH:
+        raise ValueError(f"Competência fora do recorte aprovado: {month}")
     archive, summary = filter_sbkp(raw, month)
-    path = root / "sbkp" / month[:4] / f"{month}.csv.gz"
     origin_hash = hashlib.sha256(raw).hexdigest()
     archive_hash = hashlib.sha256(archive).hexdigest()
     previous = manifest["competencias"].get(month)
-    if previous and previous["sha256_original"] == origin_hash:
-        if not path.is_file() or hashlib.sha256(path.read_bytes()).hexdigest() != previous["sha256_sbkp_gzip"]:
-            raise ValueError(f"{month}: cópia histórica diverge do manifesto")
-        return "sem_mudanca"
+    if previous:
+        _verify_snapshot(root, previous)
+        for prior in previous.get("revisoes", []):
+            _verify_snapshot(root, prior)
+        if previous["sha256_original"] == origin_hash:
+            return "sem_mudanca"
+
+    # Não reutilizar o caminho legado para versões novas.
+    # Nome endereçado pelo conteúdo: snapshots antigos continuam íntegros.
+    path = root / "sbkp" / month[:4] / "versoes" / month / f"{archive_hash}.csv.gz"
+    if path.exists():
+        if hashlib.sha256(path.read_bytes()).hexdigest() != archive_hash:
+            raise ValueError(f"{month}: colisão / versão existente modificada")
+    else:
+        atomic_write(path, archive)
     revisions = list(previous.get("revisoes", [])) if previous else []
     if previous:
-        revisions.append({
-            "sha256_original_anterior": previous["sha256_original"],
-            "sha256_sbkp_anterior": previous["sha256_sbkp_gzip"],
-            "substituido_em_utc": collected_utc,
-        })
-    atomic_write(path, archive)
-    manifest["competencias"][month] = {
+        old = {key: value for key, value in previous.items() if key != "revisoes"}
+        old["substituido_em_utc"] = collected_utc
+        revisions.append(old)
+
+    new_entry = {
         "url_original": url,
         "coletado_em_utc": collected_utc,
         "sha256_original": origin_hash,
@@ -209,9 +238,47 @@ def store_month(root, manifest, month, raw, url, collected_utc):
         "revisoes": revisions,
         **summary,
     }
+    # Publicar o recibo apenas após a verificação física do snapshot.
+    _verify_snapshot(root, new_entry)
+    manifest["competencias"][month] = new_entry
     manifest["atualizado_em_utc"] = collected_utc
-    atomic_write(root / "manifesto.json", (json.dumps(manifest, ensure_ascii=False, indent=2, sort_keys=True) + "\n").encode("utf-8"))
+    atomic_write(root / "manifesto.json",
+                 (json.dumps(manifest, ensure_ascii=False, indent=2, sort_keys=True) + "\n").encode("utf-8"))
     return "revisado" if previous else "novo"
+
+
+def _promote_complete_batch(source_root, staged_root, original_manifest_digest):
+    """Publica lote inteiro somente após todas as coletas/validações aprovadas.
+
+    Nunca sobrescreve um gzip antigo. A troca do manifesto ocorre por último.
+    Arquivos ainda não referenciados podem ficar no disco após falha física,
+    mas não são incorporados ao índice nem commitados se a execução falhar.
+    """
+    current_path = source_root / "manifesto.json"
+    current_digest = (hashlib.sha256(current_path.read_bytes()).hexdigest()
+                      if current_path.exists() else None)
+    if current_digest != original_manifest_digest:
+        raise RuntimeError("Manifesto mudou durante a execução; abortar por conflito")
+
+    proposed = load_manifest(staged_root)
+    for entry in proposed["competencias"].values():
+        _verify_snapshot(staged_root, entry)
+        for prior in entry.get("revisoes", []):
+            _verify_snapshot(staged_root, prior)
+
+    source_root.mkdir(parents=True, exist_ok=True)
+    for staged_file in (staged_root / "sbkp").rglob("*.csv.gz"):
+        relative = staged_file.relative_to(staged_root)
+        destination = source_root / relative
+        if destination.exists():
+            if hashlib.sha256(destination.read_bytes()).digest() != hashlib.sha256(staged_file.read_bytes()).digest():
+                raise RuntimeError(f"Snapshot imutável diverge: {relative}")
+            continue
+        atomic_write(destination, staged_file.read_bytes())
+
+    # A escrita é atômica e a única alteração de índice; falha antes disso
+    # não expõe um lote parcialmente aceito.
+    atomic_write(current_path, (staged_root / "manifesto.json").read_bytes())
 
 
 def choose_months(manifest, mode, start, end, refresh, limit):
@@ -226,34 +293,54 @@ def choose_months(manifest, mode, start, end, refresh, limit):
     return months
 
 
-def run(args, opener=urlopen):
-    cutoff = lagged_month(date.today())
+def run(args, opener=urlopen, today=None):
+    """Prepara lote em cópia temporária; falha não altera a base versionada."""
+    cutoff = lagged_month(today or date.today())
     start = month_string(args.start)
     end = min(month_string(args.end or cutoff), cutoff)
-    if start > end:
-        raise ValueError(f"Nenhum mês elegível (limite indicativo: {cutoff})")
+    if start < FIRST_MONTH or start > end:
+        raise ValueError(f"Intervalo fora do recorte aprovado/competências elegíveis: {start}..{end}")
     root = Path(args.out_dir).resolve()
-    # Sem edição de séries atuais ou pasta de publicação.
     if root == ROOT / "data" or str(root).startswith(str(ROOT / "_site")):
         raise ValueError("Saída não pode ser data/ nem _site/")
+
+    original_path = root / "manifesto.json"
+    original_digest = (hashlib.sha256(original_path.read_bytes()).hexdigest()
+                       if original_path.exists() else None)
     manifest = load_manifest(root)
     months = choose_months(manifest, args.mode, start, end, args.refresh, args.limit)
-    result = {"planejados": len(months), "novos": 0, "revisados": 0, "sem_mudanca": 0, "falhas": []}
-    for month in months:
-        url = official_url(month)
-        try:
-            raw, final_url = fetch_original(url, opener=opener)
-            changed = store_month(root, manifest, month, raw, final_url, datetime.now(timezone.utc).isoformat())
-            if changed == "novo":
-                result["novos"] += 1
-            elif changed == "revisado":
-                result["revisados"] += 1
-            else:
-                result["sem_mudanca"] += 1
-            print(f"{month}: {changed}", flush=True)
-        except (OSError, ValueError, RuntimeError, csv.Error, UnicodeError) as exc:
-            result["falhas"].append({"mes": month, "erro": str(exc)})
-            print(f"{month}: ERRO: {exc}", file=sys.stderr, flush=True)
+    result = {"planejados": len(months), "novos": 0, "revisados": 0,
+              "sem_mudanca": 0, "falhas": [], "publicado": False}
+    if not months:
+        result["publicado"] = True
+        print(json.dumps(result, ensure_ascii=False, indent=2))
+        return 0
+
+    with tempfile.TemporaryDirectory(prefix="rima-batch-") as staging:
+        staged_root = Path(staging) / "data/anac/rima"
+        if root.exists():
+            shutil.copytree(root, staged_root, dirs_exist_ok=True)
+        staged_manifest = load_manifest(staged_root)
+        for month in months:
+            url = official_url(month)
+            try:
+                raw, final_url = fetch_original(url, opener=opener)
+                changed = store_month(staged_root, staged_manifest, month, raw,
+                                      final_url, datetime.now(timezone.utc).isoformat())
+                if changed == "novo":
+                    result["novos"] += 1
+                elif changed == "revisado":
+                    result["revisados"] += 1
+                else:
+                    result["sem_mudanca"] += 1
+                print(f"{month}: {changed}", flush=True)
+            except (OSError, ValueError, RuntimeError, csv.Error, UnicodeError) as exc:
+                result["falhas"].append({"mes": month, "erro": str(exc)})
+                print(f"{month}: ERRO: {exc}", file=sys.stderr, flush=True)
+        if not result["falhas"]:
+            _promote_complete_batch(root, staged_root, original_digest)
+            result["publicado"] = True
+
     print(json.dumps(result, ensure_ascii=False, indent=2))
     return 1 if result["falhas"] else 0
 
