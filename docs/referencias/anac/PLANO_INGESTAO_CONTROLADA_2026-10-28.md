@@ -74,3 +74,25 @@ Diferenças legítimas ANAC/RIMA x RMA x MDIC devem ser documentadas por popula�
 [Issue de governança #8](https://github.com/brunogiacomelli1979-cyber/viracopos-cargo-intelligence/issues/8) · [Inventário histórico](INVENTARIO_DISPONIBILIDADE_2020-2026.md) · [Registro de incidentes](REGISTRO_PENDENCIAS_E_PORTOES_2026-10-28.md)
 
 **Próximo marco:** integrar a reutilização do bruto ao parser SBKP e ao planejamento de competências, provisionar armazenamento persistente com backup, testar restauração e só então desenhar piloto real autorizado. O streaming já tem testes simulados, mas **não foi executado contra a ANAC real**. Nenhuma automação de download é habilitada por este documento.
+
+
+## Marco 2 — Reprocessamento offline de bruto imutável
+
+Foi adicionado o modulo **scripts/reprocessar_bruto_anac.py** com teste **tests/test_reprocessar_bruto_anac.py**. Ele exige uma competencia e o SHA-256 exato do original guardado; confere o recibo e hash antes de processar. Le o CSV nacional em fluxo, detecta UTF-8/CP1252, respeita preambulo, valida colunas, seleciona exclusivamente SBKP, verifica competencia e codigos, e gera gzip deterministico. Em seguida reutiliza **processar_anac_rima.process_file** para verificar pesos, nulos, contagens e agregacoes do recorte. O pacote inclui hash do original, hash do CSV SBKP, hash do gzip, grupos e estado **staging_validado_local_nao_publicado**.
+
+**Sem acesso a rede, sem alteracao do manifesto historico ou do dashboard**. Saidas so podem ficar fora do repositorio ou em data/staging (ignorado pelo Git). Uma revisao original exige SHA explicito e gera pacote distinto; replay confere integridade antes de reaproveitar. Arquivos corrompidos, preambulo desconhecido, peso invalido, ausencia de SBKP ou divergencia de SHA interrompem a operacao.
+
+Exemplo com um bruto **ja arquivado no cofre persistente**:
+
+~~~sh
+python scripts/reprocessar_bruto_anac.py \
+  --acervo /volume-persistente/vcp-anac-brutos \
+  --competencia 2020-04 \
+  --sha256 HASH_REAL_DO_ARQUIVO_BRUTO \
+  --saida data/staging/anac-reprocessados
+
+python -m unittest discover -s tests -p test_reprocessar_bruto_anac.py -v
+~~~
+
+**Limites:** a validação dessa etapa é local, não equivale à reconciliação com RMA nem substitui a auditoria de manifesto/gzip do arquivador oficial. A publicação versionada do pacote em data/anac/rima continua desabilitada. Ainda precisamos testar estes novos casos no CI, manter cópia persistente externa com backup e fechar a qualidade ANAC-04 antes de autorizar um novo mês.
+
