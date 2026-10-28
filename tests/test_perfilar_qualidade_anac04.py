@@ -24,7 +24,7 @@ class DataQualityProfileTests(unittest.TestCase):
         self.assertEqual(item["carga"]["movimentos_com_carga_zero"], 1)
         self.assertEqual(item["carga"]["movimentos_com_carga_ausente"], 1)
         self.assertEqual(item["correio"], {"positivo": 1, "zero": 1, "ausente": 1})
-        self.assertEqual(item["movimentos_por_natureza"], {"D/D": 1, "I/P": 2})
+        self.assertEqual(item["movimentos_por_natureza"], {"D/D": 1, "P/I": 2})
         self.assertFalse(item["apto_publicacao"])
 
     def test_candidate_key_collisions_are_not_deduplicated(self):
