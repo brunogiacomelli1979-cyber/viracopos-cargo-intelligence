@@ -59,7 +59,7 @@ class ArchiveTests(unittest.TestCase):
             self.assertEqual(store_month(root,manifest,"2024-01",ROWS,official_url("2024-01"),"2026-10-28T00:00:00+00:00"),"sem_mudanca")
             saved=json.loads((root/"manifesto.json").read_text())
             self.assertEqual(saved["competencias"]["2024-01"]["sha256_original"],hashlib.sha256(ROWS).hexdigest())
-            self.assertTrue((root/"sbkp/2024/2024-01.csv.gz").exists())
+            self.assertTrue((Path(temp)/saved["competencias"]["2024-01"]["caminho_sbkp"]).exists())
 
     def test_revision_preserves_legacy_file_and_complete_history(self):
         with tempfile.TemporaryDirectory() as temp:
