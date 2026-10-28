@@ -47,6 +47,14 @@ def profile_csv(data, month):
     by_nature = defaultdict(Counter)
     date_samples = {}
     has_calco = "DT_CALCO" in (reader.fieldnames or [])
+    keys = (
+        ("calco", ("NR_AERONAVE_MARCAS", "NR_MOVIMENTO_TIPO", "DT_CALCO", "HH_CALCO")),
+        ("toque", ("NR_AERONAVE_MARCAS", "NR_MOVIMENTO_TIPO", "DT_TOQUE", "HH_TOQUE")),
+    )
+    key_coverage = Counter()
+    key_seen = defaultdict(set)
+    key_collisions = Counter()
+    key_by_nature = defaultdict(Counter)
     for row in reader:
         if None in row or any(v is None for v in row.values()):
             raise ValueError("CSV com coluna ausente")
@@ -64,6 +72,19 @@ def profile_csv(data, month):
         agg = directions[(row["NR_NATUREZA"], row["NR_MOVIMENTO_TIPO"])]
         agg["registros"] += 1
         agg["carga_kg"] += cargo
+        for key_type, fields in keys:
+            if not all(field in row for field in fields):
+                continue
+            values = tuple(row[field].strip() for field in fields)
+            if not all(values):
+                continue
+            key_coverage[key_type] += 1
+            composite = (row["NR_NATUREZA"], values)
+            if composite in key_seen[key_type]:
+                key_collisions[key_type] += 1
+                key_by_nature[row["NR_NATUREZA"]][key_type] += 1
+            else:
+                key_seen[key_type].add(composite)
         if has_calco:
             raw_calco = row["DT_CALCO"].strip()
             calco_month = _date_month(raw_calco)
@@ -99,6 +120,13 @@ def profile_csv(data, month):
         "total_domestica_kg": format(totals["D"], "f"),
         "total_internacional_kg": format(totals["I"], "f"),
         "grupos_por_servico": entries,
+        "auditoria_chaves_movimento": {
+            "cobertura": dict(key_coverage),
+            "colisoes_potenciais": dict(key_collisions),
+            "colisoes_por_natureza": {"domestica": dict(key_by_nature["D"]),
+                                      "internacional": dict(key_by_nature["I"])},
+            "interpretacao": "Chaves compostas matrícula+tipo de movimento+data+hora; colisão não prova duplicação física. Não remover linhas automaticamente."
+        },
         "auditoria_calco": {
             "campo_disponivel": has_calco,
             "ocorrencias": dict(date_counts),

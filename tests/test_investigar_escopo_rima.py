@@ -35,6 +35,20 @@ class ServiceProfileTests(unittest.TestCase):
         r = profile_csv(data, "2024-01")
         self.assertEqual(r["auditoria_calco"]["ocorrencias"]["formato_desconhecido"], 1)
 
+    def test_composite_movement_collision_is_flagged_not_deleted(self):
+        header = HEADER.strip() + ";NR_AERONAVE_MARCAS;DT_CALCO;HH_CALCO;DT_TOQUE;HH_TOQUE\n"
+        data = (header +
+                "2024;01;SBKP;P;I;F;1000;PTABC;2024-01-03;12:00;2024-01-03;11:50\n" +
+                "2024;01;SBKP;P;I;F;2000;PTABC;2024-01-03;12:00;2024-01-03;11:50\n" +
+                "2024;01;SBKP;D;D;J;500;PTABC;2024-01-04;12:00;2024-01-04;12:30\n").encode()
+        report = profile_csv(data, "2024-01")
+        audit = report["auditoria_chaves_movimento"]
+        self.assertEqual(audit["cobertura"]["calco"], 3)
+        self.assertEqual(audit["colisoes_potenciais"]["calco"], 1)
+        self.assertEqual(audit["colisoes_potenciais"]["toque"], 1)
+        self.assertEqual(report["registros"], 3)
+        self.assertEqual(report["total_internacional_kg"], "3000")
+
     def test_missing_cargo_is_rejected(self):
         data=(HEADER+"2024;01;SBKP;P;I;F;\n").encode()
         with self.assertRaisesRegex(ValueError,"ausente"):
