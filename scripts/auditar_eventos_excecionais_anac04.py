@@ -15,7 +15,7 @@ from collections import Counter, defaultdict
 from datetime import datetime
 from pathlib import Path
 
-from perfilar_qualidade_anac04 import ROOT, LIMIT, profile_archive
+from perfilar_qualidade_anac04 import ROOT, LIMIT, profile_archive, _weight
 
 DATE_FORMATS = ("%Y-%m-%d", "%d/%m/%Y", "%Y/%m/%d",
                 "%Y-%m-%d %H:%M:%S", "%d/%m/%Y %H:%M:%S")
@@ -120,6 +120,7 @@ def inspect_csv(data, month):
     outside_service = Counter()
     outside_movement = Counter()
     services = Counter()
+    services_carga = defaultdict(Counter)
     collision_details = []
     collisions_by_month = Counter()
     seen = {}
@@ -136,6 +137,7 @@ def inspect_csv(data, month):
             raise ValueError("Categoria ANAC inesperada")
         service = row["NR_SERVICE_TYPE"].strip()
         services[service] += 1
+        services_carga[service][_weight(row["QT_CARGA"], "QT_CARGA")] += 1
         calco, toque = parse_date(row["DT_CALCO"]), parse_date(row["DT_TOQUE"])
         if calco is None:
             calco_status["nao_informado"] += 1
@@ -195,6 +197,8 @@ def inspect_csv(data, month):
         "colisoes_toque_com_data_reconhecida": collisions_by_month["com_data_toque_reconhecida"],
         "colisoes_perfil_anonimizado": collision_details,
         "service_type_codes": dict(sorted(services.items())),
+        "service_type_por_presenca_carga": {code: dict(sorted(classes.items()))
+                                          for code, classes in sorted(services_carga.items())},
         "service_type_grupos_descritivos": dict(sorted(known_groups.items())),
         "service_type_nao_mapeados": dict(sorted(unknown_services.items())),
         "norma_competencia_calco_respeitada": (
