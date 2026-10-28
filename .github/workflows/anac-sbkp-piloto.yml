@@ -1,6 +1,7 @@
-# WORKFLOW LEGADO DESATIVADO. Consultar Issue #8 (ANAC-02/07).
-# Preservado para rastreabilidade, SEM executar download ou escrita.
-name: anac sbkp piloto [INATIVO]
+# Desativado por decisão de governança: Issue #8 / ANAC-02.
+# Este piloto utilizava ANAC Etapa Básica (transportadoras), diferente de RIMA.
+# Código legado preservado no histórico Git; não rodar o ZIP antigo.
+name: ANAC Etapa Basica — piloto legado inativo
 on:
   workflow_dispatch:
 permissions:
@@ -10,4 +11,4 @@ jobs:
     if: false
     runs-on: ubuntu-latest
     steps:
-      - run: echo "Workflow antigo intencionalmente desativado - consultar Issue #8"
+      - run: echo "Coletor legado desligado; ver Issue #8 (ANAC-02)"
