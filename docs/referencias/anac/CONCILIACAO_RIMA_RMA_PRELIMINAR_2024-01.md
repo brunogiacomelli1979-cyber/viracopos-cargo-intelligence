@@ -115,3 +115,31 @@ Esses achados **não explicam** o desvio de +81 movimentos. Uma exclusão arbitr
 ### Próximo passo necessário
 
 Solicitar/obter os originais RMA completos de 2024 com hash e inspeção visual e, idealmente, uma explicação técnica da concessionária e/ou GEIC/ANAC quanto à diferença entre **RMA publicado em 2024** e **RIMA disponibilizado no portal em 2026**, especialmente sobre revisões, movimentos incluídos/excluídos, natureza do voo e carga internacional. Não ativar modelos ou dashboard ANAC enquanto a divergência de escopo não for esclarecida.
+
+## 9. Deliberação do projeto: comparação visual permitida, sem equiparação das fontes
+
+**Decisão do proprietário em 28/10/2026:** a divergência entre números ANAC/RIMA e concessionária/RMA **não precisa ser eliminada para exibir as duas séries graficamente**. A diferença será calculada e descrita, preservando as duas observações originais, seus recortes e suas versões. Não aplicar normalizações ad hoc para criar coincidência.
+
+**Condição de implementação:** na aba *Carga aérea* foi preparado **painel experimental** com filtros independentes de competência, natureza (doméstica/internacional), medida (toneladas de carga ou movimentos) e fonte (ambas, ANAC ou RMA). A prévia JAN/2024 está rotulada como *transcrição RMA de PDF ainda não certificada por SHA-256*; não entra nas séries RMA principais, nem nos KPIs, nem no Comex, nem nos modelos. Os controles são válidos mesmo com apenas uma competência comparável; a ampliação por mês depende de documentação e dados oficiais validados.
+
+### Movimentos com ou sem carga: correção conceitual
+
+A Resolução ANAC 464/2018 (art. 3º) esclarece que aeronave de passageiros também pode transportar carga e correio (operação mista). O [dicionário oficial do RIMA](https://www.anac.gov.br/acesso-a-informacao/dados-abertos/areas-de-atuacao/operador-aeroportuario/dados-de-movimentacao-aeroportuaria/60-dados-de-movimentacao-aeroportuaria) distingue `QT_CARGA` (bens em kg, excluindo bagagem e correio), `QT_CORREIO`, três campos `QT_PAX_*` e `NR_SERVICE_TYPE` (tipo do serviço). **Movimento internacional não é automaticamente importação ou exportação aduaneira; movimento com carga não é necessariamente cargueiro.**
+
+A [execução de perfil com dados reais #40692011727](https://github.com/brunogiacomelli1979-cyber/viracopos-cargo-intelligence/actions/runs/40692011727) classificou **todos os 9.348 movimentos de janeiro/2024**, usando `QT_CARGA > 0` para carga positiva e passageiros efetivamente registrados nos campos `QT_PAX_*`. O resultado é:
+
+| Categoria | Doméstico | Internacional | Total |
+|---|---:|---:|---:|
+| Movimentos com carga positiva | 6.667 | 741 | **7.408** |
+| Movimentos com `QT_CARGA = 0` | 1.740 | 200 | **1.940** |
+| Com passageiros registrados e carga positiva | 6.395 | 270 | **6.665** |
+| Com passageiros registrados e `QT_CARGA = 0` | 1.346 | 37 | **1.383** |
+| Movimentos totais | 8.407 | 941 | **9.348** |
+
+**Importante:** `QT_CARGA = 0` significa que a fonte registrou **zero quilogramas de carga naquele movimento**, e não que um voo nunca transporta carga nem que não houve transação aduaneira. Passageiros não registrados e aeronave cargueira não são sinônimos. Ausências devem permanecer indeterminadas.
+
+A implementação está em [`scripts/gerar_comparativo_rima_rma.py`](../../../scripts/gerar_comparativo_rima_rma.py) e [dados de perfil e comparação](../../../data/comparativo_rima_rma.json), gerados a partir dos recortes ANAC já arquivados (SHA-256 verificado) e do RMA preliminar. O dashboard azul preserva os gráficos e filtros anteriores e acrescenta apenas dois painéis exploratórios na seção Carga aérea.
+
+**Verificação:** [CI #40692718303](https://github.com/brunogiacomelli1979-cyber/viracopos-cargo-intelligence/actions/runs/40692718303) aprovou validação de HTML/JSON, testes de perfil, JavaScript, reconstrução offline e preparo da página. [Prévia navegável (artefato GitHub Actions)](https://github.com/brunogiacomelli1979-cyber/viracopos-cargo-intelligence/actions/runs/40692718303/artifacts/12817837694). **Ainda não foi feita inspeção visual manual em navegador real** e **nenhuma alteração foi aplicada à branch `main` ou ao Pages publicado**.
+
+**Status ANAC-04:** tratativa da **visualização e da segregação carga/passageiros concluída em homologação**. Permanecem em aberto a conferência integral/hash do RMA 2024, eventuais regras de correção RIMA vs RMA e séries temporais coincidentes adicionais. **A divergência numérica, por si só, não é um bloqueio de visualização com ressalva; é um fato a apresentar.**
