@@ -84,3 +84,22 @@ O relatório de QA passou a separar chave candidata com campos preenchidos de ch
 **Reprodução/anônimização:** scripts/auditar_eventos_excecionais_anac04.py e testes/test_auditar_eventos_excecionais_anac04.py executam leitura offline de dados arquivados já auditados. Os resultados e logs apresentam apenas contagens, tipos de movimento, categorias de serviço, diferenças de campos e intervalos agregados — **sem matrícula, número de voo, hora exata ou dado de movimentação individual**.
 
 **Tratamento e status de governança:** podemos considerar **esclarecida a questão da competência** dos 15 registros sob o critério oficial, mas ANAC-04 permanece **ABERTA** pela colisão T/Z, pelos limites do identificador, pela série incompleta e pela reconciliação ANAC/RMA. O cofre persistente com backup real continua aguardando provisionamento; coletas novas, cron e dashboard permanecem bloqueados.
+
+
+### Cruzamento NR_SERVICE_TYPE × presença de carga (sem inferir cargueiros)
+
+A auditoria offline utiliza a tabela IATA transcrita nos metadados ANAC e as codificações Y/Z da Portaria. Preserva o código bruto, classifica QT_CARGA em positivo, zero ou ausente e **não transforma código de serviço em participação de voos exclusivamente cargueiros**.
+
+| Competência | Serviço J (passageiros regulares) com QT_CARGA positiva | Serviço F (passageiros) com QT_CARGA positiva | Serviço H (charter carga/correio) com QT_CARGA positiva |
+|---|---:|---:|---:|
+| 2020-01 | 4.332 | 410 | 21 |
+| 2020-02 | 3.978 | 360 | 25 |
+| 2020-03 | 3.111 | 409 | 37 |
+| 2024-01 | 6.325 | 656 | 77 |
+| **Total** | **17.746** | **1.835** | **160** |
+
+**Interpretação:** ao menos 17.746 de 20.474 registros com carga positiva possuem categoria de serviço J (classificada pela tabela ANAC como serviço normal de passageiros). Assim, a presença de QT_CARGA positiva **não comprova voo cargueiro**; o transporte no porão de aeronaves de passageiros é uma explicação compatível, não uma certificação do tipo físico de aeronave. Os códigos de serviço são reportados pelo operador e sujeitos a qualidade de origem.
+
+**Evidência automatizada:** [GitHub Actions #40725203330](https://github.com/brunogiacomelli1979-cyber/viracopos-cargo-intelligence/actions/runs/40725203330), 185 testes Python aprovados, inclusive exame das datas em relação ao critério normativo e análise anônima de colisão. A execução de pull request não fez deploy. As estatísticas agregadas foram impressas como ANAC04_EXCECOES_AGREGADAS sem detalhes de aeronaves, números de voo ou horários.
+
+**Caveat:** não é adequado calcular participação de voos exclusivamente cargueiros apenas a partir de categoria J/F/H ou somando QT_CARGA: são dimensões distintas. É preciso homologar o critério de cargueiro dedicado versus aeronave de passageiros que transportou carga antes da modelagem.
