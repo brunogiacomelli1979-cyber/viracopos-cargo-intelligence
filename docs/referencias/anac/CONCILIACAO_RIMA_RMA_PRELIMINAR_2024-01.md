@@ -77,3 +77,41 @@ Não escolher uma hipótese sem teste e evidência.
 Os cinco grupos perfazem os **16.015.919 kg**. A carga internacional não aparece em apenas um tipo de serviço, mas **não há evidência para excluir nenhum deles** ou afirmar que o RMA considera os mesmos códigos. Interpretar os códigos apenas mediante o dicionário IATA/ANAC e escopo específico do RMA.
 
 **Consequência:** a divergência de **2.053,919 t** entre as duas fontes permanece sem causa demonstrada. Esta investigação não autoriza adaptar os dados para fazê-los coincidir. Código auditável: [`scripts/investigar_escopo_rima.py`](../../../scripts/investigar_escopo_rima.py) e [testes](../../../tests/test_investigar_escopo_rima.py).
+
+## 8. Revisão regulatória e conferência de contagem de movimentos — 28/10/2026
+
+### A relação entre os relatórios é mais direta do que a hipótese inicial
+
+A [Resolução ANAC nº 464/2018](https://www.anac.gov.br/assuntos/legislacao/legislacao-1/resolucoes/2018/resolucao-no-464-22-02-2018), artigos **6º a 13**, regulamenta **RMA** e **RIMA** como relatórios apresentados pelos **administradores aeroportuários**, referentes aos movimentos do mês. O art. 7º exige movimento de aeronaves e cargas no RMA; o art. 10 exige os movimentos individualizados e suas cargas no RIMA; o art. 13 exige remessa mesmo havendo divergências ainda em contestação. **Não é adequado tratar essas séries como fontes institucionais independentes e dispensar sua reconciliação.**
+
+Os [metadados oficiais RIMA](https://www.anac.gov.br/acesso-a-informacao/dados-abertos/areas-de-atuacao/operador-aeroportuario/dados-de-movimentacao-aeroportuaria/60-dados-de-movimentacao-aeroportuaria) informam que o dataset publicado reproduz as remessas do administrador aeroportuário **sem correções/interpolações empregadas nos indicadores contratuais** e que seus responsáveis podem atualizar dados. Isso oferece um **mecanismo plausível para diferenças**, mas NÃO comprova quais correções ocorreram nem por que há 2.053,919 t e 81 movimentos a mais na consulta de RIMA.
+
+### Confronto adicional de movimentos, mesma competência
+
+Valores ANAC do CSV SBKP 2024-01 já arquivado e validado; RMA transcrito dos PDFs publicados:
+
+| Janeiro de 2024 | ANAC/RIMA | RMA concessionária | Desvio ANAC − RMA |
+|---|---:|---:|---:|
+| Movimentos domésticos | 8.407 | 8.338 | **+69** |
+| Movimentos internacionais | 941 | 929 | **+12** |
+| Movimentos totais | **9.348** | **9.267** | **+81** |
+| Carga doméstica | 5.908,499 t | 5.908 t | +0,499 t |
+| Carga internacional | 16.015,919 t | 13.962 t | **+2.053,919 t** |
+
+**Verificação de edições:** os PDFs oficiais [RMA janeiro/2024 (elaborado fevereiro)](https://www.viracopos.com/data/files/CD/74/48/52/BD1DD810710CF7C84918E9C2/RMA%202024%20JAN%20-%20elaborado%20em%20FEV2024.pdf), [RMA julho/2024 (elaborado agosto)](https://www.viracopos.com/data/files/61/C0/D2/0B/6E741910317C2C094918E9C2/RMA%202024%20JUL%20-%20elaborado%20em%20AGO2024.pdf) e [RMA setembro/2024 (elaborado outubro)](https://www.viracopos.com/data/files/D3/E5/65/52/379B29101B8547296C1849A8/RMA%202024%20SET%20-%20elaborado%20em%20OUT2024.pdf) apresentam, **nos textos indexados**, os mesmos dados de janeiro. **Não encontramos revisão de janeiro entre essas edições**, mas isso não exclui revisão posterior e não equivale à inspeção visual/hash dos originais.
+
+### Auditoria de competência e chave de evento
+
+A [execução #40690622665](https://github.com/brunogiacomelli1979-cyber/viracopos-cargo-intelligence/actions/runs/40690622665) comprovou que **100% dos 9.348 eventos têm `DT_CALCO` dentro de janeiro de 2024**. Pelos [metadados ANAC](https://www.anac.gov.br/acesso-a-informacao/dados-abertos/areas-de-atuacao/operador-aeroportuario/dados-de-movimentacao-aeroportuaria/60-dados-de-movimentacao-aeroportuaria), `DT_CALCO` é o calço no pouso ou o descalço na decolagem, exatamente o critério de competência da Resolução 464.
+
+A [execução #40690787280](https://github.com/brunogiacomelli1979-cyber/viracopos-cargo-intelligence/actions/runs/40690787280) examinou os 9.348 registros com duas chaves compostas (matrícula, tipo de movimento, data e hora). Conclusão:
+
+- **0 colisões** na chave com `DT_CALCO` e `HH_CALCO`.
+- **14 colisões potenciais** na chave com `DT_TOQUE` e `HH_TOQUE` (12 domésticas, 2 internacionais), **não qualificadas como duplicações físicas**.
+- Todos os registros tiveram chave completa nos dois conjuntos; nenhum foi deduplicado, reclassificado ou excluído.
+
+Esses achados **não explicam** o desvio de +81 movimentos. Uma exclusão arbitrária de 14 linhas seria indevida.
+
+### Próximo passo necessário
+
+Solicitar/obter os originais RMA completos de 2024 com hash e inspeção visual e, idealmente, uma explicação técnica da concessionária e/ou GEIC/ANAC quanto à diferença entre **RMA publicado em 2024** e **RIMA disponibilizado no portal em 2026**, especialmente sobre revisões, movimentos incluídos/excluídos, natureza do voo e carga internacional. Não ativar modelos ou dashboard ANAC enquanto a divergência de escopo não for esclarecida.
