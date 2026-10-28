@@ -3,10 +3,10 @@ on:
   push:
     branches:
       - feature/anac-rima-staging-20261028
+    # Diagnostico de rede: nao repetir download oficial a cada ajuste no codigo.
+    # Testes de unidade seguem no workflow geral de validacao de PRs.
     paths:
       - '.github/workflows/testar-acesso-anac-rima.yml'
-      - 'scripts/arquivar_anac_rima.py'
-      - 'tests/test_arquivar_anac_rima.py'
   workflow_dispatch:
 
 permissions:
