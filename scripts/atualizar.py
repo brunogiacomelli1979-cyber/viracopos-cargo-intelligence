@@ -192,10 +192,22 @@ def build(offline=False, root=ROOT, rma_start_year=2025):
     if template.count("{{DASHBOARD_JSON}}") != 1:
         raise ValueError("template precisa de um único marcador de dados")
     preview_path = root / "data/comparativo_rima_rma.json"
-    preview = (json.loads(preview_path.read_text(encoding="utf-8"))
-               if preview_path.exists()
-               else {"recortes": [], "perfil_voos": [], "status": "indisponivel"})
-    if not isinstance(preview.get("recortes"), list) or not isinstance(preview.get("perfil_voos"), list):
+    # Se acervo e documentação estiverem disponíveis, derivar a prévia diretamente
+    # dos arquivos ANAC com SHA-256 verificado, sem depender de snapshot obsoleto.
+    source_manifest = root / "data/anac/rima/manifesto.json"
+    reference_doc = root / "docs/referencias/rma/rma_2024_01_preliminar.json"
+    if source_manifest.exists() and reference_doc.exists():
+        from gerar_comparativo_rima_rma import generate
+        preview = generate(root)
+    else:
+        # Alguns testes/ferramentas copiam apenas data/assets; preservar fallback
+        # sem inventar dados. Em projeto completo, erro do gerador não é ignorado.
+        preview = (json.loads(preview_path.read_text(encoding="utf-8"))
+                   if preview_path.exists()
+                   else {"recortes": [], "perfil_voos": [], "serie_mensal": [], "status": "indisponivel"})
+    if (not isinstance(preview.get("recortes"), list)
+            or not isinstance(preview.get("perfil_voos"), list)
+            or not isinstance(preview.get("serie_mensal", []), list)):
         raise ValueError("Comparativo RIMA/RMA com estrutura inválida")
     if template.count("{{COMPARATIVO_RIMA_RMA_JSON}}") != 1:
         raise ValueError("Template precisa de um único marcador de comparação")
@@ -215,6 +227,7 @@ def build(offline=False, root=ROOT, rma_start_year=2025):
             atomic_write(root / "data" / f"{filename}.csv", stream.getvalue())
     atomic_write(root / "data/fontes.json", json.dumps(metadata, ensure_ascii=False, indent=2) + "\n")
     atomic_write(root / "data/dashboard.json", json.dumps(snapshot, ensure_ascii=False, indent=2, allow_nan=False) + "\n")
+    atomic_write(preview_path, json.dumps(preview, ensure_ascii=False, indent=2, allow_nan=False) + "\n")
     atomic_write(root / "index.html", html)
     logging.info("Snapshot gerado: %s", {name: len(rows) for name, rows in datasets.items()})
     return snapshot

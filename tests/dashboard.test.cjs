@@ -64,7 +64,8 @@ test('RIMA/RMA preview retains provenance and can distinguish passenger flights 
   assert.ok(p.por_natureza.internacional.com_carga__com_passageiros>0);
   assert.equal(p.nao_e_fluxo_aduaneiro,true);
   const template=fs.readFileSync('index.template.html','utf8');
-  for(const id of ['comparativo-mes','comparativo-indicador','comparativo-natureza','comparativo-fonte','perfil-voos-anac']){
+  for(const id of ['comparativo-mes','comparativo-indicador','comparativo-natureza','comparativo-fonte','perfil-mes','perfil-voos-anac','serie-metrica','serie-natureza','grafico-series-fontes']){
     assert.ok(template.includes('id="'+id+'"'));
   }
 });
+\ntest('history chart respects true missing months and preview source labels',()=>{\n  const js=fs.readFileSync('assets/app-blue.js','utf8');\n  assert.ok(js.includes('options.fullHistory ? rows : subset(rows)'));\n  assert.ok(js.includes('profileMonth.value'));\n  assert.ok(js.includes('data.serie_mensal || []'));\n});\n

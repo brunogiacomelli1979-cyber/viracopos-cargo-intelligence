@@ -50,7 +50,7 @@ function lineChart(target, rows, series, message, options = {}) {
   const element = byId(target);
   if (!element) return;
   element.replaceChildren();
-  const selected = subset(rows);
+  const selected = options.fullHistory ? rows : subset(rows);
   if (!selected.some(row => series.some(item => Number.isFinite(row[item.key])))) {
     const empty = node('div', 'chart-empty');
     empty.append(node('strong', '', 'Sem observações neste período'), node('p', '', message));
@@ -292,14 +292,21 @@ function renderComparativoRimaRma() {
   const rows = Array.isArray(data.recortes) ? data.recortes : [];
   const profiles = Array.isArray(data.perfil_voos) ? data.perfil_voos : [];
   const monthControl = byId('comparativo-mes');
+  const profileMonth = byId('perfil-mes');
+  const profileMonths = [...new Set(profiles.map(item => item.mes))].sort();
+  profileMonth.replaceChildren(...profileMonths.map(month => {
+    const opt = node('option', '', showMonth(month)); opt.value = month; return opt;
+  }));
+  if (profileMonths.length) profileMonth.value = profileMonths[profileMonths.length - 1];
   const months = [...new Set(rows.map(row => row.mes))].sort();
   monthControl.replaceChildren(...months.map(month => {
     const option = node('option', '', showMonth(month)); option.value = month; return option;
   }));
   if (!months.length) {
     result.textContent = 'Ainda não existem competências disponíveis simultaneamente nas duas fontes.';
-    profileTarget.textContent = 'Sem movimentos validados para esta comparação.';
-    return;
+    profileTarget.textContent = profileMonths.length ? '' : 'Sem movimentos validados para esta comparação.';
+    // O perfil ANAC funciona também quando não existe RMA para o mesmo mês.
+    if (!profileMonths.length) return;
   }
   monthControl.value = months[months.length - 1];
   const render = () => {
@@ -309,15 +316,20 @@ function renderComparativoRimaRma() {
     const source = byId('comparativo-fonte').value;
     const row = rows.find(item => item.mes === month && item.natureza === nature);
     result.replaceChildren();
-    set('comparativo-aviso', 'Prévia metodológica · RIMA conferido por SHA-256; RMA ' + showMonth(month) + ' transcrito de PDF ainda não certificado por hash. Sem ajuste de diferenças.');
+    set('comparativo-aviso', row && row.qualidade_rma === 'transcricao_preliminar_pdf_nao_certificado'
+      ? 'Comparação exploratória · ANAC/RIMA verificada por hash; RMA de '+showMonth(month)+' transcrito de PDF ainda não certificado. Diferenças mantidas.'
+      : 'Comparação exploratória: cada fonte conserva metodologia e procedência próprias. Diferenças não são corrigidas.');
     if (!row) {
       result.append(node('p', 'chart-empty', 'Não há duas fontes disponíveis para esta combinação.')); set('comparativo-diferenca',''); return;
     }
-    byId('comparativo-origem-rma').href = row.rma_url_pdf;
+    const origin = byId('comparativo-origem-rma');
+    if (row.rma_url_pdf && /^https:\/\/(?:www\.)?viracopos\.com\//.test(row.rma_url_pdf)) {
+      origin.href = row.rma_url_pdf; origin.hidden = false;
+    } else {origin.removeAttribute('href'); origin.hidden = true;}
     const field = metric === 'carga' ? 'carga_t' : 'movimentos';
     const unit = metric === 'carga' ? 't' : 'movimentos';
     const a = row['rima_' + field], b = row['rma_' + field];
-    const max = Math.max(a, b, 1);
+    const max = Math.max(1, ...[a, b].filter(Number.isFinite));
     for (const [code,label,value,css] of [
       ['rima','ANAC / RIMA',a,'blue'], ['rma','Concessionária / RMA',b,'gold']
     ]) {
@@ -338,7 +350,7 @@ function renderComparativoRimaRma() {
     } else set('comparativo-diferenca','Fonte selecionada isoladamente; escolha As duas fontes para ver a diferença.');
   };
   const renderProfile = () => {
-    const month = monthControl.value, nature = byId('perfil-natureza').value;
+    const month = profileMonth.value, nature = byId('perfil-natureza').value;
     const selected = profiles.find(item => item.mes === month);
     const vals = selected?.por_natureza?.[nature];
     profileTarget.replaceChildren();
@@ -364,8 +376,20 @@ function renderComparativoRimaRma() {
       fmt(passengersNoCargo,0)+' com passageiros e sem carga registrada. '+
       'A classificação é por movimento, não por remessa aduaneira.'));
   };
-  ['comparativo-mes','comparativo-natureza','comparativo-indicador','comparativo-fonte'].forEach(id => byId(id).addEventListener('change',() => {render();if(id==='comparativo-mes')renderProfile();}));
-  byId('perfil-natureza').addEventListener('change',renderProfile);
-  render();renderProfile();
+  const renderHistory = () => {
+    const nature = byId('serie-natureza').value;
+    const measure = byId('serie-metrica').value;
+    const isCargo = measure === 'carga', suffix = isCargo ? 'carga_t' : 'movimentos';
+    const dataRows = (data.serie_mensal || []).filter(row => row.natureza === nature);
+    lineChart('grafico-series-fontes', dataRows,
+      [{key:'rima_'+suffix,label:'ANAC / RIMA',color:blue,unit:isCargo?'t':'movimentos'},
+       {key:'rma_'+suffix,label:'Concessionária / RMA',color:gold,unit:isCargo?'t':'movimentos'}],
+      'Sem observações para esse indicador no histórico disponível.',
+      {zero:true,fullHistory:true,decimals:isCargo?1:0});
+  };
+  ['comparativo-mes','comparativo-natureza','comparativo-indicador','comparativo-fonte'].forEach(id => byId(id).addEventListener('change',render));
+  ['perfil-mes','perfil-natureza'].forEach(id => byId(id).addEventListener('change',renderProfile));
+  ['serie-natureza','serie-metrica'].forEach(id => byId(id).addEventListener('change',renderHistory));
+  render();renderProfile();renderHistory();
 }
 

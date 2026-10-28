@@ -57,8 +57,16 @@
         <p id="comparativo-diferenca" class="compare-delta" aria-live="polite"></p>
         <p class="panel-footnote">Comparação entre registros RIMA enviados pelo operador à ANAC e os totais RMA publicados pela concessionária. Uma diferença observada não demonstra erro de uma fonte. <a id="comparativo-origem-rma" href="https://www.viracopos.com/" target="_blank" rel="noopener noreferrer">Consultar RMA original</a>.</p>
       </article>
+      <article class="panel comparison-panel" id="historico-rima-rma">
+        <div class="panel-heading"><div><span class="eyebrow">LINHA DO TEMPO · FONTES INDEPENDENTES</span><h2>Histórico mensal ANAC × RMA</h2><p>Séries esparsas, sem criar valores para meses ausentes</p></div></div>
+        <div class="compare-controls"><label for="serie-natureza">Natureza <select id="serie-natureza"><option value="internacional">Internacional</option><option value="domestica">Doméstica</option></select></label>
+        <label for="serie-metrica">Medida <select id="serie-metrica"><option value="carga">Carga (toneladas)</option><option value="movimentos">Movimentos</option></select></label></div>
+        <div class="legend"><span><i class="swatch blue"></i>ANAC / RIMA</span><span><i class="swatch gold"></i>Concessionária / RMA</span></div>
+        <div id="grafico-series-fontes" class="chart" aria-label="Histórico das fontes ANAC RIMA e concessionária RMA"></div>
+        <p class="panel-footnote">Traços interrompidos indicam ausência de observação: não representam zero. Movimentos RMA não estão disponíveis na série principal de 2025–2026. Janeiro/2024 é referência preliminar do RMA.</p>
+      </article>
       <article class="panel comparison-panel" id="painel-perfil-voos"><div class="panel-heading"><div><span class="eyebrow">PERFIL DOS MOVIMENTOS · ANAC</span><h2>Movimentos com carga e passageiros</h2><p>Voos de passageiros também podem transportar carga no porão</p></div></div>
-        <div class="compare-controls"><label for="perfil-natureza">Natureza <select id="perfil-natureza"><option value="internacional">Internacional</option><option value="domestica">Doméstica</option></select></label></div>
+        <div class="compare-controls"><label for="perfil-mes">Competência ANAC <select id="perfil-mes"></select></label><label for="perfil-natureza">Natureza <select id="perfil-natureza"><option value="internacional">Internacional</option><option value="domestica">Doméstica</option></select></label></div>
         <div id="perfil-voos-anac" class="compare-profile" role="group" aria-label="Distribuição dos movimentos ANAC conforme carga registrada"></div>
         <p class="panel-footnote">Com carga = QT_CARGA maior que zero; sem carga = QT_CARGA igual a zero. Passageiros são aferidos pelos campos QT_PAX_*. Nenhum desses grupos representa automaticamente importações ou exportações aduaneiras.</p>
       </article>
