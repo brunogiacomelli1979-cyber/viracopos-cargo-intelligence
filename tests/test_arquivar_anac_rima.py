@@ -194,7 +194,7 @@ class ArchiveTests(unittest.TestCase):
                 def geturl(self):
                     return self.url
                 def read(self, count):
-                    csvdata = (HEADER + "2020;03;SBKP;P;I;-100;0\\n").encode()
+                    csvdata = (HEADER + "2020;03;SBKP;P;I;-100;0\n").encode()
                     return csvdata[:count]
             def opener(request, timeout=None, context=None):
                 return Response(request.full_url)
