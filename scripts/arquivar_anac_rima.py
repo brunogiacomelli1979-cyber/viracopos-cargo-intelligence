@@ -76,7 +76,8 @@ def fetch_original(url, opener=urlopen, retry_delay=time.sleep):
                 final_url = response.geturl()
                 if not final_url.startswith(BASE_URL):
                     raise ValueError(f"Redirecionamento inesperado: {final_url}")
-                if not (200 <= response.status < 300):
+                if response.status != 200:
+                    # Arquivamento exige o CSV integral, nunca uma resposta parcial 206.
                     raise ValueError(f"HTTP {response.status}")
                 raw = response.read(MAX_SOURCE_BYTES + 1)
                 if not raw or len(raw) > MAX_SOURCE_BYTES:
@@ -257,7 +258,7 @@ def run(args, opener=urlopen):
 def main():
     parser = argparse.ArgumentParser(description="Download histórico e arquivamento ANAC/RIMA para SBKP")
     parser.add_argument("--mode", choices=["inicial", "mensal"], required=True)
-    parser.add_argument("--start", default="2019-01")
+    parser.add_argument("--start", default="2020-01")
     parser.add_argument("--end", default=None)
     parser.add_argument("--refresh", type=int, default=12, help="Meses a reconsultar na rotina mensal")
     parser.add_argument("--limit", type=int, default=0, help="Limitar arquivos por execução; 0=todos")

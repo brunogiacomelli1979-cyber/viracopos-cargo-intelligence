@@ -17,7 +17,7 @@ from pathlib import Path
 
 
 FIELDS_REQUIRED = (
-    "ANO", "MES", "NR_AEROPORTO", "NR_MOVIMENTO_TIPO",
+    "ANO", "MES", "NR_AEROPORTO_REFERENCIA", "NR_MOVIMENTO_TIPO",
     "NR_NATUREZA", "QT_CARGA", "QT_CORREIO",
 )
 NATURES = ("domestica", "internacional")
@@ -78,7 +78,20 @@ def process_file(file_path, month, *, today=None):
     text, encoding = _decode(raw)
     if "\x00" in text:
         raise ValueError("Arquivo contém bytes nulos; não parece CSV textual")
-    stream = io.StringIO(text, newline="")
+    lines = text.splitlines(keepends=True)
+    header_index = None
+    for i, line in enumerate(lines[:20]):
+        fields = next(csv.reader([line], delimiter=";", strict=True), [])
+        fields = [x.strip().lstrip("\ufeff") for x in fields]
+        if len(fields) == len(set(fields)) and set(FIELDS_REQUIRED).issubset(fields):
+            header_index = i
+            break
+    if header_index is None:
+        raise ValueError("Cabeçalho oficial RIMA não encontrado nas 20 primeiras linhas")
+    preamble = [x.strip().lstrip("\ufeff") for x in lines[:header_index] if x.strip()]
+    if not all(x.lower().startswith("atualizado em:") for x in preamble):
+        raise ValueError("Preâmbulo RIMA inesperado")
+    stream = io.StringIO("".join(lines[header_index:]), newline="")
     reader = csv.DictReader(stream, delimiter=";", strict=True)
     if not reader.fieldnames:
         raise ValueError("Cabeçalho ausente")
@@ -99,17 +112,19 @@ def process_file(file_path, month, *, today=None):
         line = reader.line_num
         if None in row or any(value is None for value in row.values()):
             raise ValueError(f"linha {line}: número de colunas inesperado")
-        if _canonical(row["NR_AEROPORTO"]).upper() != "SBKP":
+        if _canonical(row["NR_AEROPORTO_REFERENCIA"]).upper() != "SBKP":
             continue
         rows_sbkp += 1
         year = (row["ANO"] or "").strip()
         mo = (row["MES"] or "").strip()
         if not year.isdigit() or not mo.isdigit() or f"{int(year):04d}-{int(mo):02d}" != month:
             raise ValueError(f"linha {line}: competência da linha não corresponde a {month}")
-        nature = _canonical(row["NR_NATUREZA"])
-        movement = _canonical(row["NR_MOVIMENTO_TIPO"])
-        if nature not in NATURES or movement not in MOVEMENTS:
-            raise ValueError(f"linha {line}: natureza/movimento desconhecido: {nature!r}/{movement!r}")
+        nature_code = (row["NR_NATUREZA"] or "").strip().upper()
+        movement_code = (row["NR_MOVIMENTO_TIPO"] or "").strip().upper()
+        nature = {"D": "domestica", "I": "internacional"}.get(nature_code)
+        movement = {"P": "pouso", "D": "decolagem"}.get(movement_code)
+        if nature is None or movement is None:
+            raise ValueError(f"linha {line}: códigos ANAC desconhecidos: {nature_code!r}/{movement_code!r}")
         cargo = _nonnegative(row["QT_CARGA"], "QT_CARGA", line)
         mail = _nonnegative(row["QT_CORREIO"], "QT_CORREIO", line)
         group = groups[(nature, movement)]

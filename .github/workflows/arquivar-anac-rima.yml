@@ -9,15 +9,14 @@ on:
         default: inicial
       start:
         description: "Primeira competência AAAA-MM"
-        default: "2019-01"
+        default: "2020-01"
       end:
         description: "Última competência (vazio = limite de seis meses)"
         default: ""
       limit:
         description: "Máximo de meses por execução (0 = sem limite)"
         default: "12"
-  schedule:
-    - cron: '23 12 20 * *'
+  # Agendamento congelado até fechar o registro de pendências ANAC.
 permissions:
   contents: read
 concurrency:
@@ -26,12 +25,13 @@ concurrency:
 jobs:
   archive:
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     permissions:
       contents: write
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: feature/anac-rima-staging-20261028
+          ref: ${{ github.ref_name }}
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -41,7 +41,7 @@ jobs:
         shell: bash
         env:
           MODE: ${{ github.event_name == 'workflow_dispatch' && inputs.mode || 'mensal' }}
-          START: ${{ github.event_name == 'workflow_dispatch' && inputs.start || '2019-01' }}
+          START: ${{ github.event_name == 'workflow_dispatch' && inputs.start || '2020-01' }}
           END: ${{ github.event_name == 'workflow_dispatch' && inputs.end || '' }}
           LIMIT: ${{ github.event_name == 'workflow_dispatch' && inputs.limit || '0' }}
         run: |
@@ -58,5 +58,5 @@ jobs:
           git add data/anac/rima/manifesto.json data/anac/rima/sbkp/ || true
           if ! git diff --cached --quiet; then
             git commit -m 'data: arquivar RIMA mensal SBKP validado'
-            git push origin HEAD:feature/anac-rima-staging-20261028
+            git push origin "HEAD:${{ github.ref_name }}"
           fi

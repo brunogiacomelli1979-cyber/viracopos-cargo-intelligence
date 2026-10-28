@@ -1,0 +1,50 @@
+# Registro de pendências ANAC/RIMA — bloqueio da expansão histórica
+
+**Data da auditoria:** 28/10/2026  
+**Escopo:** GitHub Actions, aquisição histórica ANAC/RIMA, biblioteca documental, código de processamento e integridade inicial.  
+**Decisão:** **NÃO REALIZAR novos lotes, liberar agendamento mensal, mesclar PR #7 ou publicar indicadores ANAC** até atender aos portões descritos abaixo. A existência de três competências isoladas não equivale a uma série histórica contínua.
+
+## Evidências verificadas
+
+- [Execução 40678591729](https://github.com/brunogiacomelli1979-cyber/viracopos-cargo-intelligence/actions/runs/40678591729): jan/2024 com 9.348 linhas SBKP arquivadas, SHA-256 validado.
+- [Execução 40680165690](https://github.com/brunogiacomelli1979-cyber/viracopos-cargo-intelligence/actions/runs/40680165690): jan/2020 com 9.739 e fev/2020 com 9.000 linhas SBKP; os arquivos compactados e manifesto foram commitados na branch.
+- [Execução 40679251194](https://github.com/brunogiacomelli1979-cyber/viracopos-cargo-intelligence/actions/runs/40679251194): jan/fev 2019 retornaram HTTP 404; sem alterações históricas.
+- [Execução 40680102297](https://github.com/brunogiacomelli1979-cyber/viracopos-cargo-intelligence/actions/runs/40680102297): acesso parcial HTTP 206 em jan/2020–jan/2024; jan/2019 404. **HTTP 206 demonstra acessibilidade, não integridade do arquivo inteiro**.
+- [Execução 40547838009](https://github.com/brunogiacomelli1979-cyber/viracopos-cargo-intelligence/actions/runs/40547838009): piloto antigo de **Etapa Básica ANAC (transportadoras)** falhou porque o ZIP consultado não apresentou CSV/TXT legível; não confundir com o pipeline RIMA que já baixou CSV real.
+- [Execução 40680332556](https://github.com/brunogiacomelli1979-cyber/viracopos-cargo-intelligence/actions/runs/40680332556): Pages PR marcado `action_required`, ator `github-actions[bot]`, sem jobs executados. Requer apuração de política de execução/aprovação; não é teste de dados reprovado.
+
+## Matriz de incidentes e ações
+
+| ID | Gravidade | Evidência / causa | Tratativa | Situação / condição para encerrar |
+|---|---|---|---|---|
+| ANAC-01 | Alta | Arquivos RIMA jan/fev 2019 HTTP 404, apesar de o pacote Ipea `flightsbr` documentar disponibilidade desde jan/2019 | Listar diretório `2019/` e URLs realmente publicadas; consultar ANAC sobre remoção/renomeação, buscar cópia oficial verificável; comparar leitor `flightsbr`. Se inviável, registrar lacuna sem imputar zero, obter decisão formal para iniciar série em 2020 | **Aberta**; não considerar 2019 recuperado com base em documentação do Ipea |
+| ANAC-02 | Alta | Antigo piloto `anac-sbkp-piloto.yml`, executando outra população (Etapa Básica), retornou ZIP sem CSV/TXT | Congelar seu uso para análise RIMA; só retomar em trilha distinta, corrigindo URL/contrato ZIP e amostra real | **Aberta / isolada**; não substituir RIMA pela Etapa Básica |
+| ANAC-03 | Alta | Processador `processar_anac_rima.py` ainda utilizava `NR_AEROPORTO`, códigos por extenso, e não aceitava preâmbulo; o CSV real usa `NR_AEROPORTO_REFERENCIA`, P/D, D/I e `Atualizado em:` | Patch na branch e testes de contrato com cabeçalho/códigos identificados em arquivo oficial | **Correção no código preparada; aguardar CI e teste com dados reais antes de fechar** |
+| ANAC-04 | Alta | Gzip/manifesto do arquivador são validados nos três meses, mas ainda sem perfil de nulos, valores inválidos, duplicidade, estabilidade dos códigos ou comparabilidade com RMA | Auditar quantitativamente cada competência, documentar denominadores/grão e reconciliar RIMA x RMA sem equiparar importação/exportação a pouso/decolagem | **Aberta**; nenhum resultado de tonelagem liberado |
+| ANAC-05 | Média | `action_required` em PRs gerados por `github-actions[bot]` sem jobs e e-mails de falhas repetidas | Diagnosticar política de permissões/Actions e aprovação; reduzir disparos; monitorar separadamente `failure` e `action_required` | **Aberta**; evitar afirmar que se trata de falha de testes |
+| ANAC-06 | Alta | Workflow de arquivamento tinha agendamento previsto, referência fixa à branch de desenvolvimento e default 2019 que gera 404 | Retirar agendamento até QA; usar branch atual no checkout/push e default provisório 2020-01 **sem declarar 2019 resolvido**; somente manual mediante plano aprovado | **Mitigada no código, bloqueada operacionalmente**; não ativar antes dos portões |
+| ANAC-07 | Média | Pilotos de rede e histórico acionados por alterações de arquivos, gerando várias execuções/e-mails e tentativas repetidas | Alterar os três workflows de diagnóstico/piloto para `workflow_dispatch` somente, mantendo `pages.yml` como guarda de PR | **Mitigada na branch**; conferir após commit |
+| ANAC-08 | Alta | Arquivos mensais nacionais não são preservados; guardamos extração SBKP mais SHA-256 de origem; revisões sobrescrevem o extrato atual | Preservar histórico Git, recibos por competência e comparação de revisões; validar imutabilidade de versões, integridade pós-clone, ausência de perda de meses e política de rollback | **Aberta** |
+| ANAC-09 | Média | Coleta em lote retorna falha geral se uma URL for 404; sucessos prévios da execução ficam no runner quando o commit é condicionado ao sucesso | Descobrir competências existentes antes de baixar; fazer lotes pequenos, gerar relatório de falhas e não publicar parcialmente sem recibo/QA | **Aberta** |
+| ANAC-10 | Média | Acervo documental contém pendência opcional de página da concessionária por `CERTIFICATE_VERIFY_FAILED` | Separar issue de coleta da concessionária, verificar cadeia TLS/URL alternativa oficial, sem desabilitar certificados | **Aberta não bloqueante para acervo ANAC**, mas bloqueia declaração de documentação externa 100% completa |
+| ANAC-11 | Média | Base ANAC/RIMA pode ter defasagem institucional de cerca de seis meses e meses ainda não divulgados; falta inventário real | Construir inventário de competências e datas de atualização reais antes do cron e da previsão; não marcar ausência recente como erro nem zero | **Aberta** |
+
+**Nota operacional:** a aprovação de 2020/2024 demonstra integridade de **recorte, competência, presença e hash**; ainda não houve avaliação de completude estatística ou equivalência com tonelagem do terminal.
+
+## Alternativas de acesso à série 2019
+
+1. **Preferida:** recuperar URL específica por enumeração de arquivos no servidor oficial (não construir nomes por suposição). Testar tamanho, cabeçalho, HTTPS e SHA-256.
+2. **Segunda:** inspecionar `flightsbr::get_airport_movement_dates_available()` / `read_airport_movements(date=201901)` em ambiente R com acesso a rede, acompanhando o URL final e comprovando que o arquivo é de RIMA. O pacote não é fonte estatística independente.
+3. **Terceira:** pedir à ANAC arquivo histórico original ou localização oficial alternativa; registrar protocolo e procedência.
+4. **Contingência:** se a indisponibilidade for confirmada, registrar 2019 como indisponível na RIMA, sem inventar competências e sem substituir com RMA/MDIC/Etapa Básica. A adoção de 2020 como início precisa de decisão documentada.
+
+## Portões obrigatórios para autorizar nova coleta
+
+- **P0. Segurança operacional:** gatilhos de diagnóstico excessivos desativados e agendamento de produção pausado; PR #7 continua *draft*, branch main e dashboard intactos.
+- **P1. Incidentes antigos:** cada ID tem status, evidência, responsável/ação e desfecho; resolver 2019 ou formalizar contingência de cobertura autorizada e tratar piloto de Etapa Básica separadamente.
+- **P2. Contrato de dados:** testes verdes do arquivador **e processador**, com arquivo real, dicionário de códigos, unidades e política de ausência.
+- **P3. Qualidade por competência:** contagem, integridade gzip, hash, datas, aeroportos, códigos, nulos, duplicidades, granulosidade e comparação entre meses, mais reconciliador RMA (comparação informativa, não igualação).
+- **P4. Confiabilidade:** simular 404 isolado, timeouts, revisão do mesmo mês, colisão de commits, preservação dos meses já arquivados e alertas; definir falha parcial explícita.
+- **P5. Governança:** revisar PR, resolver bloqueios do Actions/Pages e **somente então** aprovar fase de expansão.
+
+O monitoramento diário existente deve continuar reportando falhas novas, sem acionar lotes por conta própria. Este documento não encerra as pendências: registra a suspensão e o caminho verificável de resolução.

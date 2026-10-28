@@ -1,9 +1,7 @@
-name: Piloto historico ANAC RIMA 2020 SBKP
+name: Piloto ANAC RIMA 2020 (execucao manual)
 on:
-  push:
-    branches: [feature/anac-rima-staging-20261028]
-    paths:
-      - '.github/workflows/piloto-anac-rima-2019.yml'
+  workflow_dispatch:
+
 permissions:
   contents: write
 
@@ -36,7 +34,7 @@ jobs:
           assert item['linhas_sbkp']==9348
           print('Base 2024-01 anterior preservada e conferida.')
           PY
-      - name: Obter janeiro e fevereiro de 2019
+      - name: Obter janeiro e fevereiro de 2020
         run: |
           python scripts/arquivar_anac_rima.py --mode inicial --start 2020-01 --end 2020-02 --limit 2 --out-dir data/anac/rima
       - name: Validar integridade dos meses sem alterar 2024

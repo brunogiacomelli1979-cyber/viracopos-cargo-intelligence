@@ -1,8 +1,5 @@
 name: Sondar disponibilidade historica ANAC RIMA
 on:
-  push:
-    branches: [feature/anac-rima-staging-20261028]
-    paths: ['.github/workflows/sondar-disponibilidade-anac-rima.yml']
   workflow_dispatch:
 
 permissions:
