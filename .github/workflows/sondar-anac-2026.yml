@@ -1,0 +1,67 @@
+name: Sondar publicacao ANAC RIMA 2026 (somente leitura)
+on:
+  push:
+    branches: [feature/anac-rima-staging-20261028]
+    paths: ['.github/workflows/sondar-anac-2026.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verificar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Sondar pasta e candidatos 2026 por Range, sem salvar CSV
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p reports/anac
+          python - <<'PY'
+          import json,ssl
+          from datetime import datetime,timezone
+          from urllib.request import Request,urlopen
+          from urllib.error import HTTPError,URLError
+          from pathlib import Path
+          from scripts.arquivar_anac_rima import BASE_URL,official_url
+          urls=[("indice-raiz",BASE_URL),("indice-2026",BASE_URL+"2026/"),
+                ("controle-2025-12",official_url("2025-12"))]
+          for m in ("2026-01","2026-02","2026-03","2026-04"):
+              urls.append((m+"-csv",official_url(m)))
+              urls.append((m+"-json",official_url(m)[:-4]+".json"))
+          results=[]
+          for label,url in urls:
+              entry={"alvo":label,"url":url}
+              try:
+                  req=Request(url,headers={"User-Agent":"VCP-Insights-diagnostico-2026/1.0",
+                                           "Range":"bytes=0-255"})
+                  with urlopen(req,timeout=24,context=ssl.create_default_context()) as res:
+                      head=res.read(256)
+                      entry.update({"http":res.status,"url_final":res.geturl(),
+                                    "content_type":res.headers.get("Content-Type"),
+                                    "content_range":res.headers.get("Content-Range"),
+                                    "amostra_bytes":len(head),
+                                    "inicio":head[:40].decode("utf-8",errors="replace")})
+              except HTTPError as exc:
+                  entry.update({"http":exc.code,"tipo":"erro_http"})
+              except (URLError,TimeoutError,OSError) as exc:
+                  entry.update({"tipo":"erro_rede","detalhe":str(exc)[:160]})
+              results.append(entry)
+              print(json.dumps(entry,ensure_ascii=False),flush=True)
+          out={"consultado_utc":datetime.now(timezone.utc).isoformat(),
+               "metodo":"HTTP GET com Range; maximo 256 bytes lidos por URL",
+               "aviso":"404 apenas do caminho consultado; HTTP 206/200 parcial nao comprova CSV valido",
+               "resultados":results}
+          Path("reports/anac/sondagem-2026.json").write_text(
+              json.dumps(out,indent=2,ensure_ascii=False)+"\n",encoding="utf-8")
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: sondagem-anac-rima-2026
+          path: reports/anac/sondagem-2026.json
+          if-no-files-found: ignore
+          retention-days: 30
