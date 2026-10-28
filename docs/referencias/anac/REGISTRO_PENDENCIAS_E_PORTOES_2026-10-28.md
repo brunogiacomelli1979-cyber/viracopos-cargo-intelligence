@@ -48,3 +48,15 @@
 - **P5. Governança:** revisar PR, resolver bloqueios do Actions/Pages e **somente então** aprovar fase de expansão.
 
 O monitoramento diário existente deve continuar reportando falhas novas, sem acionar lotes por conta própria. Este documento não encerra as pendências: registra a suspensão e o caminho verificável de resolução.
+
+## Evidências adicionais — sondagens e auditoria de 28/10/2026
+
+**ANAC-01:** A listagem oficial do diretório 2019/ retornou HTTP 200 e revelou cobertura **irregular**, não ausência geral de 2019. Janeiro/2019 não consta da lista e `201901.csv` / `201901.json` retornaram HTTP 404. Fevereiro/2019 consta como **JSON apenas** (`201902.json`): amostra HTTP 206 e tamanho original informado de **147.291.769 bytes**; a amostra contém `NR_NATUREZA: null` em registro de outro aeroporto, o que exige contrato de faltantes e leitura em streaming antes de qualquer uso. Março/2019 tem CSV acessível (HTTP 206, **23.713.701 bytes** indicados). Dezembro/2019 apresenta as variantes `201912.csv` e `201912.csv.csv`, com acesso parcial da segunda (29.070.579 bytes indicados). Não escolher uma sem comparar seus hashes e conteúdo.
+
+**Alternativas para 2019:** (a) listar URLs oficiais e tratar março–dezembro como CSV após concluir os portões; (b) desenvolver leitor JSON em streaming e validar fevereiro; (c) solicitar janeiro à ANAC e registrar sua ausência se não recuperável; (d) se necessário, decidir formalmente uma cobertura a partir de fevereiro ou março de 2019, com lacunas explicitadas. O pacote Ipea `flightsbr` usa o mesmo padrão de URL e não provê cópia alternativa de janeiro.
+
+**ANAC-04:** A auditoria [40682407452](https://github.com/brunogiacomelli1979-cyber/viracopos-cargo-intelligence/actions/runs/40682407452) examinou **28.087 linhas SBKP** de 2020-01, 2020-02 e 2024-01, confirmou SHA-256, tamanho, cabeçalho e competência; apurou **0 pesos vazios ou inválidos, 0 linhas inteiramente duplicadas e 0 erros críticos**. Não encerra avaliação de chave de voo, qualidade dos demais meses nem conciliação com RMA.
+
+**ANAC-03:** O processador corrigido passou nos testes do CI [40681363536](https://github.com/brunogiacomelli1979-cyber/viracopos-cargo-intelligence/actions/runs/40681363536), mas falta teste de agregação com extrato oficial. **ANAC-07:** diagnósticos e piloto estão restritos a execução manual. **ANAC-05:** `action_required` apareceu em PRs do `github-actions[bot]` sem jobs; não equivale a falha estatística ANAC.
+
+**Evidência detalhada 2019:** [execução 40682498262](https://github.com/brunogiacomelli1979-cyber/viracopos-cargo-intelligence/actions/runs/40682498262). Nenhuma série nova foi coletada ou incorporada nesta auditoria. A expansão permanece **bloqueada**.
