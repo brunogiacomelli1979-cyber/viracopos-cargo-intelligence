@@ -18,6 +18,12 @@ class ArchiveTests(unittest.TestCase):
         self.assertEqual(list(month_sequence("2023-12","2024-02")), ["2023-12","2024-01","2024-02"])
         self.assertIn("2024/Movimentacoes_Aeroportuarias_202401.csv", official_url("2024-01"))
 
+    def test_reject_dates_before_2020(self):
+        with self.assertRaisesRegex(ValueError, "recorte aprovado"):
+            list(month_sequence("2019-12", "2020-01"))
+        self.assertEqual(list(month_sequence("2020-01", "2020-02")),
+                         ["2020-01", "2020-02"])
+
     def test_filter_keeps_sbkp_and_missing(self):
         compressed, meta = filter_sbkp(ROWS, "2024-01")
         text = gzip.decompress(compressed).decode("utf-8")

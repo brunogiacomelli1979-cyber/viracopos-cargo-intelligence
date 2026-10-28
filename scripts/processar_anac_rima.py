@@ -63,6 +63,8 @@ def _decode(data):
 def _validate_month(month, today=None):
     if not re.fullmatch(r"\d{4}-(0[1-9]|1[0-2])", month):
         raise ValueError("competência inválida, usar AAAA-MM")
+    if month < "2020-01":
+        raise ValueError("competência anterior ao recorte oficial 2020-01")
     if month >= (today or date.today()).strftime("%Y-%m"):
         raise ValueError("competência futura ou mês ainda aberto")
 

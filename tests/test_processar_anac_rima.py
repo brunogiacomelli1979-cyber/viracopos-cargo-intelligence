@@ -28,6 +28,10 @@ class RimaTests(unittest.TestCase):
     def runfile(self):
         return process_file(self.csv_file, "2025-01", today=self.today)
 
+    def test_reject_period_before_project_start(self):
+        with self.assertRaisesRegex(ValueError, "2020-01"):
+            process_file(self.csv_file, "2019-12", today=self.today)
+
     def test_real_preamble_and_codes(self):
         self.make("Atualizado em: 2025-11-01\n" +
                   HEADER + "2025;01;SBKP;P;I;120;5\n")

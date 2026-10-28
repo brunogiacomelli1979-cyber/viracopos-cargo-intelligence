@@ -29,6 +29,7 @@ BASE_URL = (
 REQUIRED = {"ANO", "MES", "NR_AEROPORTO_REFERENCIA", "NR_MOVIMENTO_TIPO",
             "NR_NATUREZA", "QT_CARGA", "QT_CORREIO"}
 MAX_SOURCE_BYTES = 250_000_000
+FIRST_MONTH = "2020-01"  # Recorte histórico oficial do projeto; não altera arquivos antigos.
 ROOT = Path(__file__).resolve().parents[1]
 OUT_DIR = ROOT / "data/anac/rima"
 
@@ -41,6 +42,8 @@ def month_string(value):
 
 def month_sequence(start, end):
     start, end = month_string(start), month_string(end)
+    if start < FIRST_MONTH:
+        raise ValueError(f"Competência anterior ao recorte aprovado ({FIRST_MONTH}): {start}")
     if start > end:
         raise ValueError("Início após fim")
     year, month = map(int, start.split("-"))
@@ -258,7 +261,7 @@ def run(args, opener=urlopen):
 def main():
     parser = argparse.ArgumentParser(description="Download histórico e arquivamento ANAC/RIMA para SBKP")
     parser.add_argument("--mode", choices=["inicial", "mensal"], required=True)
-    parser.add_argument("--start", default="2020-01")
+    parser.add_argument("--start", default=FIRST_MONTH, help="A partir de 2020-01; períodos anteriores estão fora do escopo")
     parser.add_argument("--end", default=None)
     parser.add_argument("--refresh", type=int, default=12, help="Meses a reconsultar na rotina mensal")
     parser.add_argument("--limit", type=int, default=0, help="Limitar arquivos por execução; 0=todos")

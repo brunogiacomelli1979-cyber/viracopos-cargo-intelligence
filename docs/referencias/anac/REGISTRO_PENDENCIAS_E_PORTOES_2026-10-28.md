@@ -60,3 +60,12 @@ O monitoramento diário existente deve continuar reportando falhas novas, sem ac
 **ANAC-03:** O processador corrigido passou nos testes do CI [40681363536](https://github.com/brunogiacomelli1979-cyber/viracopos-cargo-intelligence/actions/runs/40681363536), mas falta teste de agregação com extrato oficial. **ANAC-07:** diagnósticos e piloto estão restritos a execução manual. **ANAC-05:** `action_required` apareceu em PRs do `github-actions[bot]` sem jobs; não equivale a falha estatística ANAC.
 
 **Evidência detalhada 2019:** [execução 40682498262](https://github.com/brunogiacomelli1979-cyber/viracopos-cargo-intelligence/actions/runs/40682498262). Nenhuma série nova foi coletada ou incorporada nesta auditoria. A expansão permanece **bloqueada**.
+
+
+## Deliberação posterior — recorte temporal oficial 01/01/2020
+
+**Decisão do projeto:** a janela histórica obrigatória começa na competência **2020-01**. A busca de 2019 está **encerrada para o escopo operacional** e suas evidências permanecem para auditoria, sem declarar que o arquivo de janeiro/2019 foi recuperado ou corrigido na ANAC. Não haverá leitor JSON de fevereiro/2019 como requisito do pipeline 2020+.
+
+**ANAC-01 — desfecho: fora do escopo (decisão de cobertura).** Não bloqueia mais P1 por si só. Os demais incidentes **ANAC-02 a ANAC-11** seguem sujeitos aos portões P0–P5 e não foram dispensados. No arquivador e no processador, datas anteriores a 2020-01 passaram a ser recusadas, com testes de regressão. Sem liberação de cron, sem novos downloads, sem alteração do painel.
+
+Documento de referência: [Política do recorte 2020](../../RECORTE_TEMPORAL_2020.md).
