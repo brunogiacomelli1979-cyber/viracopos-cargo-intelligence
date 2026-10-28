@@ -1,0 +1,62 @@
+name: Arquivar histórico ANAC RIMA SBKP
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "inicial (backfill) ou mensal"
+        type: choice
+        options: [inicial, mensal]
+        default: inicial
+      start:
+        description: "Primeira competência AAAA-MM"
+        default: "2019-01"
+      end:
+        description: "Última competência (vazio = limite de seis meses)"
+        default: ""
+      limit:
+        description: "Máximo de meses por execução (0 = sem limite)"
+        default: "12"
+  schedule:
+    - cron: '23 12 20 * *'
+permissions:
+  contents: read
+concurrency:
+  group: arquivar-anac-rima
+  cancel-in-progress: false
+jobs:
+  archive:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/anac-rima-staging-20261028
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Testes de integridade do arquivador
+        run: python -m unittest discover -s tests -p 'test_arquivar_anac_rima.py' -v
+      - name: Baixar e arquivar SBKP
+        shell: bash
+        env:
+          MODE: ${{ github.event_name == 'workflow_dispatch' && inputs.mode || 'mensal' }}
+          START: ${{ github.event_name == 'workflow_dispatch' && inputs.start || '2019-01' }}
+          END: ${{ github.event_name == 'workflow_dispatch' && inputs.end || '' }}
+          LIMIT: ${{ github.event_name == 'workflow_dispatch' && inputs.limit || '0' }}
+        run: |
+          set -euo pipefail
+          args=(--mode "$MODE" --start "$START" --limit "$LIMIT")
+          if [[ -n "$END" ]]; then args+=(--end "$END"); fi
+          python scripts/arquivar_anac_rima.py "${args[@]}"
+      - name: Registrar somente dados ANAC validados
+        if: success()
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/anac/rima/manifesto.json data/anac/rima/sbkp/ || true
+          if ! git diff --cached --quiet; then
+            git commit -m 'data: arquivar RIMA mensal SBKP validado'
+            git push origin HEAD:feature/anac-rima-staging-20261028
+          fi
