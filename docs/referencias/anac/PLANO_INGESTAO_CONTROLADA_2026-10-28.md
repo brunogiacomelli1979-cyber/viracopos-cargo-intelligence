@@ -131,3 +131,14 @@ python -m unittest discover -s tests -p test_simular_promocao_anac.py -v
 Os scripts são opt-in; não acionam rede ou workflow de coleta. O exemplo de competência não constitui dado capturado.
 
 **Pendências:** G2 precisa de armazenamento permanente real; G4 precisa de perfil de chaves/duplicidade e reconciliação ANAC x RMA; G5/G6 seguem bloqueados. As variáveis temporárias de autorização no GitHub não foram inspecionadas nesta fase.
+
+
+## Marco 5 — ensaio de recuperacao ponta a ponta G2 (sem homologacao externa)
+
+Acrescentado o programa offline **scripts/ensaio_recuperacao_g2_anac.py**, com testes de regressao em **tests/test_ensaio_recuperacao_g2_anac.py**. O fluxo audita o cofre original, exige um CSV nacional ja arquivado por SHA explicitamente escolhido, rejeita transferencias parciais, gera e verifica snapshot, restaura o backup em pasta nova temporaria, confere a igualdade byte a byte dos objetos e recibos, reprocessa o SBKP a partir da copia recuperada e comprova que o cofre original e o snapshot nao foram modificados.
+
+Dois modos: simulado (permite volumes iguais para teste de software) e pre_homologacao (exige identificadores de dispositivo distintos no SO, sem considerar isso prova de independencia fisica). **A saida sempre deixa g2_operacional_aprovado=false**, mesmo com testes passando. O script nao coleta nem publica. Os testes tambem recusam destinos ausentes, diretorios aninhados, originais corrompidos, backups alterados e copia enquanto existem arquivos parciais.
+
+**Runbook detalhado e criterios de aceite:** [G2_HOMOLOGACAO_ARMAZENAMENTO_2026-10-28.md](G2_HOMOLOGACAO_ARMAZENAMENTO_2026-10-28.md).
+
+**Estado operacional pendente:** nao foi provisionado destino externo nem configurada rotina de backup offsite. Nao ha prova de recuperacao em volume fisicamente independente; os quatro meses ANAC de 2020/2024 contidos no manifesto guardam somente o recorte SBKP, nao o CSV nacional bruto original. Para executar o ensaio com evidencia real, sera preciso um cofre real existente, um original bruto legitimamente obtido e segunda copia duravel fora do dominio de falha do primario. Somente depois o usuario podera avaliar e aprovar a abertura do G5, sem dispensar ANAC-04 e governanca de dados.
