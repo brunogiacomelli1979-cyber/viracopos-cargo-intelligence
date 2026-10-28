@@ -8,10 +8,10 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 from arquivar_anac_rima import month_sequence, filter_sbkp, store_month, load_manifest, official_url, choose_months
 
-HEADER = "ANO;MES;NR_AEROPORTO;NR_MOVIMENTO_TIPO;NR_NATUREZA;QT_CARGA;QT_CORREIO\n"
-ROWS = (HEADER + "2024;01;SBKP;Pouso;Internacional;100;1\n" +
-        "2024;01;SBGR;Pouso;Internacional;800;9\n" +
-        "2024;01;SBKP;Decolagem;Doméstica;;0\n").encode("utf-8")
+HEADER = "ANO;MES;NR_AEROPORTO_REFERENCIA;NR_MOVIMENTO_TIPO;NR_NATUREZA;QT_CARGA;QT_CORREIO\n"
+ROWS = (HEADER + "2024;01;SBKP;P;I;100;1\n" +
+        "2024;01;SBGR;P;I;800;9\n" +
+        "2024;01;SBKP;D;D;;0\n").encode("utf-8")
 
 class ArchiveTests(unittest.TestCase):
     def test_months(self):
