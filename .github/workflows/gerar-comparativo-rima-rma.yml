@@ -1,0 +1,29 @@
+name: Gerar comparativo exploratorio RIMA RMA e perfil de voos (offline)
+on:
+  push:
+    branches: [feature/anac-rima-staging-20261028]
+    paths:
+      - '.github/workflows/gerar-comparativo-rima-rma.yml'
+      - 'scripts/gerar_comparativo_rima_rma.py'
+      - 'tests/test_gerar_comparativo_rima_rma.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  calcular:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Testar separacao movimentos com carga e passageiros
+        run: python -m unittest discover -s tests -p 'test_gerar_comparativo_rima_rma.py' -v
+      - name: Gerar dados da comparacao usando arquivo ANAC local
+        run: python scripts/gerar_comparativo_rima_rma.py --output reports/anac/comparativo-rima-rma.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: comparativo-anac-rma-preliminar
+          path: reports/anac/comparativo-rima-rma.json
+          retention-days: 30
