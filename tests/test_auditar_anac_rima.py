@@ -41,6 +41,25 @@ class AuditTests(unittest.TestCase):
             file.write_bytes(b"not gzip")
             self.assertEqual(inspect(root)["integridade_arquivos"],"reprovada")
 
+    def test_revision_old_snapshot_corruption_blocks_audit(self):
+        with tempfile.TemporaryDirectory() as t:
+            root=Path(t)
+            legacy=self.setup_month(root)
+            store=root/"data/anac/rima"
+            manifest=json.loads((store/"manifesto.json").read_text())
+            previous=dict(manifest["competencias"]["2020-01"])
+            old=store/"sbkp/2020/versoes/2020-01/old.csv.gz"
+            old.parent.mkdir(parents=True,exist_ok=True)
+            old.write_bytes(legacy.read_bytes())
+            previous["caminho_sbkp"]=str(old.relative_to(root)).replace("\\","/")
+            manifest["competencias"]["2020-01"]["revisoes"]=[previous]
+            (store/"manifesto.json").write_text(json.dumps(manifest))
+            self.assertEqual(inspect(root)["integridade_arquivos"],"aprovada")
+            old.write_bytes(b"corrupted")
+            result=inspect(root)
+            self.assertEqual(result["integridade_arquivos"],"reprovada")
+            self.assertTrue(any("revisão histórica" in str(e) for e in result["erros_criticos"]))
+
     def test_invalid_weight_blocks(self):
         with tempfile.TemporaryDirectory() as t:
             root=Path(t)
