@@ -70,6 +70,9 @@ class AnacNormaTests(unittest.TestCase):
         one = result["colisoes_perfil_anonimizado"][0]
         self.assertTrue(one["calco_difere"])
         self.assertTrue(one["valores_de_carga_diferem"])
+        self.assertEqual(one["tipos_de_servico"], ["J"])
+        self.assertFalse(one["codigo_voo_igual"])
+        self.assertTrue(one["aeroporto_relacionado_igual"])
         blob = json.dumps(result)
         self.assertNotIn("PTABC", blob)
         self.assertNotIn("451", blob)
