@@ -104,6 +104,40 @@ def _duration_bucket(minutes):
     return "diferenca_acima_360_minutos_a_investigar"
 
 
+def _flight_number_quality(first, second):
+    """0 no RIMA pode significar numero nao aplicavel: igualdade nao prova identidade."""
+    a, b = (str(x.get("NR_VOO_NUMERO", "")).strip().lower() for x in (first, second))
+    if not a or not b or a in ("0", "null") or b in ("0", "null"):
+        return "sem_numero_confiavel_ou_numero_zero"
+    return "ambos_informados_sem_garantia_de_unicidade"
+
+
+def _pair_timing(first, second):
+    """Perfil em faixas, sem divulgar data/hora, matricula ou identificador."""
+    durations = [_delta(first), _delta(second)]
+    buckets = sorted(_duration_bucket(d) for d in durations)
+    parsed = []
+    for row in (first, second):
+        date = parse_date(row["DT_CALCO"])
+        clock = parse_hour(row["HH_CALCO"])
+        parsed.append(datetime.combine(date, clock) if date and clock else None)
+    if any(x is None for x in parsed):
+        gap = "descalco_nao_comparavel"
+    else:
+        diff = abs((parsed[0]-parsed[1]).total_seconds()) / 60
+        gap = ("mesmo_instante" if diff == 0 else
+               "ate_5_min" if diff <= 5 else
+               "6_a_30_min" if diff <= 30 else
+               "31_a_120_min" if diff <= 120 else "mais_de_120_min")
+    return {
+        "faixas_entre_calco_e_toque": buckets,
+        "faixa_separacao_entre_calcos": gap,
+        "ambos_tem_sequencia_temporal_nao_negativa": all(
+            d is not None and d >= 0 for d in durations),
+        "interpretacao": "faixas sao indicios, nao identificam movimento fisico"
+    }
+
+
 def inspect_csv(data, month):
     reader = csv.DictReader(io.StringIO(data.decode("utf-8"), newline=""),
                             delimiter=";", strict=True)
@@ -172,8 +206,12 @@ def inspect_csv(data, month):
                     "movimento": move,
                     "natureza": nature,
                     "tipos_de_servico": sorted({old["NR_SERVICE_TYPE"].strip(), row["NR_SERVICE_TYPE"].strip()}),
-                    "codigo_voo_igual": old.get("NR_VOO_NUMERO") == row.get("NR_VOO_NUMERO"),
-                    "aeroporto_relacionado_igual": old.get("NR_VOO_OUTRO_AEROPORTO") == row.get("NR_VOO_OUTRO_AEROPORTO"),
+                    "codigo_voo_igual": (bool("NR_VOO_NUMERO" in header) and
+                                          old.get("NR_VOO_NUMERO") == row.get("NR_VOO_NUMERO")),
+                    "numero_voo_qualidade": _flight_number_quality(old, row),
+                    "aeroporto_relacionado_igual": (bool("NR_VOO_OUTRO_AEROPORTO" in header) and
+                                                      old.get("NR_VOO_OUTRO_AEROPORTO") == row.get("NR_VOO_OUTRO_AEROPORTO")),
+                    "perfil_temporal_anonimizado": _pair_timing(old, row),
                     "campos_distintos": diff,
                     "campos_distintos_quantidade": len(diff),
                     "valores_de_carga_diferem": "QT_CARGA" in diff,
