@@ -125,7 +125,7 @@ def audit(store):
     for receipt in sorted((store / "receipts").glob("????-??/*.json")):
         try:
             info = json.loads(receipt.read_text(encoding="utf-8"))
-            if info.get("schema") != "anac-original-raw-v1":
+            if info.get("schema") != "anac-original-raw-v1" or info.get("status") != "bruto_preservado_nao_validado":
                 raise ValueError("Contrato de recibo invalido")
             month, sha = info["competencia"], info["sha256"]
             if not re.fullmatch(r"[0-9a-f]{64}", sha):
@@ -143,6 +143,8 @@ def audit(store):
         except (OSError, ValueError, KeyError, TypeError, json.JSONDecodeError) as exc:
             failures.append({"recibo": str(receipt), "erro": str(exc)})
     orphan = [p.relative_to(store).as_posix() for p in (store / "objects").glob("*/*.csv") if p.resolve() not in referenced]
+    if not checked:
+        failures.append({"erro": "Nenhum bruto com recibo validado; acervo vazio nao aprova auditoria"})
     return {"recibos_validos": checked, "objetos_orfaos": orphan,
             "erros": failures, "aprovado": not failures and not orphan}
 
