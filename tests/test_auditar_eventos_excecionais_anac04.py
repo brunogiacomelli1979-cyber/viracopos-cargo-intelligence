@@ -53,6 +53,8 @@ class AnacNormaTests(unittest.TestCase):
         self.assertEqual(result["service_type_nao_mapeados"], {})
         self.assertEqual(result["service_type_grupos_descritivos"]["voo_alternado_portaria"],1)
         self.assertEqual(result["service_type_grupos_descritivos"]["voo_retorno_portaria"],1)
+        self.assertEqual(result["service_type_por_presenca_carga"]["Y"]["positivo"],1)
+        self.assertEqual(result["service_type_por_presenca_carga"]["Z"]["positivo"],1)
 
     def test_null_text_treated_as_uninformed_and_not_collision(self):
         a = row(toque="null", htoque="null")
@@ -113,7 +115,8 @@ class AnacNormaTests(unittest.TestCase):
                     "diferenca_dias":z["toque_fora_mes_diferenca_dias_toque_menos_calco"],
                     "colisoes_perfil":z["colisoes_perfil_anonimizado"],
                     "codigos_sem_mapeamento":z["service_type_nao_mapeados"],
-                    "contagem_codigos_yz":{c:z["service_type_codes"].get(c,0) for c in ("Y","Z")}
+                    "contagem_codigos_yz":{c:z["service_type_codes"].get(c,0) for c in ("Y","Z")},
+                    "presenca_carga_por_servico":{c:z["service_type_por_presenca_carga"].get(c,{}) for c in ("J","F","H","Y","Z")}
                 } for m,z in r["competencias"].items()
             }
         },ensure_ascii=False,sort_keys=True))
