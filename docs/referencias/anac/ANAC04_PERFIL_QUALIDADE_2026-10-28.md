@@ -103,3 +103,21 @@ A auditoria offline utiliza a tabela IATA transcrita nos metadados ANAC e as cod
 **Evidência automatizada:** [GitHub Actions #40725203330](https://github.com/brunogiacomelli1979-cyber/viracopos-cargo-intelligence/actions/runs/40725203330), 185 testes Python aprovados, inclusive exame das datas em relação ao critério normativo e análise anônima de colisão. A execução de pull request não fez deploy. As estatísticas agregadas foram impressas como ANAC04_EXCECOES_AGREGADAS sem detalhes de aeronaves, números de voo ou horários.
 
 **Caveat:** não é adequado calcular participação de voos exclusivamente cargueiros apenas a partir de categoria J/F/H ou somando QT_CARGA: são dimensões distintas. É preciso homologar o critério de cargueiro dedicado versus aeronave de passageiros que transportou carga antes da modelagem.
+
+
+## Quarta passagem — triagem temporal da colisão T/Z (sem correção de origem)
+
+**Evidência:** [GitHub Actions #40726098137](https://github.com/brunogiacomelli1979-cyber/viracopos-cargo-intelligence/actions/runs/40726098137) — **187 testes Python aprovados**, sem deploy. O script de auditoria preserva a saída anonimizada.
+
+O diagnóstico da única colisão residual com DT_TOQUE reconhecida (março/2020, decolagem doméstica, T versus Z) agora confirma:
+- as duas sequências de horário descalço → toque de rodas são **não negativas e menores ou iguais a 120 minutos**;
+- o intervalo entre os dois horários de descalço está na faixa de **6 a 30 minutos**;
+- o número de voo coincide e está informado, mas **não é identificador de operação comprovadamente único**;
+- matrícula, aeroporto relacionado, toque e QT_CARGA coincidem; o tipo de serviço e a hora de descalço divergem;
+- nenhum identificador, data/hora exata, número de voo ou matrícula é colocado em documentos, logs ou relatórios.
+
+A verificação temporal **não conclui** que sejam operações distintas nem duplicação. Na estrutura de reporte da Portaria 1.017/2018 (alteração de 2019), o campo COD_RIMA identifica a operação e poderia auxiliar a reconciliação, mas **não está presente no CSV nacional público arquivado**; o valor 0 é permitido em NR_VOO_NUMERO quando não aplicável. O uso de combinação de outros campos como chave primária não está homologado.
+
+**Tratativa formal:** minuta não enviada de consulta à GEIC/ANAC disponível em [CONSULTA_TECNICA_GEIC_ANAC04_TZ_2026-10-28.md](CONSULTA_TECNICA_GEIC_ANAC04_TZ_2026-10-28.md), com seis perguntas sobre grão físico, unicidade, COD_RIMA, revisões e classificação T/Z. Não se presumiu retorno institucional, não houve envio automático de e-mail.
+
+**Estado do incidente:** ANAC-04-TZ = **PENDENTE DE CONFIRMAÇÃO DA FONTE**; evidência operacional temporal suficiente para registrar uma exceção circunscrita, mas insuficiente para excluir uma linha ou declarar a base sem ressalvas. Integridade de hash/arquivo permanece aprovada nos quatro meses; completude histórica e reconciliação metodológica seguem abertas. A liberação de novos lotes, cron e visualização de dados ANAC fica bloqueada.
