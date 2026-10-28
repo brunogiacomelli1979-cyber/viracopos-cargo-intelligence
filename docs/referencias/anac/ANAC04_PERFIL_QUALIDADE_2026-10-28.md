@@ -42,3 +42,22 @@ A execução [#40721770749](https://github.com/brunogiacomelli1979-cyber/viracop
 O comando não faz download e não altera manifesto ou site. O JSON produzido é diagnóstico local. O script mantém as flags liberado_dashboard=false e liberado_nova_coleta=false.
 
 **Referências:** [Issue #8](https://github.com/brunogiacomelli1979-cyber/viracopos-cargo-intelligence/issues/8) e [Plano de Ingestão](PLANO_INGESTAO_CONTROLADA_2026-10-28.md).
+
+
+## Segunda passagem — anomalias de DT_TOQUE (investigação sem descarte)
+
+O relatório de QA passou a separar chave candidata com campos preenchidos de chave com **data efetivamente reconhecida**. Comprovamos que o CSV oficial contém o marcador textual literal **null** para algumas datas DT_TOQUE. Não é um horário/código de voo nem uma data válida; tampouco devemos confundi-lo com carga zero.
+
+| Competência | DT_TOQUE = texto null | DT_TOQUE fora do mês | Colisões chave toque (todas) | Colisões com data reconhecida | Duplicatas exatas de linha |
+|---|---:|---:|---:|---:|---:|
+| 2020-01 | 57 | 11 | 6 | 0 | 0 |
+| 2020-02 | 70 | 0 | 11 | 0 | 0 |
+| 2020-03 | 63 | 1 | 12 | 1 | 0 |
+| 2024-01 | 74 | 3 | 14 | 0 | 0 |
+| **Total** | **264** | **15** | **43** | **1** | **0** |
+
+**Diagnóstico:** das 43 colisões preliminares de chave de toque, 42 deixam de ser candidatas a repetição física quando se exige a presença de data reconhecida. Resta **uma colisão de chave com DT_TOQUE reconhecido**, ainda sem interpretação documental. Repetições de uma chave incompleta não autorizam exclusão; preservam-se as 34.968 linhas. Os 15 eventos com data de toque fora do mês também não são excluídos: operações próximas à virada de mês ou erro de registro são hipóteses, não conclusões.
+
+**Correção de contrato implementada:** o parser exploratório agora classifica string null (case-insensitive) como nao_informada, distinta de formato_nao_reconhecido, sem alterar um único byte da fonte nem substituir o valor por zero. Registra separadamente cobertura da chave com data reconhecida, colisões nesta condição e os marcadores de ausência encontrados. Testes de regressão verificam que null nunca certifica chave operacional.
+
+**Pendências reais:** investigar a única colisão com data reconhecida, estabelecer regra de interpretação dos 15 toques em competências diferentes, validar o dicionário ANAC e confirmar critério de registros múltiplos. O status ANAC-04 continua aberto e os portões de coleta/publicação permanecem fechados.
