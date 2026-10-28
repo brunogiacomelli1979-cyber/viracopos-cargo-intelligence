@@ -133,6 +133,16 @@ class AnacNormaTests(unittest.TestCase):
         self.assertEqual(r["total_toque_fora_mes"],15)
         self.assertEqual(r["total_toque_nao_informado"],264)
         self.assertEqual(r["total_colisoes_toque_data_reconhecida"],1)
+        case = r["competencias"]["2020-03"]["colisoes_perfil_anonimizado"][0]
+        self.assertEqual(case["tipos_de_servico"], ["T", "Z"])
+        self.assertEqual(case["movimento"], "D")
+        self.assertEqual(case["natureza"], "D")
+        self.assertEqual(case["numero_voo_qualidade"], "ambos_informados_sem_garantia_de_unicidade")
+        self.assertEqual(case["perfil_temporal_anonimizado"]["faixa_separacao_entre_calcos"],
+                         "6_a_30_min")
+        self.assertTrue(case["perfil_temporal_anonimizado"]["ambos_tem_sequencia_temporal_nao_negativa"])
+        self.assertEqual(case["perfil_temporal_anonimizado"]["faixas_entre_calco_e_toque"],
+                         ["diferenca_ate_120_minutos"] * 2)
         self.assertEqual(r["total_calco_fora_mes"],0)
         self.assertTrue(r["todos_calcos_no_mes"])
         self.assertTrue(r["nao_liberado_para_publicacao"])
