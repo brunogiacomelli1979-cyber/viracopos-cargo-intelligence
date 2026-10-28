@@ -15,8 +15,9 @@ Adotamos as camadas: inventário -> arquivo bruto -> recorte SBKP -> auditoria -
 1. **Inventário** — data/anac/rima/inventario_disponibilidade.json é uma fotografia das listagens oficiais ANAC de 28/10/2026 com evidência [Actions #40687137171](https://github.com/brunogiacomelli1979-cyber/viracopos-cargo-intelligence/actions/runs/40687137171). Há 72 competências CSV listadas em 2020–2025. Listagem **não comprova** integridade do conteúdo, existência de linhas SBKP nem download integral. O índice 2026 estava indisponível no endereço consultado.
 2. **Planejador** — scripts/planejar_coleta_anac.py lê o inventário e manifesto locais, não usa rede e classifica competências como arquivado_pendente_reauditoria, listado_pendente_captura, nao_listado_no_indice, indice_indisponivel ou nao_inventariado. Para 2020–2025, resulta em 4 meses arquivados e 68 ainda pendentes de coleta.
 3. **Cofre bruto offline** — scripts/acervo_bruto_anac.py recebe CSV oficial **já existente no computador**, copia o original em blocos para pasta durável **fora do Git**, calcula SHA-256, preserva versões e registra recibos imutáveis. Rejeita arquivo vazio/HTML, cabeçalho ausente, tamanho excessivo, URL incompatível e diretório de destino dentro do repositório.
-4. **Auditoria offline** — valida hashes, recibos, objetos órfãos e rejeita acervo vazio. Diferencia bytes preservados de dados estatisticamente validados.
-5. **Testes** — tests/test_ingestao_controlada_anac.py: 10 cenários locais aprovados, sem acesso à ANAC ou publicação.
+4. **Downloader HTTPS isolado** — scripts/baixar_original_anac.py executa somente quando chamado explicitamente por código; usa streaming em blocos, TLS válido, rejeita HTTP 206 e respostas truncadas, limita retries para erros transitórios, distingue 404 e respeita Retry-After (até 60 s). **Não há nenhum workflow ou agendamento que o invoque.**
+5. **Auditoria offline** — valida hashes, recibos, objetos órfãos e rejeita acervo vazio. Diferencia bytes preservados de dados estatisticamente validados.
+6. **Testes** — tests/test_ingestao_controlada_anac.py (10 casos) e tests/test_baixar_original_anac.py (9 casos). **19 testes locais aprovados**, todos com rede simulada e sem publicação.
 
 ## Uso sem rede
 
@@ -24,6 +25,7 @@ Adotamos as camadas: inventário -> arquivo bruto -> recorte SBKP -> auditoria -
 python scripts/planejar_coleta_anac.py --inicio 2020-01 --fim 2025-12
 python scripts/planejar_coleta_anac.py --inicio 2026-01 --fim 2026-04
 python -m unittest discover -s tests -p test_ingestao_controlada_anac.py -v
+python -m unittest discover -s tests -p test_baixar_original_anac.py -v
 
 # Exemplo SOMENTE com original previamente obtido e volume persistente provisionado:
 python scripts/acervo_bruto_anac.py registrar \
@@ -44,7 +46,7 @@ O registro bruto **não baixa** arquivos, não modifica o manifesto SBKP, não p
 | G0 | Sem novos lotes, main e dashboard isolados | Princípio observado nesta entrega; variáveis de Actions ainda não verificadas |
 | G1 | Inventário com evidências e estados corretos | Implementado offline |
 | G2 | Cofre imutável, hashes, recibos e auditoria | Implementado em código e testes locais; infraestrutura persistente não provisionada |
-| G3 | Download streaming, TLS, cache e retries seletivos | **Pendente**; coletor original ainda baixa CSV em memória |
+| G3 | Download streaming, TLS, retries seletivos e cache | Módulo streaming isolado e testes simulados aprovados; **cache/reuso online e integração ao coletor legado ainda pendentes** |
 | G4 | Grão, campos, nulos, duplicatas, agregação e reconciliação RMA | **Pendente** para toda a série |
 | G5 | Piloto de competência nova com auditoria local e pós-push | **Bloqueado**, não autorizado |
 | G6 | Expansão 1 -> 3 -> 6 meses e cron | **Bloqueado**, não autorizado |
@@ -71,4 +73,4 @@ Diferenças legítimas ANAC/RIMA x RMA x MDIC devem ser documentadas por popula�
 
 [Issue de governança #8](https://github.com/brunogiacomelli1979-cyber/viracopos-cargo-intelligence/issues/8) · [Inventário histórico](INVENTARIO_DISPONIBILIDADE_2020-2026.md) · [Registro de incidentes](REGISTRO_PENDENCIAS_E_PORTOES_2026-10-28.md)
 
-**Próximo marco:** implementar downloader HTTPS em streaming para armazenamento durável, com cache/retomada, teste de interrupção e integração ao processamento SBKP somente após validação local. Nenhuma automação de download é habilitada por este documento.
+**Próximo marco:** integrar a reutilização do bruto ao parser SBKP e ao planejamento de competências, provisionar armazenamento persistente com backup, testar restauração e só então desenhar piloto real autorizado. O streaming já tem testes simulados, mas **não foi executado contra a ANAC real**. Nenhuma automação de download é habilitada por este documento.
