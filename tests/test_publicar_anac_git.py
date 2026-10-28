@@ -1,5 +1,7 @@
 """Integração Git totalmente local: nenhum acesso à ANAC nem a repositórios remotos reais."""
 import json
+import os
+from unittest.mock import patch
 import subprocess
 import sys
 import tempfile
@@ -31,6 +33,11 @@ def add_month(repo, month, amount):
 
 class PublishIntegrationTests(unittest.TestCase):
     def setUp(self):
+        # Fixtures usam clones Git locais; devem ignorar refs sintéticas de PR
+        # (ex.: 7/merge), mantendo a validação real do publicador inalterada.
+        github_ref = patch.dict(os.environ, {"GITHUB_REF_NAME": HOMOLOG_BRANCH})
+        github_ref.start()
+        self.addCleanup(github_ref.stop)
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
