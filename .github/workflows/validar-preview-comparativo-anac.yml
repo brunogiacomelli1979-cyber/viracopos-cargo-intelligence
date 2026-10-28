@@ -1,0 +1,67 @@
+name: Validar comparativo ANAC RMA e voos com carga (sem publicar)
+on:
+  push:
+    branches: [feature/anac-rima-staging-20261028]
+    paths:
+      - '.github/workflows/validar-preview-comparativo-anac.yml'
+      - 'index.template.html'
+      - 'assets/app-blue.js'
+      - 'assets/style-blue.css'
+      - 'scripts/atualizar.py'
+      - 'scripts/validar_dados.py'
+      - 'data/comparativo_rima_rma.json'
+      - 'tests/dashboard.test.cjs'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validar HTML e integridade do painel sem alterar saídas
+        run: python scripts/validar_dados.py
+      - name: Testar perfil real e arquivos comparativos
+        run: |
+          python -m unittest discover -s tests -p 'test_gerar_comparativo_rima_rma.py' -v
+          python -m unittest discover -s tests -p 'test_pipeline.py' -v
+          node --test tests/dashboard.test.cjs
+          node --check assets/app-blue.js
+      - name: Testar gerador de site e validar novamente
+        run: |
+          python scripts/atualizar.py --offline
+          python scripts/validar_dados.py
+          python scripts/preparar_site.py
+      - name: Conferir bloqueio de publicação e amostra real
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          preview=json.loads(Path('data/comparativo_rima_rma.json').read_text())
+          assert preview['liberado_para_indicadores'] is False
+          manifest=json.loads(Path('data/anac/rima/manifesto.json').read_text(encoding='utf-8'))
+          expected=sorted(manifest['competencias'])
+          assert [p['mes'] for p in preview['perfil_voos']] == expected
+          assert preview['perfil_voos'][-1]['movimentos']==9348
+          assert preview['meses_anac']==len(expected)
+          assert preview['meses_com_duas_fontes']==1
+          assert len(preview['serie_mensal'])==2*len({r['mes'] for r in preview['serie_mensal']})
+          assert preview['recortes'][1]['qualidade_rma']=='transcricao_preliminar_pdf_nao_certificado'
+          assert 'comparativo-mes' in Path('_site/index.html').read_text()
+          assert 'dados-comparativo-rima-rma' in Path('_site/index.html').read_text()
+          print('Preview pronto na branch de homologação; main não foi alterada.')
+          PY
+      - name: Guardar prévia navegável como artefato, sem publicar Pages
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: previa-dashboard-comparativo-anac-rma
+          path: _site/
+          retention-days: 14

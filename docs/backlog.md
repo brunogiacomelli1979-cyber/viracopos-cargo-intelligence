@@ -12,6 +12,11 @@
 2. **Operação mensal**: acompanhar primeiro disparo por cron em 13/11/2026, 07:17 de Brasília; verificar competências por fonte, erros parciais e revisão dos arquivos anuais. A comprovação do fluxo ampliado fica nas execuções Actions.
 3. **Manutenção de dependências**: atualizar majors das Actions para runtimes atuais, preservando o fluxo testado; revisar pin pypdf ao atualizar o contrato de extração.
 
+## Deliberação temporal do projeto
+- **Início do histórico-alvo: 2020-01**, conforme [política de recorte](RECORTE_TEMPORAL_2020.md). Isso não implica séries completas desde 2020; documentar lacunas por fonte.
+- A indisponibilidade de janeiro/2019 na ANAC foi retirada do escopo operacional **por decisão metodológica**, não por conserto na origem.
+- A Issue #8 segue bloqueando novos lotes ANAC até encerrar os demais incidentes, comprovar QA e governança. Preservar o dashboard vigente.
+
 ## Dados e análise
 4. **ANAC etapa combinada**: implementar uma série própria, validar dicionário e sentidos, e reconciliar as diferenças de cobertura com o RMA. Não substituir ou juntar populações sem explicar.
 5. **Backfill**: ampliar RMA/MDIC anteriores a 2025 e revisar anos passados de modo explícito, mantendo hashes e registros de alterações.

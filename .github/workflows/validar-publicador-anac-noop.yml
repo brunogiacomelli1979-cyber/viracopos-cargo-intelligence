@@ -1,0 +1,82 @@
+name: ANAC-06 — ensaio de publicacao sem alteracoes (Git remoto)
+on:
+  push:
+    branches: [feature/anac-rima-staging-20261028]
+    paths:
+      - '.github/workflows/validar-publicador-anac-noop.yml'
+      - 'scripts/publicar_anac_git.py'
+      - 'tests/test_publicar_anac_git.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: anac06-noop-publicador
+  cancel-in-progress: false
+jobs:
+  verificar:
+    if: ${{ github.ref_name == 'feature/anac-rima-staging-20261028' && github.repository == 'brunogiacomelli1979-cyber/viracopos-cargo-intelligence' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/anac-rima-staging-20261028
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Testes do publicador com Git local
+        run: python -m unittest discover -s tests -p 'test_publicar_anac_git.py' -v
+      - name: Verificar arquivos reais existentes
+        run: python scripts/auditar_anac_rima.py
+      - name: Executar publicador verdadeiro em modo idempotente
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          import os
+          import subprocess
+          from pathlib import Path
+          import sys
+          sys.path.insert(0, "scripts")
+          from publicar_anac_git import HOMOLOG_BRANCH, publish
+
+          def git(*args):
+              return subprocess.check_output(["git", *args], text=True).strip()
+
+          before_sha = git("rev-parse", "HEAD")
+          before_tree = git("rev-parse", "HEAD:data/anac/rima")
+          before_manifest = Path("data/anac/rima/manifesto.json").read_bytes()
+          main_before = git("ls-remote", "origin", "refs/heads/main").split()[0]
+          branch_before = git("ls-remote", "origin", "refs/heads/"+HOMOLOG_BRANCH).split()[0]
+          if before_sha != branch_before:
+              raise RuntimeError("Homologação remota avançou antes do ensaio")
+          result = publish(Path("."))
+          if result != {"status": "sem_alteracoes", "commit": None}:
+              raise RuntimeError("Publicador deveria detectar ausência de mudanças")
+          assert git("rev-parse", "HEAD") == before_sha
+          assert git("rev-parse", "HEAD:data/anac/rima") == before_tree
+          assert Path("data/anac/rima/manifesto.json").read_bytes() == before_manifest
+          assert git("ls-remote", "origin", "refs/heads/main").split()[0] == main_before
+          assert git("ls-remote", "origin", "refs/heads/"+HOMOLOG_BRANCH).split()[0] == branch_before
+          assert not git("diff","--cached","--name-only")
+          assert not git("status","--porcelain","--untracked-files=no")
+          output={"resultado":"aprovado","modo":"nenhuma_alteracao",
+                  "arquivador_publicador_real":True,"git_remoto_consultado":True,
+                  "sha_inicial_final":before_sha,
+                  "manifesto_inalterado":True,"main_inalterada":True,
+                  "homologacao_inalterada":True,
+                  "coleta_nova":False,"commit_novo":False,
+                  "limite":"Nao comprova publicacao de mes novo; nenhuma escrita remota efetuada."}
+          Path("reports/anac").mkdir(parents=True,exist_ok=True)
+          Path("reports/anac/anac06-noop.json").write_text(json.dumps(output,indent=2)+"\n")
+          print(json.dumps(output))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: anac06-publicador-noop-remoto
+          path: reports/anac/anac06-noop.json
+          if-no-files-found: ignore
+          retention-days: 30

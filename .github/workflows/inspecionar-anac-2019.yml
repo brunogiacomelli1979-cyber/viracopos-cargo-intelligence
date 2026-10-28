@@ -1,0 +1,13 @@
+# WORKFLOW LEGADO DESATIVADO. Consultar Issue #8 (ANAC-02/07).
+# Preservado para rastreabilidade, SEM executar download ou escrita.
+name: inspecionar anac 2019 [INATIVO]
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  desativado:
+    if: false
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Workflow antigo intencionalmente desativado - consultar Issue #8"

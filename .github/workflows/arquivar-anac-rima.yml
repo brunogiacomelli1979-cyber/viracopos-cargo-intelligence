@@ -1,21 +1,83 @@
-# Ponto de entrada do workflow_dispatch no branch padrão.
-# A coleta real NÃO é executada na main. A implementação restrita só existe
-# na branch feature/anac-rima-staging-20261028 e exige dupla autorização.
 name: Arquivar ANAC RIMA SBKP — piloto restrito 2020-03
 on:
   workflow_dispatch:
     inputs:
       confirmar_competencia:
-        description: "Somente competência 2020-03; selecionar a branch de homologação"
+        description: "Somente competencia 2020-03; autorizacao separada em variaveis do repositorio"
         type: choice
         options: ['2020-03']
         default: '2020-03'
+  # Sem schedule e sem push: nunca iniciar backfill em massa acidentalmente.
 permissions:
   contents: read
+concurrency:
+  group: arquivar-anac-rima
+  cancel-in-progress: false
 jobs:
-  bloqueado-na-main:
-    if: ${{ false }}
+  verificar-autorizacao:
+    if: ${{ github.event_name == 'workflow_dispatch' && github.ref_name == 'feature/anac-rima-staging-20261028' && github.repository == 'brunogiacomelli1979-cyber/viracopos-cargo-intelligence' && inputs.confirmar_competencia == '2020-03' }}
     runs-on: ubuntu-latest
+    timeout-minutes: 3
+    permissions:
+      contents: read
+    outputs:
+      autorizado: ${{ steps.gate.outputs.autorizado }}
     steps:
-      - name: Operação desativada na branch principal
-        run: echo "A coleta é permitida exclusivamente na branch de homologação."
+      - name: Conferir dupla autorização sem baixar dados
+        id: gate
+        shell: bash
+        env:
+          COLETA_GLOBAL: ${{ vars.ANAC_RIMA_COLETA_AUTORIZADA }}
+          COLETA_PILOTO: ${{ vars.ANAC_RIMA_PILOTO_202003_AUTORIZADO }}
+        run: |
+          if [[ "$COLETA_GLOBAL" == "true" && "$COLETA_PILOTO" == "true" ]]; then
+            echo "autorizado=true" >> "$GITHUB_OUTPUT"
+            echo "## Piloto ANAC 2020-03: autorizações presentes" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "autorizado=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::ANAC 2020-03 nao executada: verifique as duas variaveis de autorizacao do repositorio."
+            echo "## Piloto ANAC 2020-03: NÃO EXECUTADO" >> "$GITHUB_STEP_SUMMARY"
+            echo "Falta a dupla autorização operacional. Nenhum CSV foi baixado e nenhum commit foi feito." >> "$GITHUB_STEP_SUMMARY"
+          fi
+  archive:
+    needs: verificar-autorizacao
+    if: ${{ needs.verificar-autorizacao.outputs.autorizado == 'true' && github.event_name == 'workflow_dispatch' && github.ref_name == 'feature/anac-rima-staging-20261028' && github.repository == 'brunogiacomelli1979-cyber/viracopos-cargo-intelligence' && inputs.confirmar_competencia == '2020-03' && vars.ANAC_RIMA_COLETA_AUTORIZADA == 'true' && vars.ANAC_RIMA_PILOTO_202003_AUTORIZADO == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/anac-rima-staging-20261028
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Testar integridade do coletor e publicador Git
+        run: |
+          python -m unittest discover -s tests -p 'test_arquivar_anac_rima.py' -v
+          python -m unittest discover -s tests -p 'test_publicar_anac_git.py' -v
+          python -m unittest discover -s tests -p 'test_auditar_anac_rima.py' -v
+          python -m unittest discover -s tests -p 'test_workflow_guard_anac.py' -v
+      - name: Capturar estado remoto antes do arquivamento
+        run: |
+          echo "ANAC06_BASE=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+          echo "ANAC06_MAIN=$(git ls-remote origin refs/heads/main | cut -f1)" >> "$GITHUB_ENV"
+      - name: Arquivar exclusivamente 2020-03 (um mes, sem backfill amplo)
+        run: python scripts/arquivar_anac_rima.py --mode inicial --start 2020-03 --end 2020-03 --limit 1
+      - name: Auditoria integral e somas independentes antes do commit
+        run: |
+          python scripts/auditar_anac_rima.py
+          python scripts/validar_agrupamento_rima.py
+      - name: Publicar apenas acervo auditado na branch homologada
+        run: python scripts/publicar_anac_git.py
+      - name: Auditar após o push em worktree remoto
+        run: python scripts/verificar_publicacao_anac_rima.py --base "$ANAC06_BASE" --main-sha "$ANAC06_MAIN" --month 2020-03 --output reports/anac/qa-pos-push.json
+      - name: Arquivar evidência do push
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: anac06-qa-pos-push
+          path: reports/anac/qa-pos-push.json
+          if-no-files-found: ignore
+          retention-days: 30

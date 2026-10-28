@@ -1,0 +1,55 @@
+name: Sondar disponibilidade historica ANAC RIMA
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  sondar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Sondar uma competencia por ano sem download integral
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json,ssl,time
+          from urllib.error import HTTPError,URLError
+          from urllib.request import Request,urlopen
+          from scripts.arquivar_anac_rima import official_url
+
+          results=[]
+          for year in range(2020,2025):
+              month=f"{year}-01"
+              url=official_url(month)
+              status=None
+              try:
+                  # Streaming com limite de leitura; evitar copiar arquivos nacionais.
+                  request=Request(url,headers={
+                      "User-Agent":"VCP-Insights-ANAC-RIMA-availability/1.0",
+                      "Range":"bytes=0-127",
+                      "Accept":"text/csv,text/plain,application/octet-stream"
+                  })
+                  with urlopen(request,timeout=25,context=ssl.create_default_context()) as response:
+                      head=response.read(128)
+                      status=response.status
+                      info={"mes":month,"status_http":status,"bytes_amostra":len(head),
+                            "tamanho_informado":response.headers.get("Content-Length"),
+                            "url_final":response.geturl(),"situacao":"acessivel"}
+              except HTTPError as e:
+                  info={"mes":month,"status_http":e.code,"situacao":"nao_encontrado" if e.code==404 else "erro_http"}
+              except (URLError,TimeoutError,OSError) as e:
+                  info={"mes":month,"situacao":"erro_rede","erro":str(e)[:160]}
+              results.append(info)
+              print(json.dumps(info,ensure_ascii=False),flush=True)
+              time.sleep(0.2)
+          print("SONDAGEM_RESULTADO="+json.dumps(results,ensure_ascii=False),flush=True)
+          if not any(x["mes"]=="2024-01" and x["situacao"]=="acessivel" for x in results):
+              raise SystemExit("Controle 2024-01 nao respondeu: reavaliar servidor; nenhuma base foi alterada")
+          PY

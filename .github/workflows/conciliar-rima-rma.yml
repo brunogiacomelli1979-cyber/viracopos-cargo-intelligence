@@ -1,0 +1,53 @@
+name: Conciliacao RIMA versus RMA (offline e exploratoria)
+on:
+  push:
+    branches: [feature/anac-rima-staging-20261028]
+    paths:
+      - '.github/workflows/conciliar-rima-rma.yml'
+      - 'scripts/conciliar_rima_rma.py'
+      - 'tests/test_conciliar_rima_rma.py'
+      - 'docs/referencias/rma/rma_2024_01_preliminar.json'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  conciliar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Testar barreiras de qualidade e nao publicacao
+        run: python -m unittest discover -s tests -p 'test_conciliar_rima_rma.py' -v
+      - name: Comparar cobertura real e bloquear mes sem sobreposicao
+        run: |
+          python scripts/conciliar_rima_rma.py --output reports/anac/rima-rma-cobertura-atual.json
+      - name: Fazer confronto preliminar com RMA 2024-01 sem publicar
+        run: |
+          python scripts/conciliar_rima_rma.py --referencia-preliminar docs/referencias/rma/rma_2024_01_preliminar.json --output reports/anac/rima-rma-2024-01-preliminar.json
+      - name: Confirmar que nenhuma comparacao foi certificada/publicada
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root = Path("reports/anac")
+          curr = json.loads((root/"rima-rma-cobertura-atual.json").read_text())
+          pre = json.loads((root/"rima-rma-2024-01-preliminar.json").read_text())
+          assert curr["situacao"] == "sem_mes_coincidente" and curr["meses_coincidentes"] == 0
+          assert pre["situacao"] == "apenas_confronto_preliminar" and pre["meses_coincidentes"] == 1
+          assert pre["comparacoes"]["2024-01"]["referencia_pdf_verificada"] is False
+          assert not curr["liberado_dashboard"] and not pre["liberado_dashboard"]
+          assert pre["comparacoes"]["2024-01"]["comparacao_internacional"]["diferenca_t"] == "2053.919"
+          assert pre["comparacoes"]["2024-01"]["movimentos_domesticos"]["diferenca"] == 69
+          assert pre["comparacoes"]["2024-01"]["movimentos_internacionais"]["diferenca"] == 12
+          print("Comparacao apenas exploratoria, com divergencia registrada e publicacao bloqueada.")
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: reconciliacao-anac-rima-rma-nao-publicavel
+          path: reports/anac/rima-rma-*.json
+          if-no-files-found: ignore
+          retention-days: 30

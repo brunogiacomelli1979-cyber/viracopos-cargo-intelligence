@@ -1,0 +1,32 @@
+name: Investigar distribuicao RIMA janeiro 2024 (offline)
+on:
+  push:
+    branches: [feature/anac-rima-staging-20261028]
+    paths:
+      - '.github/workflows/investigar-escopo-rima.yml'
+      - 'scripts/investigar_escopo_rima.py'
+      - 'tests/test_investigar_escopo_rima.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  investigar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Testes de perfil de grupos
+        run: python -m unittest discover -s tests -p 'test_investigar_escopo_rima.py' -v
+      - name: Gerar perfil agregado de tipos de servico com ANAC ja arquivada
+        run: python scripts/investigar_escopo_rima.py --output reports/anac/escopo-servicos-2024-01.json
+      - name: Guardar relatorio de diagnostico sem publicar dados
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: perfil-service-type-rima-sbkp-2024-01
+          path: reports/anac/escopo-servicos-2024-01.json
+          if-no-files-found: ignore
+          retention-days: 14

@@ -1,0 +1,44 @@
+name: ANAC-06 — ensaio real de permissão Git sem dados
+on:
+  push:
+    branches: [feature/anac-rima-staging-20261028]
+    paths:
+      - '.github/workflows/ensaiar-publicacao-git-anac.yml'
+      - 'scripts/ensaiar_publicacao_git_anac.py'
+      - 'tests/test_ensaiar_publicacao_git_anac.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: anac06-ensaio-escrita
+  cancel-in-progress: false
+jobs:
+  ensaio:
+    if: ${{ github.ref_name == 'feature/anac-rima-staging-20261028' && github.repository == 'brunogiacomelli1979-cyber/viracopos-cargo-intelligence' }}
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/anac-rima-staging-20261028
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Testes offline (Git local)
+        run: python -m unittest discover -s tests -p 'test_ensaiar_publicacao_git_anac.py' -v
+      - name: Validar acervo existente ANAC antes de escrever ref remota
+        run: |
+          python scripts/auditar_anac_rima.py
+          python scripts/validar_agrupamento_rima.py --output reports/anac/anac06-validacao.json
+      - name: Testar escrita real em ref Git temporária e limpar
+        run: python scripts/ensaiar_publicacao_git_anac.py --output reports/anac/anac06-ensaio-remoto.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: anac06-ensaio-permissoes-sem-dados
+          path: reports/anac/anac06-*.json
+          retention-days: 30
+          if-no-files-found: ignore

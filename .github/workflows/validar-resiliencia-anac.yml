@@ -1,0 +1,35 @@
+name: Validar resiliencia historica ANAC RIMA (offline)
+on:
+  push:
+    branches: [feature/anac-rima-staging-20261028]
+    paths:
+      - '.github/workflows/validar-resiliencia-anac.yml'
+      - 'scripts/arquivar_anac_rima.py'
+      - 'scripts/auditar_anac_rima.py'
+      - 'tests/test_arquivar_anac_rima.py'
+      - 'tests/test_auditar_anac_rima.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  resiliencia:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Testar falhas parciais e revisoes imutaveis sem rede
+        run: |
+          python -m unittest discover -s tests -p 'test_arquivar_anac_rima.py' -v
+          python -m unittest discover -s tests -p 'test_auditar_anac_rima.py' -v
+      - name: Auditar acervo real sem baixar ou publicar
+        run: python scripts/auditar_anac_rima.py --output reports/anac/resiliencia-acervo.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: anac-resiliencia-offline
+          path: reports/anac/resiliencia-acervo.json
+          if-no-files-found: ignore
+          retention-days: 14

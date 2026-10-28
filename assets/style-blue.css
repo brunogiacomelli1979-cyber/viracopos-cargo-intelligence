@@ -11,3 +11,22 @@
 @media(max-width:760px){:root{--header:68px}.site-header{padding:0 20px;justify-content:space-between}.mobile-toggle{display:block}.main-nav{display:none;position:absolute;top:var(--header);left:0;right:0;background:white;border-bottom:1px solid var(--line);padding:12px 20px;height:auto;box-shadow:0 12px 20px #142b4610}.main-nav.open{display:grid;grid-template-columns:1fr 1fr;gap:5px}.main-nav a{font-size:12px;padding:12px}.content-area{padding:23px 20px 18px}.page-heading{margin-bottom:20px}h1{font-size:27px}.page-heading p{font-size:11px}.breadcrumb{font-size:7px}.filter-bar{flex-wrap:wrap;gap:10px;padding:12px}.filter-caption{display:none}.filter-fields{gap:12px;justify-content:space-between;width:100%}.filter-fields label{gap:6px;font-size:9px}select{font-size:10px;padding:7px 18px 7px 7px}.period-summary{margin-left:0}.kpi-grid{grid-template-columns:1fr 1fr;gap:12px}.kpi-card{min-height:147px;padding:16px}.kpi-number strong{font-size:30px}.dashboard-grid{grid-template-columns:1fr;gap:16px}.panel{padding:20px}.panel-heading{gap:12px}.panel-heading .text-link{white-space:normal;text-align:right;font-size:9px}.view{gap:16px}.chart svg{min-width:520px}.source-grid{grid-template-columns:1fr}.mini-kpis{gap:10px}.mini-kpis>div{padding:14px}.mini-kpis strong{font-size:23px}.mini-kpis span,.mini-kpis small{font-size:9px}.method-grid{grid-template-columns:1fr;gap:22px}.site-footer{flex-direction:column;gap:8px}.panel-heading:has(.segment){flex-direction:column}.macro-reading strong{font-size:32px}.lower-grid .macro-item{padding:6px 12px 0}.macro-item strong{font-size:25px}}
 @media(max-width:380px){.content-area{padding:20px 14px}.kpi-card{padding:14px}.kpi-number strong{font-size:26px}.kpi-label{font-size:8px}.filter-fields{gap:6px}.filter-fields label{gap:4px}.panel{padding:17px}.macro-item strong{font-size:22px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.view{animation:none}*{transition:none!important}}
+
+
+/* Comparação RIMA/RMA experimental — mantém paleta e geometria azul aprovada. */
+.comparison-panel .compare-controls{display:flex;flex-wrap:wrap;gap:12px 20px;padding:12px 0;align-items:center}
+.compare-controls label{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted)}
+.compare-controls select{max-width:200px;border:1px solid var(--line)}
+.compare-warning{font-size:11px;color:#775813;background:#fff8e9;border-left:3px solid #c3931c;padding:10px 12px;border-radius:3px;margin:5px 0 16px}
+.compare-bars,.compare-profile{display:grid;gap:18px;padding:8px 0}
+.compare-bar-item{display:flex;flex-direction:column;gap:9px}
+.compare-bar-top{display:flex;justify-content:space-between;gap:16px;align-items:center;font-size:12px}
+.compare-bar-top strong{font-weight:600;color:var(--ink)}
+.compare-bar-top span{color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.compare-bar-track{width:100%;height:20px;background:#e9eff6;border-radius:4px;overflow:hidden}
+.compare-bar-fill{height:100%;min-width:0;border-radius:4px;transition:width .18s}
+.compare-bar-fill.blue{background:#2563b8}
+.compare-bar-fill.gold{background:#c3931c}
+.compare-delta{font-weight:600;font-size:13px;margin:14px 0 8px;color:var(--ink)}
+.compare-profile-note{font-size:11px;color:var(--muted);margin:4px 0}
+@media (max-width:650px){.comparison-panel .compare-controls{align-items:stretch}.compare-controls label{flex:1 1 170px;justify-content:space-between}.compare-controls select{max-width:165px}.compare-bar-top{align-items:start}}

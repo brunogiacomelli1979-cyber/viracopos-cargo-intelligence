@@ -50,7 +50,7 @@ function lineChart(target, rows, series, message, options = {}) {
   const element = byId(target);
   if (!element) return;
   element.replaceChildren();
-  const selected = subset(rows);
+  const selected = options.fullHistory ? rows : subset(rows);
   if (!selected.some(row => series.some(item => Number.isFinite(row[item.key])))) {
     const empty = node('div', 'chart-empty');
     empty.append(node('strong', '', 'Sem observações neste período'), node('p', '', message));
@@ -278,4 +278,118 @@ document.addEventListener('click', event => {const link = event.target.closest('
 window.addEventListener('hashchange', () => showView(location.hash.slice(1)));
 mobileToggle.addEventListener('click', () => {const open = mobileToggle.getAttribute('aria-expanded') !== 'true'; document.querySelector('.main-nav').classList.toggle('open', open); mobileToggle.setAttribute('aria-expanded', String(open)); mobileToggle.setAttribute('aria-label', open ? 'Fechar menu' : 'Abrir menu');});
 document.addEventListener('keydown', event => {if (event.key === 'Escape' && mobileToggle.getAttribute('aria-expanded') === 'true') {closeMenu(); mobileToggle.focus();}});
-renderAll(); renderSources(); showView(location.hash.slice(1), false);
+renderAll(); renderSources(); renderComparativoRimaRma(); showView(location.hash.slice(1), false);
+
+
+function renderComparativoRimaRma() {
+  const dataNode = byId('dados-comparativo-rima-rma');
+  const result = byId('grafico-comparacao-fontes');
+  const profileTarget = byId('perfil-voos-anac');
+  if (!dataNode || !result || !profileTarget) return;
+  let data;
+  try { data = JSON.parse(dataNode.textContent); }
+  catch {result.textContent = 'Comparação indisponível: dados inconsistentes.'; return;}
+  const rows = Array.isArray(data.recortes) ? data.recortes : [];
+  const profiles = Array.isArray(data.perfil_voos) ? data.perfil_voos : [];
+  const monthControl = byId('comparativo-mes');
+  const profileMonth = byId('perfil-mes');
+  const profileMonths = [...new Set(profiles.map(item => item.mes))].sort();
+  profileMonth.replaceChildren(...profileMonths.map(month => {
+    const opt = node('option', '', showMonth(month)); opt.value = month; return opt;
+  }));
+  if (profileMonths.length) profileMonth.value = profileMonths[profileMonths.length - 1];
+  const months = [...new Set(rows.map(row => row.mes))].sort();
+  monthControl.replaceChildren(...months.map(month => {
+    const option = node('option', '', showMonth(month)); option.value = month; return option;
+  }));
+  if (!months.length) {
+    result.textContent = 'Ainda não existem competências disponíveis simultaneamente nas duas fontes.';
+    profileTarget.textContent = profileMonths.length ? '' : 'Sem movimentos validados para esta comparação.';
+    // O perfil ANAC funciona também quando não existe RMA para o mesmo mês.
+    if (!profileMonths.length) return;
+  }
+  monthControl.value = months[months.length - 1];
+  const render = () => {
+    const month = monthControl.value;
+    const nature = byId('comparativo-natureza').value;
+    const metric = byId('comparativo-indicador').value;
+    const source = byId('comparativo-fonte').value;
+    const row = rows.find(item => item.mes === month && item.natureza === nature);
+    result.replaceChildren();
+    set('comparativo-aviso', row && row.qualidade_rma === 'transcricao_preliminar_pdf_nao_certificado'
+      ? 'Comparação exploratória · ANAC/RIMA verificada por hash; RMA de '+showMonth(month)+' transcrito de PDF ainda não certificado. Diferenças mantidas.'
+      : 'Comparação exploratória: cada fonte conserva metodologia e procedência próprias. Diferenças não são corrigidas.');
+    if (!row) {
+      result.append(node('p', 'chart-empty', 'Não há duas fontes disponíveis para esta combinação.')); set('comparativo-diferenca',''); return;
+    }
+    const origin = byId('comparativo-origem-rma');
+    if (row.rma_url_pdf && /^https:\/\/(?:www\.)?viracopos\.com\//.test(row.rma_url_pdf)) {
+      origin.href = row.rma_url_pdf; origin.hidden = false;
+    } else {origin.removeAttribute('href'); origin.hidden = true;}
+    const field = metric === 'carga' ? 'carga_t' : 'movimentos';
+    const unit = metric === 'carga' ? 't' : 'movimentos';
+    const a = row['rima_' + field], b = row['rma_' + field];
+    const max = Math.max(1, ...[a, b].filter(Number.isFinite));
+    for (const [code,label,value,css] of [
+      ['rima','ANAC / RIMA',a,'blue'], ['rma','Concessionária / RMA',b,'gold']
+    ]) {
+      if (source !== 'ambas' && source !== code) continue;
+      if (!Number.isFinite(value)) continue;
+      const item = node('div','compare-bar-item');
+      const title = node('div','compare-bar-top');
+      title.append(node('strong','',label),node('span','',fmt(value,metric === 'carga' ? (code === 'rima' ? 3 : 0) : 0) + ' ' + unit));
+      const track = node('div','compare-bar-track');
+      const bar = node('div','compare-bar-fill ' + css);
+      bar.style.width = (value / max * 100).toFixed(2) + '%';
+      track.append(bar); item.append(title,track); result.append(item);
+    }
+    if (source === 'ambas' && Number.isFinite(a) && Number.isFinite(b)) {
+      const delta = a - b, percent = b !== 0 ? ' (' + fmt(delta / b * 100, 2) + '% do RMA)' : '';
+      set('comparativo-diferenca', 'Diferença ANAC − RMA: ' + (delta > 0 ? '+' : '') +
+          fmt(delta, metric === 'carga' ? 3 : 0) + ' ' + unit + percent);
+    } else set('comparativo-diferenca','Fonte selecionada isoladamente; escolha As duas fontes para ver a diferença.');
+  };
+  const renderProfile = () => {
+    const month = profileMonth.value, nature = byId('perfil-natureza').value;
+    const selected = profiles.find(item => item.mes === month);
+    const vals = selected?.por_natureza?.[nature];
+    profileTarget.replaceChildren();
+    if (!vals) {profileTarget.append(node('p','chart-empty','Perfil de movimentos ainda indisponível para este mês.'));return;}
+    const total = vals.movimentos;
+    for (const [key,label,css] of [
+      ['com_carga','Com carga registrada (QT_CARGA > 0)','blue'],
+      ['sem_carga','Sem carga registrada (QT_CARGA = 0)','gold']
+    ]) {
+      const amount = vals[key] ?? 0;
+      const item = node('div','compare-bar-item');
+      const top = node('div','compare-bar-top');
+      top.append(node('strong','',label),node('span','',fmt(amount,0)+' de '+fmt(total,0)+' movimentos'));
+      const track = node('div','compare-bar-track');
+      const bar = node('div','compare-bar-fill '+css);
+      bar.style.width = (total ? amount/total*100 : 0).toFixed(2)+'%';
+      track.append(bar);item.append(top,track);profileTarget.append(item);
+    }
+    const both = vals.com_carga__com_passageiros ?? 0;
+    const passengersNoCargo = vals.sem_carga__com_passageiros ?? 0;
+    profileTarget.append(node('p','compare-profile-note',
+      fmt(both,0)+' movimentos com passageiros e carga; '+
+      fmt(passengersNoCargo,0)+' com passageiros e sem carga registrada. '+
+      'A classificação é por movimento, não por remessa aduaneira.'));
+  };
+  const renderHistory = () => {
+    const nature = byId('serie-natureza').value;
+    const measure = byId('serie-metrica').value;
+    const isCargo = measure === 'carga', suffix = isCargo ? 'carga_t' : 'movimentos';
+    const dataRows = (data.serie_mensal || []).filter(row => row.natureza === nature);
+    lineChart('grafico-series-fontes', dataRows,
+      [{key:'rima_'+suffix,label:'ANAC / RIMA',color:blue,unit:isCargo?'t':'movimentos'},
+       {key:'rma_'+suffix,label:'Concessionária / RMA',color:gold,unit:isCargo?'t':'movimentos'}],
+      'Sem observações para esse indicador no histórico disponível.',
+      {zero:true,fullHistory:true,decimals:isCargo?1:0});
+  };
+  ['comparativo-mes','comparativo-natureza','comparativo-indicador','comparativo-fonte'].forEach(id => byId(id).addEventListener('change',render));
+  ['perfil-mes','perfil-natureza'].forEach(id => byId(id).addEventListener('change',renderProfile));
+  ['serie-natureza','serie-metrica'].forEach(id => byId(id).addEventListener('change',renderHistory));
+  render();renderProfile();renderHistory();
+}
+

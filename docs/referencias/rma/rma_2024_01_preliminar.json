@@ -1,0 +1,30 @@
+{
+  "mes": "2024-01",
+  "carga_domestica_t": "5908",
+  "carga_internacional_t": "13962",
+  "courier_internacional_t": "604",
+  "documento": "RMA 2024 JUL — elaborado em agosto de 2024, primeira página",
+  "url_pdf": "https://www.viracopos.com/data/files/61/C0/D2/0B/6E741910317C2C094918E9C2/RMA%202024%20JUL%20-%20elaborado%20em%20AGO2024.pdf",
+  "sha256_pdf": null,
+  "verificacao_pdf_completa": false,
+  "status": "transcricao_preliminar_nao_certificada",
+  "metodo": "Valores transcritos do texto indexado do PDF público oficial, cotejados com outra edição publicada para janeiro/2024. O download completo e a verificação visual/hash do PDF falharam devido a limitações de acesso HTTPS; não usar para KPI público, publicação ou encerramento de ANAC-04. O texto indexado das edições de janeiro e setembro de 2024 apresenta os mesmos números de janeiro, inclusive movimentos: DOM 8.338 e INT 929; não há evidência de revisão nesses exemplares. Os PDFs originais ainda requerem hash/inspeção visual.",
+  "observacoes": [
+    "RMA informado em toneladas inteiras, carga internacional INT* = importações + exportações; direção não separada",
+    "RMA courier é quadro separado; não equiparar automaticamente ao correio QT_CORREIO da ANAC",
+    "Publicação sujeita a revisões sem aviso prévio",
+    "As discrepâncias de ANAC e RMA não provam erro de qualquer origem antes da reconciliação de conceitos, escopo e revisões"
+  ],
+  "movimentos_domesticos": 8338,
+  "movimentos_internacionais": 929,
+  "referencias_adicionais_indice": [
+    {
+      "edicao": "RMA JAN/2024 (elaborado FEV/2024)",
+      "url": "https://www.viracopos.com/data/files/CD/74/48/52/BD1DD810710CF7C84918E9C2/RMA%202024%20JAN%20-%20elaborado%20em%20FEV2024.pdf"
+    },
+    {
+      "edicao": "RMA SET/2024 (elaborado OUT/2024)",
+      "url": "https://www.viracopos.com/data/files/D3/E5/65/52/379B29101B8547296C1849A8/RMA%202024%20SET%20-%20elaborado%20em%20OUT2024.pdf"
+    }
+  ]
+}

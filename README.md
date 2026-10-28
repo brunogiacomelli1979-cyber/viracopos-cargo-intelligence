@@ -2,6 +2,9 @@
 
 Observatório independente de movimentação de carga, comércio exterior e economia. **[Abrir o painel](https://brunogiacomelli1979-cyber.github.io/viracopos-cargo-intelligence/)** · [Execuções e atualização](https://github.com/brunogiacomelli1979-cyber/viracopos-cargo-intelligence/actions)
 
+## Recorte histórico de pesquisa
+**A partir de 01/01/2020** é o marco inicial planejado para estudos e consolidação histórica. **Não** representa cobertura atual de todas as bases: o painel segue usando apenas as competências oficiais confirmadas por fonte. Veja [Política do recorte temporal](docs/RECORTE_TEMPORAL_2020.md). A ANAC/RIMA permanece isolada em PR de desenvolvimento, sem publicação no painel, até encerrar a [Issue #8](https://github.com/brunogiacomelli1979-cyber/viracopos-cargo-intelligence/issues/8).
+
 ## Versão 2
 
 Interface profissional com fundo claro, azul-marinho e amarelo, indicadores na primeira tela e navegação por áreas. Filtros de competência e janela são preservados ao trocar de seção. Gráficos permitem apontar ou usar as setas do teclado; tabelas expansíveis oferecem os valores exatos apresentados. A lateral desktop mostra a cobertura de cada base. O projeto não possui vínculo ou endosso do aeroporto ou dos órgãos citados.
