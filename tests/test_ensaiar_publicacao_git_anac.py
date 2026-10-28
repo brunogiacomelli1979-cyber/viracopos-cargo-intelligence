@@ -56,7 +56,7 @@ class RemoteWriteProbeTests(unittest.TestCase):
 
     def test_dirty_checkout_cannot_push(self):
         (self.work/"README.md").write_text("modificado\n")
-        with self.assertRaisesRegex(RemoteProbeError,"não está limpo"):
+        with self.assertRaisesRegex(RemoteProbeError,"Arquivo versionado modificado"):
             probe(self.work,run_id="123",strict=False)
         self.assertIsNone(remote_sha(self.work,"ci/anac06-probe-123-1"))
 
