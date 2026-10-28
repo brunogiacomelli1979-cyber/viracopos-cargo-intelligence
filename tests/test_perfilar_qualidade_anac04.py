@@ -41,6 +41,15 @@ class DataQualityProfileTests(unittest.TestCase):
         self.assertIn("linhas_idênticas_exigem_analise_de_granularidade",
                       item["alertas_investigacao"])
 
+    def test_unrecognized_toque_does_not_certify_candidate_key(self):
+        row = ROW1.replace(";2020-04-10;11:55", ";SEM_DATA_TOQUE;11:55")
+        result = profile_csv((HEADER + row + row.replace(";100;0;", ";200;0;")).encode(), "2020-04")
+        touch = result["chaves_operacionais_candidatas"]["toque"]
+        self.assertEqual(touch["colisoes_adicionais"], 1)
+        self.assertEqual(touch["linhas_com_data_reconhecida"], 0)
+        self.assertEqual(touch["colisoes_com_data_reconhecida"], 0)
+        self.assertEqual(result["datas_nao_reconhecidas_valores_frequentes"]["DT_TOQUE"][0]["valor"], "SEM_DATA_TOQUE")
+
     def test_out_of_month_date_is_flagged_not_deleted(self):
         item = profile_csv((HEADER + ROW1 + ROW3).encode(), "2020-04")
         self.assertEqual(item["datas_operacionais"]["DT_CALCO"]["fora_da_competencia"], 1)
@@ -87,6 +96,9 @@ class DataQualityProfileTests(unittest.TestCase):
                     "ausente": item["carga"]["movimentos_com_carga_ausente"],
                     "colisoes_calco": item["chaves_operacionais_candidatas"].get("calco", {}).get("colisoes_adicionais"),
                     "colisoes_toque": item["chaves_operacionais_candidatas"].get("toque", {}).get("colisoes_adicionais"),
+                    "colisoes_toque_data_reconhecida": item["chaves_operacionais_candidatas"].get("toque", {}).get("colisoes_com_data_reconhecida"),
+                    "cobertura_data_toque": item["chaves_operacionais_candidatas"].get("toque", {}).get("pct_cobertura_data_reconhecida"),
+                    "valores_toque_nao_reconhecidos": item["datas_nao_reconhecidas_valores_frequentes"].get("DT_TOQUE", []),
                     "cobertura_chave_toque": item["chaves_operacionais_candidatas"].get("toque", {}).get("pct_cobertura"),
                     "duplicatas_exatas": item["duplicatas_exatas_adicionais"],
                     "correio": item["correio"],
