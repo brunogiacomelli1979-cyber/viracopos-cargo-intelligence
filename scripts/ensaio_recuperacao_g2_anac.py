@@ -43,6 +43,19 @@ def _check_layout(source, backup_root, restore_root):
     return source, backup_root, restore_root
 
 
+def _assert_quiescent(source):
+    """Um cofre com escrita pendente nao pode produzir snapshot certificado."""
+    allowed = {"objects", "receipts", "incoming"}
+    for entry in source.iterdir():
+        if entry.name not in allowed or entry.is_symlink() or not entry.is_dir():
+            raise ValueError("Cofre possui entrada inesperada ou symlink; verificar antes do backup")
+    pending = source / "incoming"
+    if pending.is_dir() and any(pending.iterdir()):
+        raise ValueError("Cofre possui aquisicao parcial em incoming; aguardar tratamento")
+    if pending.is_symlink():
+        raise ValueError("Incoming e um symlink; falha fechada")
+
+
 def _check_devices(primary, backup_root):
     # Diferentes st_dev indicam volumes distintos para o SO, mas nao
     # comprovam discos fisicamente independentes nem retencao externa.
@@ -68,6 +81,7 @@ def drill(source, backup_root, recovery_parent, month, sha256, *, mode="simulado
     devices = _check_devices(source, backup_root)
     if mode == "pre_homologacao" and not devices["volumes_so_distintos"]:
         raise ValueError("Pre-homologacao exige volumes distintos no SO; ainda nao prova midia independente")
+    _assert_quiescent(source)
     before = audit(source)
     if not before["aprovado"]:
         raise ValueError(f"Cofre fonte reprovado: {before['erros'][:2]}")
@@ -111,6 +125,7 @@ def drill(source, backup_root, recovery_parent, month, sha256, *, mode="simulado
             raise ValueError("Staging recuperado ausente")
         if _inventory(recovered) != source_inventory:
             raise ValueError("Recuperado mudou durante reprocessamento")
+    _assert_quiescent(source)
     if _inventory(source) != source_inventory:
         raise ValueError("Acervo primario mudou durante o ensaio")
     if verify(backup_root, snap)["snapshot_id"] != snap:
