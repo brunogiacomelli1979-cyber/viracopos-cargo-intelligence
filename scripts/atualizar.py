@@ -191,7 +191,16 @@ def build(offline=False, root=ROOT, rma_start_year=2025):
     template = (root / "index.template.html").read_text(encoding="utf-8")
     if template.count("{{DASHBOARD_JSON}}") != 1:
         raise ValueError("template precisa de um único marcador de dados")
-    html = template.replace("{{DASHBOARD_JSON}}", compact)
+    preview_path = root / "data/comparativo_rima_rma.json"
+    preview = (json.loads(preview_path.read_text(encoding="utf-8"))
+               if preview_path.exists()
+               else {"recortes": [], "perfil_voos": [], "status": "indisponivel"})
+    if not isinstance(preview.get("recortes"), list) or not isinstance(preview.get("perfil_voos"), list):
+        raise ValueError("Comparativo RIMA/RMA com estrutura inválida")
+    if template.count("{{COMPARATIVO_RIMA_RMA_JSON}}") != 1:
+        raise ValueError("Template precisa de um único marcador de comparação")
+    comparison_json = json.dumps(preview, ensure_ascii=False, allow_nan=False, separators=(",", ":")).replace("<", "\\u003c")
+    html = template.replace("{{DASHBOARD_JSON}}", compact).replace("{{COMPARATIVO_RIMA_RMA_JSON}}", comparison_json)
     for asset in ("assets/style-blue.css", "assets/app-blue.js"):
         version = hashlib.sha256((root / asset).read_bytes()).hexdigest()[:12]
         html = html.replace(f'"{asset}"', f'"{asset}?v={version}"')

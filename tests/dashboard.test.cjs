@@ -46,3 +46,25 @@ test('published default period provides all four real headline indicators',()=>{
     assert.ok(Number.isFinite(vm.runInContext(expression,context)),expression+' must not be an empty placeholder');
   }
 });
+
+test('RIMA/RMA preview retains provenance and can distinguish passenger flights with cargo',()=>{
+  const comparison=JSON.parse(fs.readFileSync('data/comparativo_rima_rma.json','utf8'));
+  assert.equal(comparison.status,'preliminar_com_divergencias');
+  assert.equal(comparison.liberado_para_indicadores,false);
+  const international=comparison.recortes.find(r=>r.mes==='2024-01'&&r.natureza==='internacional');
+  assert.equal(international.rima_carga_t,16015.919);
+  assert.equal(international.rma_carga_t,13962);
+  assert.equal(international.qualidade_rma,'transcricao_preliminar_pdf_nao_certificado');
+  const p=comparison.perfil_voos.find(r=>r.mes==='2024-01');
+  assert.equal(p.movimentos,9348);
+  for(const nature of ['internacional','domestica']){
+    const n=p.por_natureza[nature];
+    assert.equal(n.movimentos,n.com_carga+n.sem_carga+(n.carga_indeterminada||0));
+  }
+  assert.ok(p.por_natureza.internacional.com_carga__com_passageiros>0);
+  assert.equal(p.nao_e_fluxo_aduaneiro,true);
+  const template=fs.readFileSync('index.template.html','utf8');
+  for(const id of ['comparativo-mes','comparativo-indicador','comparativo-natureza','comparativo-fonte','perfil-voos-anac']){
+    assert.ok(template.includes('id="'+id+'"'));
+  }
+});

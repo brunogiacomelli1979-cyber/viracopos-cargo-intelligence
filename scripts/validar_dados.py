@@ -87,6 +87,11 @@ def validate_project(root=ROOT):
     embedded = re.search(r'<script type="application/json" id="dados-incorporados">(.*?)</script>', html, re.S)
     if not embedded or json.loads(embedded[1]) != snapshot:
         raise ValueError("index.html diverge do snapshot")
+    expected_preview = root / "data/comparativo_rima_rma.json"
+    match_preview = re.search(r'<script type="application/json" id="dados-comparativo-rima-rma">(.*?)</script>',html,re.S)
+    if expected_preview.is_file():
+        if not match_preview or json.loads(match_preview[1]) != json.loads(expected_preview.read_text(encoding="utf-8")):
+            raise ValueError("Dados comparativos RIMA/RMA divergem do HTML")
     for asset in ("assets/style-blue.css", "assets/app-blue.js"):
         version = hashlib.sha256((root / asset).read_bytes()).hexdigest()[:12]
         if f'"{asset}?v={version}"' not in html:

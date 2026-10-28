@@ -1,0 +1,91 @@
+{
+  "versao": 1,
+  "status": "preliminar_com_divergencias",
+  "recortes": [
+    {
+      "mes": "2024-01",
+      "natureza": "domestica",
+      "rima_carga_t": 5908.499,
+      "rma_carga_t": 5908,
+      "rima_movimentos": 8407,
+      "rma_movimentos": 8338,
+      "qualidade_rima": "conferido_sha256",
+      "qualidade_rma": "transcricao_preliminar_pdf_nao_certificado",
+      "rima_sha256": "be370a36e8857d37a88cbc483683337fde5c403342339ad37cd57cc6de1549de",
+      "rma_url_pdf": "https://www.viracopos.com/data/files/61/C0/D2/0B/6E741910317C2C094918E9C2/RMA%202024%20JUL%20-%20elaborado%20em%20AGO2024.pdf"
+    },
+    {
+      "mes": "2024-01",
+      "natureza": "internacional",
+      "rima_carga_t": 16015.919,
+      "rma_carga_t": 13962,
+      "rima_movimentos": 941,
+      "rma_movimentos": 929,
+      "qualidade_rima": "conferido_sha256",
+      "qualidade_rma": "transcricao_preliminar_pdf_nao_certificado",
+      "rima_sha256": "be370a36e8857d37a88cbc483683337fde5c403342339ad37cd57cc6de1549de",
+      "rma_url_pdf": "https://www.viracopos.com/data/files/61/C0/D2/0B/6E741910317C2C094918E9C2/RMA%202024%20JUL%20-%20elaborado%20em%20AGO2024.pdf"
+    }
+  ],
+  "perfil_voos": [
+    {
+      "mes": "2024-01",
+      "movimentos": 9348,
+      "por_natureza": {
+        "domestica": {
+          "com_carga": 6667,
+          "com_carga__com_passageiros": 6395,
+          "com_carga__sem_passageiros_registrados": 272,
+          "com_passageiros": 7741,
+          "movimentos": 8407,
+          "sem_carga": 1740,
+          "sem_carga__com_passageiros": 1346,
+          "sem_carga__sem_passageiros_registrados": 394,
+          "sem_passageiros_registrados": 666,
+          "service_type:C": 9,
+          "service_type:D": 150,
+          "service_type:F": 267,
+          "service_type:G": 438,
+          "service_type:H": 31,
+          "service_type:J": 7238,
+          "service_type:K": 2,
+          "service_type:L": 3,
+          "service_type:N": 22,
+          "service_type:P": 105,
+          "service_type:T": 6,
+          "service_type:W": 14,
+          "service_type:Y": 67,
+          "service_type:Z": 55
+        },
+        "internacional": {
+          "com_carga": 741,
+          "com_carga__com_passageiros": 270,
+          "com_carga__sem_passageiros_registrados": 471,
+          "com_passageiros": 307,
+          "movimentos": 941,
+          "sem_carga": 200,
+          "sem_carga__com_passageiros": 37,
+          "sem_carga__sem_passageiros_registrados": 163,
+          "sem_passageiros_registrados": 634,
+          "service_type:C": 3,
+          "service_type:D": 30,
+          "service_type:F": 503,
+          "service_type:G": 22,
+          "service_type:H": 85,
+          "service_type:J": 270,
+          "service_type:L": 1,
+          "service_type:P": 4,
+          "service_type:Y": 11,
+          "service_type:Z": 12
+        }
+      },
+      "criterio": "com_carga é QT_CARGA > 0, não implica importação/exportação. Passageiros baseados em QT_PAX_* disponíveis. Um voo de passageiros pode transportar carga.",
+      "nao_e_fluxo_aduaneiro": true
+    }
+  ],
+  "atencao": "RMA janeiro/2024 transcrito de PDF oficial indexado, sem arquivo integral ou SHA-256 certificado; as diferenças são mantidas.",
+  "cobertura": "Exibir somente competências efetivamente disponíveis nas duas fontes; não criar meses ou zeros.",
+  "sem_ajuste_de_diferenca": true,
+  "liberado_para_indicadores": false,
+  "origem_analise": "https://github.com/brunogiacomelli1979-cyber/viracopos-cargo-intelligence/actions/runs/40692011727"
+}

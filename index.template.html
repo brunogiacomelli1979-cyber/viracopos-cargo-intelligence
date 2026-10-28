@@ -45,6 +45,23 @@
 
     <section class="view" id="carga-aerea" aria-label="Carga aérea" hidden>
       <div id="cargo-summary" class="mini-kpis"></div><article class="panel"><div class="panel-heading"><div><span class="eyebrow">SÉRIE HISTÓRICA · RMA VIRACOPOS</span><h2>Movimentação de cargas</h2><p>Volumes internacionais e domésticos, em toneladas por mês</p></div></div><div class="legend"><span><i class="swatch blue"></i>Internacional</span><span><i class="swatch gold"></i>Doméstica</span></div><div id="grafico-carga" class="chart chart-large" aria-label="Gráfico de carga internacional e doméstica"></div><p id="cargo-scope" class="panel-footnote">Consulte o recorte e as unidades em Fontes.</p></article>
+      <article class="panel comparison-panel" id="comparativo-fontes"><div class="panel-heading"><div><span class="eyebrow">ANÁLISE DE FONTES · EXPERIMENTAL</span><h2>ANAC × Concessionária</h2><p>Compare números publicados para a mesma competência, sem ajustar divergências</p></div></div>
+        <div class="compare-controls">
+          <label for="comparativo-mes">Competência <select id="comparativo-mes"></select></label>
+          <label for="comparativo-indicador">Medida <select id="comparativo-indicador"><option value="carga">Carga (toneladas)</option><option value="movimentos">Movimentos de aeronaves</option></select></label>
+          <label for="comparativo-natureza">Natureza <select id="comparativo-natureza"><option value="internacional">Internacional</option><option value="domestica">Doméstica</option></select></label>
+          <label for="comparativo-fonte">Exibir <select id="comparativo-fonte"><option value="ambas">As duas fontes</option><option value="rima">ANAC / RIMA</option><option value="rma">Concessionária / RMA</option></select></label>
+        </div>
+        <p class="compare-warning" id="comparativo-aviso">Comparação exploratória. A transcrição RMA de janeiro/2024 ainda não tem PDF integral verificado por hash.</p>
+        <div id="grafico-comparacao-fontes" class="compare-bars" role="group" aria-label="Comparação dos dois conjuntos de dados"></div>
+        <p id="comparativo-diferenca" class="compare-delta" aria-live="polite"></p>
+        <p class="panel-footnote">Comparação entre registros RIMA enviados pelo operador à ANAC e os totais RMA publicados pela concessionária. Uma diferença observada não demonstra erro de uma fonte. <a id="comparativo-origem-rma" href="https://www.viracopos.com/" target="_blank" rel="noopener noreferrer">Consultar RMA original</a>.</p>
+      </article>
+      <article class="panel comparison-panel" id="painel-perfil-voos"><div class="panel-heading"><div><span class="eyebrow">PERFIL DOS MOVIMENTOS · ANAC</span><h2>Movimentos com carga e passageiros</h2><p>Voos de passageiros também podem transportar carga no porão</p></div></div>
+        <div class="compare-controls"><label for="perfil-natureza">Natureza <select id="perfil-natureza"><option value="internacional">Internacional</option><option value="domestica">Doméstica</option></select></label></div>
+        <div id="perfil-voos-anac" class="compare-profile" role="group" aria-label="Distribuição dos movimentos ANAC conforme carga registrada"></div>
+        <p class="panel-footnote">Com carga = QT_CARGA maior que zero; sem carga = QT_CARGA igual a zero. Passageiros são aferidos pelos campos QT_PAX_*. Nenhum desses grupos representa automaticamente importações ou exportações aduaneiras.</p>
+      </article>
     </section>
     <section class="view" id="comex" aria-label="Comércio exterior" hidden>
       <article class="panel"><div class="panel-heading"><div><span class="eyebrow">VIRACOPOS · RECORTE ADUANEIRO</span><h2>Importação e exportação</h2><p>Valor FOB mensal, em US$ milhões</p></div></div><div class="legend"><span><i class="swatch blue"></i>Importação</span><span><i class="swatch gold"></i>Exportação</span></div><div id="grafico-comex" class="chart" aria-label="Comércio exterior do recorte aduaneiro de Viracopos"></div><p class="panel-footnote">Registros aduaneiros filtrados pelo recorte informado em Fontes. Peso líquido e FOB não equivalem à carga física da ANAC.</p></article>
@@ -63,6 +80,7 @@
   </main>
 </div>
 <script type="application/json" id="dados-incorporados">{{DASHBOARD_JSON}}</script>
+<script type="application/json" id="dados-comparativo-rima-rma">{{COMPARATIVO_RIMA_RMA_JSON}}</script>
 <script src="assets/app-blue.js" defer></script>
 </body>
 </html>
