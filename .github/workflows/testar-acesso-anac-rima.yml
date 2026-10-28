@@ -1,0 +1,71 @@
+name: Diagnosticar acesso ANAC RIMA (um mes)
+on:
+  push:
+    branches:
+      - feature/anac-rima-staging-20261028
+    paths:
+      - '.github/workflows/testar-acesso-anac-rima.yml'
+      - 'scripts/arquivar_anac_rima.py'
+      - 'tests/test_arquivar_anac_rima.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  acesso:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Testar arquivador com dados sinteticos
+        run: python -m unittest discover -s tests -p 'test_arquivar_anac_rima.py' -v
+      - name: Conferir servidor e download oficial de 2024-01
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import socket
+          from urllib.parse import urlsplit
+          from scripts.arquivar_anac_rima import official_url
+          url=official_url("2024-01")
+          print("Host:",urlsplit(url).hostname)
+          print("Path:",urlsplit(url).path)
+          try:
+              addresses=socket.getaddrinfo(urlsplit(url).hostname,443)
+              print("DNS resolvido:",len(addresses),"enderecos")
+          except OSError as err:
+              print("DNS falhou:",repr(err))
+              raise
+          PY
+          python scripts/arquivar_anac_rima.py --mode inicial --start 2024-01 --end 2024-01 --limit 1 --out-dir data/anac/rima
+      - name: Verificar manifestos e arquivos gerados
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import gzip,hashlib,json
+          from pathlib import Path
+          root=Path('data/anac/rima')
+          manifest=json.loads((root/'manifesto.json').read_text(encoding='utf-8'))
+          assert list(manifest['competencias'])==['2024-01']
+          entry=manifest['competencias']['2024-01']
+          file=root/'sbkp/2024/2024-01.csv.gz'
+          data=file.read_bytes()
+          assert hashlib.sha256(data).hexdigest()==entry['sha256_sbkp_gzip']
+          rows=gzip.decompress(data).decode('utf-8').splitlines()
+          assert len(rows)>1
+          assert all('SBKP' in r for r in rows[1:])
+          print('Dados verificados:',len(rows)-1,'linhas SBKP')
+          print('SHA-256:',entry['sha256_sbkp_gzip'])
+          PY
+      - name: Guardar amostra para inspecao
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: amostra-oficial-anac-rima-sbkp-2024-01
+          path: data/anac/rima/
+          retention-days: 7
