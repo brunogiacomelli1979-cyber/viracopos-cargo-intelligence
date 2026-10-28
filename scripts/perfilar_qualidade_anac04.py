@@ -91,7 +91,8 @@ def profile_csv(data, month):
         nature, movement = row["NR_NATUREZA"].strip(), row["NR_MOVIMENTO_TIPO"].strip()
         if nature not in ("D", "I") or movement not in ("P", "D"):
             raise ValueError(f"Linha {reader.line_num}: movimento/natureza desconhecidos")
-        volumes[f"{nature}/{movement}"] += 1
+        # Mesmo contrato do auditor independente: movimento/natureza.
+        volumes[f"{movement}/{nature}"] += 1
         cargo_status = _weight(row["QT_CARGA"], "QT_CARGA")
         mail_status = _weight(row["QT_CORREIO"], "QT_CORREIO")
         cargo[cargo_status] += 1
@@ -148,6 +149,7 @@ def profile_csv(data, month):
         "competencia": month,
         "registros_movimentacao": total,
         "movimentos_por_natureza": dict(sorted(volumes.items())),
+        "convenção_grupos": "NR_MOVIMENTO_TIPO/NR_NATUREZA (P ou D / D ou I)",
         "carga": {"movimentos_com_carga_positiva": cargo["positivo"],
                   "movimentos_com_carga_zero": cargo["zero"],
                   "movimentos_com_carga_ausente": cargo["ausente"],
