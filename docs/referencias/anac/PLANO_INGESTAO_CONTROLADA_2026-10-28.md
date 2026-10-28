@@ -98,3 +98,36 @@ python -m unittest discover -s tests -p test_reprocessar_bruto_anac.py -v
 
 **Limites:** a validação dessa etapa é local/offline, não equivale à reconciliação com RMA nem substitui a auditoria de manifesto/gzip do arquivador oficial. A publicação versionada do pacote em data/anac/rima continua desabilitada. Precisamos manter cópia persistente externa com backup validado e fechar ANAC-04 antes de autorizar um novo mês.
 
+
+
+## Marco 3 — backup e restauração offline
+
+O módulo scripts/backup_acervo_anac.py implementa snapshots por conteúdo (SHA-256 do inventário canônico), cópia integral de objects/ e receipts/, hashes conferidos durante e após a transferência, validação do backup e restauração em outro diretório **novo**, sem sobrescrever o cofre original.
+
+O backup exige auditoria de origem aprovada. Destinos dentro do Git ou aninhados na origem são recusados. Uma falha não torna visível um snapshot incompleto; a restauração revalida os arquivos antes de criar o destino final. Os testes simulam perda total do primeiro cofre e reprocessamento após a restauração, sem download. SHA-256 garante detecção de corrupção acidental, não autenticação frente a invasor que possa alterar manifestos e hashes.
+
+Comandos somente depois de configurar dois locais persistentes independentes:
+
+~~~sh
+python scripts/backup_acervo_anac.py backup --origem /volume-A/vcp-anac-brutos --destino /volume-B/vcp-anac-backups
+python scripts/backup_acervo_anac.py verificar --backup /volume-B/vcp-anac-backups --snapshot SHA256_DO_SNAPSHOT
+python scripts/backup_acervo_anac.py restaurar --backup /volume-B/vcp-anac-backups --snapshot SHA256_DO_SNAPSHOT --novo-cofre /volume-A/vcp-anac-recuperado
+~~~
+
+**Restrição:** dois diretórios no mesmo disco não protegem contra perda física. Para aprovar G2 operacionalmente, exigimos volume independente, backup/versionamento, proteção de acesso e exercício real de restauração com comparação integral de hashes. Testes em runner temporário não comprovam durabilidade física.
+
+## Marco 4 — simulação de integração ao manifesto
+
+O módulo scripts/simular_promocao_anac.py utiliza um bruto armazenado por SHA e pacote SBKP validado para construir **uma cópia temporária descartável** da base data/anac/rima. Só inclui competência nova; valida tanto a base como o candidato por auditoria integral e somatórias independentes; exige que todos os meses anteriores permaneçam idênticos. Ao final descarta o candidato.
+
+**Nenhuma alteração ao manifesto da branch, ao Git, dashboard, cron ou dados publicados.** Uma revisão de competência existente é recusada; exigirá fluxo específico preservando recibos e versões.
+
+~~~sh
+python scripts/simular_promocao_anac.py --acervo /volume-A/vcp-anac-brutos --competencia 2020-04 --sha256 SHA256_REAL_DO_ORIGINAL --staging data/staging/anac-reprocessados
+python -m unittest discover -s tests -p test_backup_acervo_anac.py -v
+python -m unittest discover -s tests -p test_simular_promocao_anac.py -v
+~~~
+
+Os scripts são opt-in; não acionam rede ou workflow de coleta. O exemplo de competência não constitui dado capturado.
+
+**Pendências:** G2 precisa de armazenamento permanente real; G4 precisa de perfil de chaves/duplicidade e reconciliação ANAC x RMA; G5/G6 seguem bloqueados. As variáveis temporárias de autorização no GitHub não foram inspecionadas nesta fase.
