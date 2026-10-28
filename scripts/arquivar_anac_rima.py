@@ -26,7 +26,7 @@ BASE_URL = (
     "Operador%20Aeroportu%C3%A1rio/"
     "Dados%20de%20Movimenta%C3%A7%C3%A3o%20Aeroportu%C3%A1rias/"
 )
-REQUIRED = {"ANO", "MES", "NR_AEROPORTO", "NR_MOVIMENTO_TIPO",
+REQUIRED = {"ANO", "MES", "NR_AEROPORTO_REFERENCIA", "NR_MOVIMENTO_TIPO",
             "NR_NATUREZA", "QT_CARGA", "QT_CORREIO"}
 MAX_SOURCE_BYTES = 250_000_000
 ROOT = Path(__file__).resolve().parents[1]
@@ -129,12 +129,16 @@ def filter_sbkp(raw, month):
         total += 1
         if None in row or any(v is None for v in row.values()):
             raise ValueError(f"Linha {reader.line_num}: colunas inconsistentes")
-        if (row["NR_AEROPORTO"] or "").strip().upper() != "SBKP":
+        if (row["NR_AEROPORTO_REFERENCIA"] or "").strip().upper() != "SBKP":
             continue
         year, mo = row["ANO"].strip(), row["MES"].strip()
         if not (year.isdigit() and mo.isdigit()
                 and f"{int(year):04d}-{int(mo):02d}" == month):
             raise ValueError(f"Linha {reader.line_num}: competência divergente")
+        if row["NR_MOVIMENTO_TIPO"].strip() not in ("P", "D"):
+            raise ValueError(f"Linha {reader.line_num}: código de movimento ANAC desconhecido")
+        if row["NR_NATUREZA"].strip() not in ("D", "I"):
+            raise ValueError(f"Linha {reader.line_num}: código de natureza ANAC desconhecido")
         writer.writerow(row)
         selected += 1
     if total == 0 or selected == 0:
