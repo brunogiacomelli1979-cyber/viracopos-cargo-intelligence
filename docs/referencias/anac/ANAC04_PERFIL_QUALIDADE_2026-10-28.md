@@ -64,3 +64,23 @@ O relatório de QA passou a separar chave candidata com campos preenchidos de ch
 
 
 **Validação final do ajuste:** [GitHub Actions #40722757215](https://github.com/brunogiacomelli1979-cyber/viracopos-cargo-intelligence/actions/runs/40722757215) — **176 testes Python aprovados**, validação do site aprovada e deploy ignorado no evento PR. Os 264 marcadores foram confirmados como texto literal null e aparecem agora como datas nao_informadas, não como formato_nao_reconhecido. Nenhum recorte, manifesto ou dado publicado foi modificado. ANAC-04 permanece aberta até a triagem da colisão remanescente e validação documental da semântica.
+
+
+## Terceira passagem — conclusões normativas e revisão da prioridade
+
+**Base documental oficial:**
+- [Metadados ANAC de Movimentação Aeroportuária](https://www.anac.gov.br/acesso-a-informacao/dados-abertos/areas-de-atuacao/operador-aeroportuario/dados-de-movimentacao-aeroportuaria/60-dados-de-movimentacao-aeroportuaria): definições de DT_CALCO, DT_TOQUE, NR_SERVICE_TYPE, QT_CARGA, QT_CORREIO, unidade kg, origem declarada pelo administrador aeroportuário e possibilidade de atualização posterior.
+- [Portaria ANAC nº 1.017/SRA/SIA/2018, texto compilado com alteração de 2019](https://pergamum.anac.gov.br/pergamum/vinculos/PA2018-1017.pdf): art. 7º (uma linha por movimento), art. 8º §1º (mês de referência determinado por **calço no pouso/descalço na decolagem**, não toque de pista); inciso VIII (SERVICE_TYPE Y = alternado, Z = retorno). DT_CALCO/HH_CALCO e DT_TOQUE/HH_TOQUE são horários **locais** do aeroporto.
+
+**Verificação nas 34.968 linhas:**
+- **15 DT_TOQUE fora do mês**: **todos são decolagens**, todos apresentam o toque **um dia após** a data do descalço, com intervalo descalço→toque **não negativo e de até 120 minutos**; DT_CALCO da totalidade dos 34.968 registros pertence à competência indicada. Isso é **compatível com a regra de reporte da ANAC**; não caracterizar como erro de competência nem mover para outro mês. Não foi realizada correção de dados.
+- **264 valores textuais null** em DT_TOQUE: ausências documentadas, que não validam chave por toque. Permanecem nulos sem imputação.
+- **43 colisões da chave candidata de toque**: somente **uma** persiste ao requerer data de toque reconhecida e não ausente.
+- **Colisão residual (2020-03, decolagem doméstica)**: mesma chave candidata de toque, mesmo número de voo, mesmo aeroporto relacionado e mesma quantidade de carga, mas **NR_SERVICE_TYPE distinto (T versus Z)** e **HH_CALCO distinto**. O código T é teste técnico na tabela ANAC/IATA; Z é voo de retorno na Portaria. Os demais campos comparados não divergiram. Isso NÃO prova duplicidade física nem justifica excluir uma linha; é necessário obter identificador operacional confiável ou confirmação da ANAC/aeroporto.
+- **Códigos de serviço examinados**: todos tiveram correspondência na tabela publicada pela ANAC ou na Portaria para Y/Z; a correspondência de domínio não certifica que cada linha foi classificada corretamente pelo operador.
+
+**Limitação de rastreabilidade importante:** a Portaria menciona COD_RIMA, código de operação que poderia auxiliar o vínculo de movimentos, porém **o export público de dados arquivados contém NR_AEROPORTO_REFERENCIA e outros campos, mas não COD_RIMA**. Não inventar ID de voo ou somar linhas como um único movimento físico. A chave de calço pode ter zero colisões neste subconjunto, mas não está homologada como chave primária pela ANAC.
+
+**Reprodução/anônimização:** scripts/auditar_eventos_excecionais_anac04.py e testes/test_auditar_eventos_excecionais_anac04.py executam leitura offline de dados arquivados já auditados. Os resultados e logs apresentam apenas contagens, tipos de movimento, categorias de serviço, diferenças de campos e intervalos agregados — **sem matrícula, número de voo, hora exata ou dado de movimentação individual**.
+
+**Tratamento e status de governança:** podemos considerar **esclarecida a questão da competência** dos 15 registros sob o critério oficial, mas ANAC-04 permanece **ABERTA** pela colisão T/Z, pelos limites do identificador, pela série incompleta e pela reconciliação ANAC/RMA. O cofre persistente com backup real continua aguardando provisionamento; coletas novas, cron e dashboard permanecem bloqueados.
