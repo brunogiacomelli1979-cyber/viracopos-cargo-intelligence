@@ -51,6 +51,21 @@ class ReconcilerTests(unittest.TestCase):
         self.assertIsNone(_anac_tonnes(groups, "internacional"))
         self.assertFalse(_compare(_anac_tonnes(groups, "internacional"), "13962")["comparavel"])
 
+    def test_incomplete_group_does_not_break_reconciliation(self):
+        groups = {**GROUPS, "internacional/pouso": {
+            "status": "incompleto", "carga_kg": None
+        }}
+        anac = {"resultado": "aprovado_tecnicamente", "erros": [],
+                "comparacoes": {"2024-01": {"grupos": groups}}}
+        prelim = {"mes": "2024-01", "carga_domestica_t": "5908",
+                  "carga_internacional_t": "13962",
+                  "courier_internacional_t": "604",
+                  "status": "transcricao_preliminar_nao_certificada",
+                  "fonte": "RMA_pdf_transcricao_preliminar"}
+        output = reconcile(anac, {}, prelim)
+        self.assertFalse(output["comparacoes"]["2024-01"]["comparacao_internacional"]["comparavel"])
+        self.assertFalse(output["liberado_dashboard"])
+
     def test_bad_rma_duplicate_month_rejected(self):
         text = ("mes,carga_internacional_t,carga_domestica_t,courier_internacional_t\n"
                 "2025-01,12,14,1\n2025-01,12,14,1\n")

@@ -160,7 +160,7 @@ def reconcile(rima_report, rma_current, preliminary=None):
             "status": ("preliminar_nao_publicavel" if provisional else "diferencas_a_reconciliar_metodologicamente"),
         }
         for nature in ("domestica", "internacional"):
-            if result[f"comparacao_{nature}"]["alerta"].startswith("discrepancia"):
+            if result[f"comparacao_{nature}"].get("alerta", "").startswith("discrepancia"):
                 summary["alertas"].append({"mes": month, "natureza": nature,
                                            "tipo": "divergencia_fisica_conceitual_a_investigar"})
         summary["comparacoes"][month] = result
