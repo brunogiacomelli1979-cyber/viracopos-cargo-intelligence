@@ -31,6 +31,27 @@ def inspect(root=ROOT):
                    "rima_rma": "não diretamente comparáveis"}}
     for month, entry in sorted(months.items()):
         errors = []
+        # Revisões devem continuar fisicamente recuperáveis, não apenas com hashes no JSON.
+        for version in entry.get("revisoes", []):
+            try:
+                old_path = (root / version["caminho_sbkp"]).resolve()
+                if not old_path.is_relative_to((root / "data/anac/rima").resolve()):
+                    raise ValueError("caminho histórico fora do acervo")
+                if not old_path.is_file():
+                    raise ValueError("arquivo histórico ausente")
+                old_bytes = old_path.read_bytes()
+                if (len(old_bytes) != version["bytes_sbkp_gzip"]
+                        or hashlib.sha256(old_bytes).hexdigest() != version["sha256_sbkp_gzip"]):
+                    raise ValueError("tamanho/hash da versão histórica divergente")
+                if len(old_bytes) > 10_000_000:
+                    raise ValueError("versão histórica excede limite")
+                with gzip.open(old_path, "rb") as old_stream:
+                    raw_old = old_stream.read(100_000_001)
+                if (len(raw_old) > 100_000_000
+                        or hashlib.sha256(raw_old).hexdigest() != version["conteudo_sbkp_sha256"]):
+                    raise ValueError("hash de conteúdo histórico divergente")
+            except (OSError, ValueError, KeyError, EOFError) as exc:
+                errors.append(f"revisão histórica indisponível: {exc}")
         path = root / entry["caminho_sbkp"]
         if not re.fullmatch(r"\d{4}-(0[1-9]|1[0-2])", month):
             errors.append("competência inválida")
@@ -120,7 +141,8 @@ def inspect(root=ROOT):
                 "pesos_nulos": dict(empty), "pesos_zero": dict(zero),
                 "pesos_invalidos": dict(invalid),
                 "duplicatas_linha_inteira": duplicates,
-                "sha256_gzip": hashlib.sha256(encoded).hexdigest()
+                "sha256_gzip": hashlib.sha256(encoded).hexdigest(),
+                "versoes_anteriores": len(entry.get("revisoes", []))
             }
             summary["total_registros"] += total
             if duplicates:
