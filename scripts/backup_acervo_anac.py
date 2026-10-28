@@ -126,6 +126,8 @@ def verify(backup_root, snapshot_id):
     if not HASH.fullmatch(snapshot_id):
         raise ValueError("ID de snapshot invalido")
     snapshot = backup_root / "snapshots" / snapshot_id
+    if snapshot.is_symlink() or (backup_root / "snapshots").is_symlink():
+        raise ValueError("Diretorio de backup nao pode ser link simbolico")
     manifest_path = snapshot / "manifesto_backup.json"
     if manifest_path.is_symlink():
         raise ValueError("Manifesto de backup nao pode ser link")
@@ -206,7 +208,7 @@ def restore(backup_root, snapshot_id, destination):
     _audit_or_fail(destination)
     if _inventory(destination) != entries:
         raise ValueError("Falha na verificacao apos restauracao")
-    return {"estado": "restaurado_em_novo_diretorio", "destino": str(destination), **checked}
+    return {**checked, "estado": "restaurado_em_novo_diretorio", "destino": str(destination)}
 
 
 def main():
