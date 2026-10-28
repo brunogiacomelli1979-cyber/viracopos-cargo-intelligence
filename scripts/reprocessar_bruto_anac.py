@@ -12,7 +12,6 @@ import hashlib
 import json
 import os
 import re
-import shutil
 import tempfile
 from pathlib import Path
 
@@ -132,7 +131,8 @@ def _inspect_existing(final, sha, month):
 def prepare(vault, month, sha256, out_dir):
     """Executa QA e publica apenas pacote local versionado, nunca dados de producao."""
     output = Path(out_dir).resolve()
-    if output == ROOT / "data" or output == ROOT / "_site" or output == ROOT / "data/anac/rima":
+    if (output == ROOT / "data" or output.is_relative_to(ROOT / "_site")
+            or output.is_relative_to(ROOT / "data/anac/rima")):
         raise ValueError("Nao utilizar caminho publico ou acervo versionado como staging")
     raw, receipt = locate_original(vault, month, sha256)
     final = output / month / sha256
