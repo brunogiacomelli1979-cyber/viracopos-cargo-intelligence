@@ -1,48 +1,14 @@
-name: Validar coleta ANAC SBKP — piloto
+# Desativado por decisão de governança: Issue #8 / ANAC-02.
+# Este piloto utilizava ANAC Etapa Básica (transportadoras), diferente de RIMA.
+# Código legado preservado no histórico Git; não rodar o ZIP antigo.
+name: ANAC Etapa Basica — piloto legado inativo
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'scripts/coletar_anac_sbkp.py'
-      - 'tests/test_anac_sbkp.py'
-      - '.github/workflows/anac-sbkp-piloto.yml'
   workflow_dispatch:
-
 permissions:
   contents: read
 jobs:
-  validate:
+  desativado:
+    if: false
     runs-on: ubuntu-latest
-    timeout-minutes: 35
     steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: feat/anac-carga-sbkp-2020-2024
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - name: Confirmar ambiente Python e executar contratos ANAC
-        run: |
-          python --version
-          python -m unittest discover -s tests -p test_anac_sbkp.py -v
-      - name: Coletar mês-piloto real da ANAC
-        run: python scripts/coletar_anac_sbkp.py --start 2024-01 --end 2024-01 --strict-complete
-      - name: Inspecionar recibo e csv do piloto
-        run: |
-          python - <<'PY'
-          import csv, json
-          from pathlib import Path
-          meta=json.loads(Path('data/staging/anac/anac_sbkp_fontes.json').read_text())
-          with Path('data/staging/anac/anac_sbkp_carga_mensal.csv').open() as f:
-              rows=list(csv.DictReader(f))
-          assert meta['meses_validados']==1 and meta['status']=='validado'
-          assert len(rows)==4 and {r['sentido'] for r in rows}=={'embarque','desembarque'}
-          assert {r['natureza'] for r in rows}=={'internacional','domestica'}
-          print('Piloto ANAC com quatro grupos verificados',meta['recibos'][0]['sha256'])
-          PY
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: anac-sbkp-piloto-2024-01
-          path: data/staging/anac/
-          retention-days: 14
+      - run: echo "Coletor legado desligado; ver Issue #8 (ANAC-02)"
