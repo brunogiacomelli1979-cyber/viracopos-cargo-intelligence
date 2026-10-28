@@ -34,7 +34,7 @@ DATE_FORMATS = ("%Y-%m-%d", "%d/%m/%Y", "%Y/%m/%d",
 
 def _date_status(value, month):
     value = value.strip()
-    if not value:
+    if not value or value.lower() == "null":
         return "nao_informada"
     for fmt in DATE_FORMATS:
         try:
@@ -75,6 +75,7 @@ def profile_csv(data, month):
     service = Counter()
     dates = {field: Counter() for field in DATE_FIELDS if field in header}
     unknown_date_values = {field: Counter() for field in dates}
+    absent_date_markers = {field: Counter() for field in dates}
     seen_exact = set()
     repeated_exact = 0
     keys = {name: {"vistos": set(), "vistos_datas_reconhecidas": set(),
@@ -135,6 +136,8 @@ def profile_csv(data, month):
             counts[state] += 1
             if state == "formato_nao_reconhecido":
                 unknown_date_values[field][row[field].strip()[:32]] += 1
+            elif state == "nao_informada":
+                absent_date_markers[field][row[field].strip().lower() or "(vazio)"] += 1
     if not total:
         raise ValueError("Recorte sem movimentos SBKP")
     key_report = {}
@@ -177,6 +180,8 @@ def profile_csv(data, month):
         "duplicatas_exatas_adicionais": repeated_exact,
         "chaves_operacionais_candidatas": key_report,
         "datas_operacionais": {k: dict(sorted(v.items())) for k, v in dates.items()},
+        "datas_marcadores_de_ausencia": {
+            field: dict(sorted(counter.items())) for field, counter in absent_date_markers.items()},
         "datas_nao_reconhecidas_valores_frequentes": {
             field: [{"valor": value, "registros": count}
                     for value, count in counter.most_common(5)]
