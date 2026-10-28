@@ -1,22 +1,13 @@
-name: Arquivar histórico ANAC RIMA SBKP
+name: Arquivar ANAC RIMA SBKP — piloto restrito 2020-03
 on:
   workflow_dispatch:
     inputs:
-      mode:
-        description: "inicial (backfill) ou mensal"
+      confirmar_competencia:
+        description: "Somente competencia 2020-03; autorizacao separada em variaveis do repositorio"
         type: choice
-        options: [inicial, mensal]
-        default: inicial
-      start:
-        description: "Primeira competência AAAA-MM"
-        default: "2020-01"
-      end:
-        description: "Última competência (vazio = limite de seis meses)"
-        default: ""
-      limit:
-        description: "Máximo de meses por execução (0 = sem limite)"
-        default: "12"
-  # Agendamento congelado até fechar o registro de pendências ANAC.
+        options: ['2020-03']
+        default: '2020-03'
+  # Sem schedule e sem push: nunca iniciar backfill em massa acidentalmente.
 permissions:
   contents: read
 concurrency:
@@ -24,8 +15,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   archive:
-    # Gate fechado: sem variável explícita de autorização, execução não coleta.
-    if: ${{ github.ref_name == 'feature/anac-rima-staging-20261028' && vars.ANAC_RIMA_COLETA_AUTORIZADA == 'true' }}
+    if: ${{ github.event_name == 'workflow_dispatch' && github.ref_name == 'feature/anac-rima-staging-20261028' && github.repository == 'brunogiacomelli1979-cyber/viracopos-cargo-intelligence' && inputs.confirmar_competencia == '2020-03' && vars.ANAC_RIMA_COLETA_AUTORIZADA == 'true' && vars.ANAC_RIMA_PILOTO_202003_AUTORIZADO == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 45
     permissions:
@@ -33,32 +23,21 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.ref_name }}
+          ref: feature/anac-rima-staging-20261028
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Testes de integridade e publicação Git segura
+      - name: Testar integridade do coletor e publicador Git
         run: |
           python -m unittest discover -s tests -p 'test_arquivar_anac_rima.py' -v
           python -m unittest discover -s tests -p 'test_publicar_anac_git.py' -v
           python -m unittest discover -s tests -p 'test_auditar_anac_rima.py' -v
-      - name: Baixar e arquivar SBKP
-        shell: bash
-        env:
-          MODE: ${{ github.event_name == 'workflow_dispatch' && inputs.mode || 'mensal' }}
-          START: ${{ github.event_name == 'workflow_dispatch' && inputs.start || '2020-01' }}
-          END: ${{ github.event_name == 'workflow_dispatch' && inputs.end || '' }}
-          LIMIT: ${{ github.event_name == 'workflow_dispatch' && inputs.limit || '0' }}
-        run: |
-          set -euo pipefail
-          args=(--mode "$MODE" --start "$START" --limit "$LIMIT")
-          if [[ -n "$END" ]]; then args+=(--end "$END"); fi
-          python scripts/arquivar_anac_rima.py "${args[@]}"
-      - name: Conferir integridade e agregações reais antes do commit
-        if: success()
+          python -m unittest discover -s tests -p 'test_workflow_guard_anac.py' -v
+      - name: Arquivar exclusivamente 2020-03 (um mes, sem backfill amplo)
+        run: python scripts/arquivar_anac_rima.py --mode inicial --start 2020-03 --end 2020-03 --limit 1
+      - name: Auditoria integral e somas independentes antes do commit
         run: |
           python scripts/auditar_anac_rima.py
           python scripts/validar_agrupamento_rima.py
-      - name: Publicar apenas na branch homologada com proteção anti-conflito
-        if: success()
+      - name: Publicar apenas acervo auditado na branch homologada
         run: python scripts/publicar_anac_git.py

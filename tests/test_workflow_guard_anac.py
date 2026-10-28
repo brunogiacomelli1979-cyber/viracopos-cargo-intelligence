@@ -32,7 +32,12 @@ class WorkflowSafetyTests(unittest.TestCase):
     def test_active_collector_still_locked(self):
         text = (WF / "arquivar-anac-rima.yml").read_text(encoding="utf-8")
         self.assertIn("vars.ANAC_RIMA_COLETA_AUTORIZADA == 'true'", text)
+        self.assertIn("vars.ANAC_RIMA_PILOTO_202003_AUTORIZADO == 'true'", text)
+        self.assertIn("github.event_name == 'workflow_dispatch'", text)
         self.assertIn("github.ref_name == 'feature/anac-rima-staging-20261028'", text)
+        self.assertIn("inputs.confirmar_competencia == '2020-03'", text)
+        self.assertIn("--mode inicial --start 2020-03 --end 2020-03 --limit 1", text)
+        self.assertNotIn("--limit \"$LIMIT\"", text)
         self.assertNotIn("  schedule:", text)
         self.assertNotIn("  push:", text)
         self.assertIn("scripts/publicar_anac_git.py", text)
