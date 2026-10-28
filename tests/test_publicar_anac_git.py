@@ -36,7 +36,8 @@ class PublishIntegrationTests(unittest.TestCase):
         self.root = Path(self.temp.name)
         self.origin = self.root / "origin.git"
         command(self.root, "init", "--bare", "--initial-branch=main", str(self.origin))
-        self.seed = self.clone("seed", "main")
+        self.seed = self.root / "seed"
+        command(self.root, "clone", str(self.origin), str(self.seed))
         command(self.seed, "config", "user.name", "Teste ANAC")
         command(self.seed, "config", "user.email", "test@example.invalid")
         (self.seed / "README.md").write_text("Base simulada para teste local\n")
@@ -121,7 +122,6 @@ class PublishIntegrationTests(unittest.TestCase):
         worker = self.clone("worker", HOMOLOG_BRANCH)
         with self.assertRaisesRegex(PublishError, "bloqueada"):
             publish(worker, branch="main")
-        command(worker, "switch", "main") if False else None
 
 
 if __name__ == "__main__":
