@@ -167,6 +167,11 @@ def inspect_csv(data, month):
                 # de carga e reportado. Somente campos que divergiram.
                 collision_details.append({
                     "competencia": month,
+                    "movimento": move,
+                    "natureza": nature,
+                    "tipos_de_servico": sorted({old["NR_SERVICE_TYPE"].strip(), row["NR_SERVICE_TYPE"].strip()}),
+                    "codigo_voo_igual": old.get("NR_VOO_NUMERO") == row.get("NR_VOO_NUMERO"),
+                    "aeroporto_relacionado_igual": old.get("NR_VOO_OUTRO_AEROPORTO") == row.get("NR_VOO_OUTRO_AEROPORTO"),
                     "campos_distintos": diff,
                     "campos_distintos_quantidade": len(diff),
                     "valores_de_carga_diferem": "QT_CARGA" in diff,
