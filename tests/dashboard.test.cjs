@@ -50,6 +50,15 @@ test('published default period provides all four real headline indicators',()=>{
 test('RIMA/RMA preview retains provenance and can distinguish passenger flights with cargo',()=>{
   const comparison=JSON.parse(fs.readFileSync('data/comparativo_rima_rma.json','utf8'));
   assert.equal(comparison.status,'preliminar_com_divergencias');
+  assert.equal(comparison.versao,2);
+  assert.deepEqual(comparison.perfil_voos.map(item=>item.mes),['2020-01','2020-02','2024-01']);
+  assert.equal(comparison.serie_mensal.length,46);
+  assert.equal(comparison.meses_com_duas_fontes,1);
+  const sparse2020=comparison.serie_mensal.find(r=>r.mes==='2020-01'&&r.natureza==='internacional');
+  assert.equal(sparse2020.rma_carga_t,null);
+  const sparse2025=comparison.serie_mensal.find(r=>r.mes==='2025-01'&&r.natureza==='internacional');
+  assert.equal(sparse2025.rima_carga_t,null);
+
   assert.equal(comparison.liberado_para_indicadores,false);
   const international=comparison.recortes.find(r=>r.mes==='2024-01'&&r.natureza==='internacional');
   assert.equal(international.rima_carga_t,16015.919);
