@@ -2,7 +2,10 @@ name: Inventariar disponibilidade ANAC RIMA 2020+ (sem CSV)
 on:
   push:
     branches: [feature/anac-rima-staging-20261028]
-    paths: ['.github/workflows/inventariar-anac-rima.yml']
+    paths:
+      - '.github/workflows/inventariar-anac-rima.yml'
+      - 'scripts/inventariar_anac_rima.py'
+      - 'tests/test_inventariar_anac_rima.py'
   workflow_dispatch:
 permissions:
   contents: read
