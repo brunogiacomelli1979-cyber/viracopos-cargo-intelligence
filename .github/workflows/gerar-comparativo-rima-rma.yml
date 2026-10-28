@@ -30,7 +30,11 @@ jobs:
           from pathlib import Path
           data=json.loads(Path("reports/anac/comparativo-rima-rma.json").read_text())
           assert data["versao"] == 2
-          assert [p["mes"] for p in data["perfil_voos"]] == ["2020-01","2020-02","2024-01"]
+          manifest=json.loads(Path("data/anac/rima/manifesto.json").read_text(encoding="utf-8"))
+          months=sorted(manifest["competencias"])
+          assert [p["mes"] for p in data["perfil_voos"]] == months
+          assert data["meses_anac"] == len(months)
+          assert len(data["serie_mensal"]) == 2*len(set(x["mes"] for x in data["serie_mensal"]))
           assert len(data["recortes"]) == 2
           assert data["meses_com_duas_fontes"] == 1
           assert all(row["rma_carga_t"] is None for row in data["serie_mensal"] if row["mes"]=="2020-01")

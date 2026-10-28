@@ -86,10 +86,11 @@ class MonthlyExpansionTests(unittest.TestCase):
         from validar_dados import ROOT
         result=generate(ROOT)
         self.assertEqual(result["versao"],2)
-        self.assertEqual([p["mes"] for p in result["perfil_voos"]],
-                         ["2020-01","2020-02","2024-01"])
+        import json
+        months = sorted(json.loads((ROOT/"data/anac/rima/manifesto.json").read_text(encoding="utf-8"))["competencias"])
+        self.assertEqual([p["mes"] for p in result["perfil_voos"]], months)
         self.assertEqual(len(result["recortes"]),2)
-        self.assertEqual(result["meses_anac"],3)
+        self.assertEqual(result["meses_anac"],len(months))
         self.assertEqual(result["meses_com_duas_fontes"],1)
         self.assertFalse(result["liberado_para_indicadores"])
         self.assertEqual(result["perfil_voos"][-1]["movimentos"],9348)
