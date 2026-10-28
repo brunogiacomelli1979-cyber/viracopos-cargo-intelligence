@@ -41,6 +41,14 @@ class WorkflowSafetyTests(unittest.TestCase):
         self.assertNotIn("  schedule:", text)
         self.assertNotIn("  push:", text)
         self.assertIn("scripts/publicar_anac_git.py", text)
+        self.assertIn("needs: verificar-autorizacao", text)
+        self.assertIn("steps.gate.outputs.autorizado", text)
+        self.assertIn("needs.verificar-autorizacao.outputs.autorizado == 'true'", text)
+        self.assertIn("echo \"autorizado=false\" >> \"$GITHUB_OUTPUT\"", text)
+        self.assertIn("## Piloto ANAC 2020-03: NÃO EXECUTADO", text)
+        self.assertIn("contents: read", text)
+        self.assertIn("contents: write", text)
+
 
     def test_year_probe_respects_2020_start(self):
         text = (WF / "sondar-disponibilidade-anac-rima.yml").read_text(encoding="utf-8")
