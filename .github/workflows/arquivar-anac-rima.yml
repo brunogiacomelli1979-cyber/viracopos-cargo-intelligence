@@ -33,6 +33,10 @@ jobs:
           python -m unittest discover -s tests -p 'test_publicar_anac_git.py' -v
           python -m unittest discover -s tests -p 'test_auditar_anac_rima.py' -v
           python -m unittest discover -s tests -p 'test_workflow_guard_anac.py' -v
+      - name: Capturar estado remoto antes do arquivamento
+        run: |
+          echo "ANAC06_BASE=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+          echo "ANAC06_MAIN=$(git ls-remote origin refs/heads/main | cut -f1)" >> "$GITHUB_ENV"
       - name: Arquivar exclusivamente 2020-03 (um mes, sem backfill amplo)
         run: python scripts/arquivar_anac_rima.py --mode inicial --start 2020-03 --end 2020-03 --limit 1
       - name: Auditoria integral e somas independentes antes do commit
@@ -41,3 +45,13 @@ jobs:
           python scripts/validar_agrupamento_rima.py
       - name: Publicar apenas acervo auditado na branch homologada
         run: python scripts/publicar_anac_git.py
+      - name: Auditar após o push em worktree remoto
+        run: python scripts/verificar_publicacao_anac_rima.py --base "$ANAC06_BASE" --main-sha "$ANAC06_MAIN" --month 2020-03 --output reports/anac/qa-pos-push.json
+      - name: Arquivar evidência do push
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: anac06-qa-pos-push
+          path: reports/anac/qa-pos-push.json
+          if-no-files-found: ignore
+          retention-days: 30

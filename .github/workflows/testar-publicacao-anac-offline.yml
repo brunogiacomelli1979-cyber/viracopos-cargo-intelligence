@@ -7,6 +7,8 @@ on:
       - 'scripts/publicar_anac_git.py'
       - 'tests/test_publicar_anac_git.py'
       - 'tests/test_anac06_end_to_end.py'
+      - 'scripts/verificar_publicacao_anac_rima.py'
+      - 'tests/test_verificar_publicacao_anac_rima.py'
       - 'scripts/arquivar_anac_rima.py'
       - '.github/workflows/arquivar-anac-rima.yml'
   workflow_dispatch:
@@ -27,5 +29,7 @@ jobs:
         run: python -m unittest discover -s tests -p 'test_publicar_anac_git.py' -v
       - name: Executar coletor, auditor e publicador completos em Git bare local
         run: python -m unittest discover -s tests -p 'test_anac06_end_to_end.py' -v
+      - name: Verificar efeitos do push e estabilidade da main em Git local
+        run: python -m unittest discover -s tests -p 'test_verificar_publicacao_anac_rima.py' -v
       - name: Conferir os tres meses reais sem baixar dados
         run: python scripts/auditar_anac_rima.py
