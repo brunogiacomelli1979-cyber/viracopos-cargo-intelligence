@@ -25,6 +25,16 @@ class ArchiveTests(unittest.TestCase):
         self.assertNotIn("SBGR",text)
         self.assertIn(";;0",text)
 
+    def test_official_update_preamble(self):
+        sample = b"Atualizado em: 2025-01-01\n" + ROWS
+        compressed, meta = filter_sbkp(sample, "2024-01")
+        self.assertEqual(meta["linhas_sbkp"], 2)
+        self.assertIn("SBKP", gzip.decompress(compressed).decode("utf-8"))
+
+    def test_reject_unexpected_preamble(self):
+        with self.assertRaises(ValueError):
+            filter_sbkp(b"Erro inesperado\n" + ROWS, "2024-01")
+
     def test_reject_empty_and_bad_month(self):
         with self.assertRaises(ValueError):
             filter_sbkp(HEADER.encode(), "2024-01")
