@@ -88,6 +88,9 @@ class RawStoreTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             register(self.src, "2020-04", URL, ROOT / "data" / "staging" / "raw")
 
+    def test_empty_vault_is_not_certified(self):
+        self.assertFalse(audit(self.store)["aprovado"])
+
     def test_orphan_is_detected(self):
         receipt = register(self.src, "2020-04", URL, self.store)
         (self.store / "receipts" / "2020-04" / (receipt["sha256"] + ".json")).unlink()
