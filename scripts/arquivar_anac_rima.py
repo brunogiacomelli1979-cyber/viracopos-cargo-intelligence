@@ -101,10 +101,25 @@ def filter_sbkp(raw, month):
         encoding = "cp1252"
     if "\x00" in text:
         raise ValueError("CSV contém bytes nulos")
-    reader = csv.DictReader(io.StringIO(text, newline=""), delimiter=";", strict=True)
+    lines = text.splitlines(keepends=True)
+    header_at = None
+    for pos, line in enumerate(lines[:20]):
+        candidate = next(csv.reader([line], delimiter=";", strict=True), [])
+        candidate = [field.strip().lstrip("\ufeff") for field in candidate]
+        if len(candidate) == len(set(candidate)) and REQUIRED.issubset(set(candidate)):
+            header_at = pos
+            break
+    if header_at is None:
+        preview = [line.strip()[:200] for line in lines[:8]]
+        raise ValueError(f"Cabeçalho ANAC não localizado nas primeiras 20 linhas; prévia: {preview!r}")
+    preamble = [line.strip().lstrip("\ufeff") for line in lines[:header_at] if line.strip()]
+    if not all(line.lower().startswith("atualizado em:") for line in preamble):
+        raise ValueError(f"Preâmbulo ANAC não reconhecido: {preamble[:5]!r}")
+    reader = csv.DictReader(io.StringIO("".join(lines[header_at:]), newline=""),
+                            delimiter=";", strict=True)
     headers = [x.strip().lstrip("\ufeff") for x in reader.fieldnames or []]
     if len(headers) != len(set(headers)) or not REQUIRED.issubset(set(headers)):
-        raise ValueError(f"Cabeçalho inesperado: {headers[:30]}")
+        raise ValueError(f"Cabeçalho ANAC inesperado: {headers[:30]}")
     reader.fieldnames = headers
     output = io.StringIO(newline="")
     writer = csv.DictWriter(output, fieldnames=headers, delimiter=";", lineterminator="\n")
