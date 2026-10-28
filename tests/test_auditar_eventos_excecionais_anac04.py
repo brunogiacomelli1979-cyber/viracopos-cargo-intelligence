@@ -75,11 +75,46 @@ class AnacNormaTests(unittest.TestCase):
         self.assertEqual(one["tipos_de_servico"], ["J"])
         self.assertFalse(one["codigo_voo_igual"])
         self.assertTrue(one["aeroporto_relacionado_igual"])
+        self.assertEqual(one["numero_voo_qualidade"], "ambos_informados_sem_garantia_de_unicidade")
+        self.assertEqual(one["perfil_temporal_anonimizado"]["faixa_separacao_entre_calcos"], "6_a_30_min")
+        self.assertTrue(one["perfil_temporal_anonimizado"]["ambos_tem_sequencia_temporal_nao_negativa"])
         blob = json.dumps(result)
         self.assertNotIn("PTABC", blob)
         self.assertNotIn("451", blob)
         self.assertNotIn("2020-04-01", blob)
         self.assertTrue(result["nenhum_registro_excluido"])
+
+    def test_t_z_with_zero_number_is_not_proof_of_same_flight(self):
+        # A Portaria admite numero de voo 0 quando nao se aplica.
+        a = row(move="D", service="T", flight="0", calco="2020-04-30",
+                hcalco="23:55", toque="2020-05-01", htoque="00:01")
+        b = row(move="D", service="Z", flight="0", calco="2020-04-30",
+                hcalco="23:58", toque="2020-05-01", htoque="00:01")
+        report = inspect_csv((HEADER + a + b).encode(), "2020-04")
+        self.assertEqual(report["colisoes_toque_com_data_reconhecida"], 1)
+        case = report["colisoes_perfil_anonimizado"][0]
+        self.assertTrue(case["codigo_voo_igual"])
+        self.assertEqual(case["numero_voo_qualidade"], "sem_numero_confiavel_ou_numero_zero")
+        self.assertEqual(case["tipos_de_servico"], ["T", "Z"])
+        self.assertEqual(case["perfil_temporal_anonimizado"]["faixa_separacao_entre_calcos"], "ate_5_min")
+        self.assertTrue(case["perfil_temporal_anonimizado"]["ambos_tem_sequencia_temporal_nao_negativa"])
+        self.assertTrue(report["nenhum_registro_excluido"])
+        serialized = json.dumps(report)
+        self.assertNotIn("PTABC", serialized)
+        self.assertNotIn("23:55", serialized)
+        self.assertNotIn("23:58", serialized)
+
+    def test_temporal_conflict_is_raised_as_investigation_not_deleted(self):
+        a = row(move="D", service="T", calco="2020-04-01",
+                hcalco="00:15", toque="2020-04-01", htoque="00:01")
+        b = row(move="D", service="Z", calco="2020-04-01",
+                hcalco="00:17", toque="2020-04-01", htoque="00:01")
+        report = inspect_csv((HEADER + a + b).encode(), "2020-04")
+        case = report["colisoes_perfil_anonimizado"][0]
+        self.assertFalse(case["perfil_temporal_anonimizado"]["ambos_tem_sequencia_temporal_nao_negativa"])
+        self.assertEqual(case["perfil_temporal_anonimizado"]["faixas_entre_calco_e_toque"],
+                         ["sequencia_temporal_negativa_a_investigar"] * 2)
+        self.assertTrue(report["nenhum_registro_excluido"])
 
     def test_invalid_date_is_not_silently_parsed(self):
         with self.assertRaisesRegex(ValueError, "nao reconhecida"):
