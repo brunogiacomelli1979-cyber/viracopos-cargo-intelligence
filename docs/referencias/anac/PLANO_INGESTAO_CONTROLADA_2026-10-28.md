@@ -94,5 +94,7 @@ python scripts/reprocessar_bruto_anac.py \
 python -m unittest discover -s tests -p test_reprocessar_bruto_anac.py -v
 ~~~
 
-**Limites:** a validação dessa etapa é local, não equivale à reconciliação com RMA nem substitui a auditoria de manifesto/gzip do arquivador oficial. A publicação versionada do pacote em data/anac/rima continua desabilitada. Ainda precisamos testar estes novos casos no CI, manter cópia persistente externa com backup e fechar a qualidade ANAC-04 antes de autorizar um novo mês.
+**Evidência de CI:** [GitHub Actions #40716967457](https://github.com/brunogiacomelli1979-cyber/viracopos-cargo-intelligence/actions/runs/40716967457) — **144 testes Python aprovados**, além de validações de dados, metodologia, JavaScript e geração do site. A execução ocorreu via PR, **sem deploy e sem coleta de dados**. Esta evidência é de código/testes, não comprova cobertura histórica ANAC nova.
+
+**Limites:** a validação dessa etapa é local/offline, não equivale à reconciliação com RMA nem substitui a auditoria de manifesto/gzip do arquivador oficial. A publicação versionada do pacote em data/anac/rima continua desabilitada. Precisamos manter cópia persistente externa com backup validado e fechar ANAC-04 antes de autorizar um novo mês.
 
