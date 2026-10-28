@@ -74,9 +74,12 @@ def profile_csv(data, month):
     mail = Counter()
     service = Counter()
     dates = {field: Counter() for field in DATE_FIELDS if field in header}
+    unknown_date_values = {field: Counter() for field in dates}
     seen_exact = set()
     repeated_exact = 0
-    keys = {name: {"vistos": set(), "cobertura": 0, "colisoes": 0}
+    keys = {name: {"vistos": set(), "vistos_datas_reconhecidas": set(),
+                   "cobertura": 0, "colisoes": 0,
+                   "cobertura_datas_reconhecidas": 0, "colisoes_datas_reconhecidas": 0}
             for name, fields in KEYS.items() if set(fields).issubset(header)}
     total = 0
     for row in reader:
@@ -119,8 +122,19 @@ def profile_csv(data, month):
                 metrics["colisoes"] += 1
             else:
                 metrics["vistos"].add(candidate)
+            date_column = "DT_CALCO" if name == "calco" else "DT_TOQUE"
+            date_status = _date_status(row[date_column], month)
+            if date_status in ("na_competencia", "fora_da_competencia"):
+                metrics["cobertura_datas_reconhecidas"] += 1
+                if candidate in metrics["vistos_datas_reconhecidas"]:
+                    metrics["colisoes_datas_reconhecidas"] += 1
+                else:
+                    metrics["vistos_datas_reconhecidas"].add(candidate)
         for field, counts in dates.items():
-            counts[_date_status(row[field], month)] += 1
+            state = _date_status(row[field], month)
+            counts[state] += 1
+            if state == "formato_nao_reconhecido":
+                unknown_date_values[field][row[field].strip()[:32]] += 1
     if not total:
         raise ValueError("Recorte sem movimentos SBKP")
     key_report = {}
@@ -129,6 +143,9 @@ def profile_csv(data, month):
             "linhas_com_chave_completa": metrics["cobertura"],
             "linhas_sem_chave_completa": total - metrics["cobertura"],
             "colisoes_adicionais": metrics["colisoes"],
+            "linhas_com_data_reconhecida": metrics["cobertura_datas_reconhecidas"],
+            "colisoes_com_data_reconhecida": metrics["colisoes_datas_reconhecidas"],
+            "pct_cobertura_data_reconhecida": round(100 * metrics["cobertura_datas_reconhecidas"] / total, 4),
             "pct_cobertura": round(100 * metrics["cobertura"] / total, 4),
             "pct_colisoes_sobre_chaves_completas": (
                 round(100 * metrics["colisoes"] / metrics["cobertura"], 4)
@@ -160,6 +177,10 @@ def profile_csv(data, month):
         "duplicatas_exatas_adicionais": repeated_exact,
         "chaves_operacionais_candidatas": key_report,
         "datas_operacionais": {k: dict(sorted(v.items())) for k, v in dates.items()},
+        "datas_nao_reconhecidas_valores_frequentes": {
+            field: [{"valor": value, "registros": count}
+                    for value, count in counter.most_common(5)]
+            for field, counter in unknown_date_values.items()},
         "alertas_investigacao": alerts,
         "apto_publicacao": False,
     }
