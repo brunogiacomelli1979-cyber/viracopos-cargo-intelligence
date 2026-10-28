@@ -6,6 +6,7 @@ on:
       - '.github/workflows/gerar-comparativo-rima-rma.yml'
       - 'scripts/gerar_comparativo_rima_rma.py'
       - 'tests/test_gerar_comparativo_rima_rma.py'
+      - 'data/anac/rima/manifesto.json'
   workflow_dispatch:
 permissions:
   contents: read
@@ -22,6 +23,21 @@ jobs:
         run: python -m unittest discover -s tests -p 'test_gerar_comparativo_rima_rma.py' -v
       - name: Gerar dados da comparacao usando arquivo ANAC local
         run: python scripts/gerar_comparativo_rima_rma.py --output reports/anac/comparativo-rima-rma.json
+      - name: Confirmar cobertura mensal sem imputar lacunas
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          data=json.loads(Path("reports/anac/comparativo-rima-rma.json").read_text())
+          assert data["versao"] == 2
+          assert [p["mes"] for p in data["perfil_voos"]] == ["2020-01","2020-02","2024-01"]
+          assert len(data["recortes"]) == 2
+          assert data["meses_com_duas_fontes"] == 1
+          assert all(row["rma_carga_t"] is None for row in data["serie_mensal"] if row["mes"]=="2020-01")
+          assert all(row["rima_carga_t"] is None for row in data["serie_mensal"] if row["mes"]=="2025-01")
+          assert not data["liberado_para_indicadores"]
+          print("Meses ANAC", data["meses_anac"], "pares", data["meses_com_duas_fontes"])
+          PY
       - uses: actions/upload-artifact@v4
         with:
           name: comparativo-anac-rma-preliminar
