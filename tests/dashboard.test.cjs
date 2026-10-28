@@ -68,4 +68,10 @@ test('RIMA/RMA preview retains provenance and can distinguish passenger flights 
     assert.ok(template.includes('id="'+id+'"'));
   }
 });
-\ntest('history chart respects true missing months and preview source labels',()=>{\n  const js=fs.readFileSync('assets/app-blue.js','utf8');\n  assert.ok(js.includes('options.fullHistory ? rows : subset(rows)'));\n  assert.ok(js.includes('profileMonth.value'));\n  assert.ok(js.includes('data.serie_mensal || []'));\n});\n
+
+test('history chart respects true missing months and preview source labels',()=>{
+  const js=fs.readFileSync('assets/app-blue.js','utf8');
+  assert.ok(js.includes('options.fullHistory ? rows : subset(rows)'));
+  assert.ok(js.includes('profileMonth.value'));
+  assert.ok(js.includes('data.serie_mensal || []'));
+});
