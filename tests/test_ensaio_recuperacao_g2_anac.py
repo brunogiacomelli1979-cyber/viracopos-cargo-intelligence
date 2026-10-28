@@ -115,6 +115,19 @@ class G2DrillTests(unittest.TestCase):
             self.run_drill()
         self.assertEqual(list(self.backups.iterdir()), [])
 
+    def test_incoming_partial_blocks_backup_before_snapshot(self):
+        incoming = self.primary / "incoming" / "transferencia.partial"
+        incoming.write_bytes(b"incomplete")
+        with self.assertRaisesRegex(ValueError, "aquisicao parcial"):
+            self.run_drill()
+        self.assertEqual(list(self.backups.iterdir()), [])
+
+    def test_unknown_primary_file_is_not_silently_ignored(self):
+        (self.primary / "unexpected.txt").write_text("untracked")
+        with self.assertRaisesRegex(ValueError, "entrada inesperada"):
+            self.run_drill()
+        self.assertEqual(list(self.backups.iterdir()), [])
+
     def test_source_with_second_revision_both_versions_survive(self):
         self.csv_path.write_bytes(DATA.replace(b"100;0", b"200;0"))
         second = register(self.csv_path, "2020-04", URL, self.primary)
