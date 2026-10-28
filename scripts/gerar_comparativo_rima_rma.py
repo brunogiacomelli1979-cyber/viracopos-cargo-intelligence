@@ -219,6 +219,7 @@ def main():
     result = generate(args.root)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(result,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+    print("COMPARATIVO_JSON=" + json.dumps(result, ensure_ascii=False, separators=(",",":")))
     print(json.dumps({"resumo":"Gerado comparativo exploratório sem download",
                       "recortes":result["recortes"],
                       "perfil_voos":result["perfil_voos"]},ensure_ascii=False))
