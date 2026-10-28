@@ -1,0 +1,21 @@
+# Ponto de entrada do workflow_dispatch no branch padrão.
+# A coleta real NÃO é executada na main. A implementação restrita só existe
+# na branch feature/anac-rima-staging-20261028 e exige dupla autorização.
+name: Arquivar ANAC RIMA SBKP — piloto restrito 2020-03
+on:
+  workflow_dispatch:
+    inputs:
+      confirmar_competencia:
+        description: "Somente competência 2020-03; selecionar a branch de homologação"
+        type: choice
+        options: ['2020-03']
+        default: '2020-03'
+permissions:
+  contents: read
+jobs:
+  bloqueado-na-main:
+    if: ${{ false }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Operação desativada na branch principal
+        run: echo "A coleta é permitida exclusivamente na branch de homologação."
