@@ -39,3 +39,13 @@ O arquivo do relatório apresenta 71 meses com as extensões CSV e JSON e **2022
 **Status ANAC-11:** **parcialmente comprovada, aberta para 2026 e data de publicação**. A auditoria registrou positivamente os meses de 2020–2025 sem acelerar a coleta indevidamente.
 
 [Política de recorte](../../RECORTE_TEMPORAL_2020.md) · [Tratativas dos workflows](TRATATIVAS_WORKFLOWS_2026-10-28.md)
+
+## Sondagem de outubro de 2026 — confirmação por endereço individual
+
+Em [GitHub Actions #40687999846](https://github.com/brunogiacomelli1979-cyber/viracopos-cargo-intelligence/actions/runs/40687999846), o portal oficial ANAC respondeu **HTTP 200 na pasta-base** e **HTTP 206 no arquivo de controle de dezembro/2025**. O controle contém a linha informativa `Atualizado em: 2026-10-01`; **essa data não deve ser interpretada como primeira publicação do arquivo**.
+
+O diretório `/2026/` respondeu **HTTP 404**. As oito tentativas de acesso aos nomes convencionais CSV e JSON de **janeiro, fevereiro, março e abril de 2026** retornaram **HTTP 404**. A inspeção leu apenas 256 bytes do controle e não baixou arquivos nacionais. Portanto, a indisponibilidade é do **caminho consultado**, não prova de inexistência dos dados em outro endpoint oficial.
+
+**Tratativa encaminhada:** solicitação técnica preparada à GEIC/ANAC, `geic@anac.gov.br`, para confirmação do calendário, local de publicação de 2026 e histórico de revisões. O e-mail foi **salvo como rascunho para revisão e envio humano**, não enviado automaticamente.
+
+**ANAC-11 permanece aberta:** exige resposta oficial ou identificação e verificação de URL legítima, mais política de latência e atualização. Não inventar arquivos 2026, não utilizar dados RMA como se fossem RIMA, não liberar cron.
