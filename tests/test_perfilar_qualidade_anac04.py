@@ -50,6 +50,14 @@ class DataQualityProfileTests(unittest.TestCase):
         self.assertEqual(touch["colisoes_com_data_reconhecida"], 0)
         self.assertEqual(result["datas_nao_reconhecidas_valores_frequentes"]["DT_TOQUE"][0]["valor"], "SEM_DATA_TOQUE")
 
+    def test_literal_null_is_absent_not_invalid_or_valid_key(self):
+        row = ROW1.replace(";2020-04-10;11:55", ";null;11:55")
+        item = profile_csv((HEADER + row).encode(), "2020-04")
+        self.assertEqual(item["datas_operacionais"]["DT_TOQUE"]["nao_informada"], 1)
+        self.assertNotIn("formato_nao_reconhecido", item["datas_operacionais"]["DT_TOQUE"])
+        self.assertEqual(item["datas_marcadores_de_ausencia"]["DT_TOQUE"], {"null": 1})
+        self.assertEqual(item["chaves_operacionais_candidatas"]["toque"]["linhas_com_data_reconhecida"], 0)
+
     def test_out_of_month_date_is_flagged_not_deleted(self):
         item = profile_csv((HEADER + ROW1 + ROW3).encode(), "2020-04")
         self.assertEqual(item["datas_operacionais"]["DT_CALCO"]["fora_da_competencia"], 1)
@@ -105,6 +113,7 @@ class DataQualityProfileTests(unittest.TestCase):
                     "servicos": item["service_type"],
                     "datas_calco": item["datas_operacionais"].get("DT_CALCO", {}),
                     "datas_toque": item["datas_operacionais"].get("DT_TOQUE", {}),
+                    "marcadores_toque": item["datas_marcadores_de_ausencia"].get("DT_TOQUE", {}),
                 } for month, item in result["perfis"].items()
             }
         }, ensure_ascii=False, sort_keys=True))
