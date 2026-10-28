@@ -24,41 +24,6 @@ jobs:
         run: python -m unittest discover -s tests -p 'test_auditar_anac_rima.py' -v
       - name: Auditar integridade e perfil dos 3 meses arquivados
         run: python scripts/auditar_anac_rima.py --output reports/anac/auditoria-acervo.json
-      - name: Investigar diretório 2019 sem baixar dados
-        shell: bash
-        run: |
-          python - <<'PY'
-          import json,ssl
-          from html.parser import HTMLParser
-          from urllib.error import HTTPError,URLError
-          from urllib.request import Request,urlopen
-          from scripts.arquivar_anac_rima import BASE_URL,official_url
-          class Links(HTMLParser):
-              def __init__(self): super().__init__();self.links=[]
-              def handle_starttag(self,tag,attrs):
-                  if tag=="a":
-                      url=dict(attrs).get("href","")
-                      if url:self.links.append(url)
-          for label,url in [
-              ("raiz",BASE_URL),("ano_2019",BASE_URL+"2019/"),
-              ("jan_2019",official_url("2019-01")),
-              ("dez_2019",official_url("2019-12")),
-              ("controle_2020",official_url("2020-01"))]:
-              request=Request(url,headers={"User-Agent":"VCP-Insights-Audit/1.0","Range":"bytes=0-4095"})
-              try:
-                  with urlopen(request,timeout=25,context=ssl.create_default_context()) as f:
-                      snippet=f.read(4096)
-                      parser=Links()
-                      parser.feed(snippet.decode("utf-8",errors="replace"))
-                      print(json.dumps({"consulta":label,"http":f.status,
-                          "url":f.geturl(),"links_amostra":parser.links[:30],
-                          "amostra_inicio":snippet[:100].decode("utf-8",errors="replace")},
-                          ensure_ascii=False),flush=True)
-              except HTTPError as exc:
-                  print(json.dumps({"consulta":label,"http":exc.code,"conclusao":"sem_confirmacao_de_arquivo"},ensure_ascii=False),flush=True)
-              except (URLError,OSError,TimeoutError) as exc:
-                  print(json.dumps({"consulta":label,"erro_rede":str(exc)[:150]},ensure_ascii=False),flush=True)
-          PY
       - name: Publicar relatório técnico temporário
         if: always()
         uses: actions/upload-artifact@v4

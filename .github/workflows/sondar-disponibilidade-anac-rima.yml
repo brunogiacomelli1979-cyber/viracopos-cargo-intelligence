@@ -25,7 +25,7 @@ jobs:
           from scripts.arquivar_anac_rima import official_url
 
           results=[]
-          for year in range(2019,2025):
+          for year in range(2020,2025):
               month=f"{year}-01"
               url=official_url(month)
               status=None

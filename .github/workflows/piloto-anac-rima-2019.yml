@@ -1,70 +1,13 @@
-name: Piloto ANAC RIMA 2020 (execucao manual)
+# WORKFLOW LEGADO DESATIVADO. Consultar Issue #8 (ANAC-02/07).
+# Preservado para rastreabilidade, SEM executar download ou escrita.
+name: piloto anac rima 2019 [INATIVO]
 on:
   workflow_dispatch:
-
 permissions:
-  contents: write
-
-concurrency:
-  group: piloto-anac-rima-2019
-  cancel-in-progress: false
-
+  contents: read
 jobs:
-  piloto:
+  desativado:
+    if: false
     runs-on: ubuntu-latest
-    timeout-minutes: 12
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - name: Validar codigo arquivador
-        run: python -m unittest discover -s tests -p 'test_arquivar_anac_rima.py' -v
-      - name: Confirmar arquivo consolidado 2024-01
-        shell: bash
-        run: |
-          python - <<'PY'
-          import hashlib,json
-          from pathlib import Path
-          root=Path('data/anac/rima')
-          item=json.loads((root/'manifesto.json').read_text())['competencias']['2024-01']
-          file=root/'sbkp/2024/2024-01.csv.gz'
-          assert file.is_file()
-          assert hashlib.sha256(file.read_bytes()).hexdigest()==item['sha256_sbkp_gzip']
-          assert item['linhas_sbkp']==9348
-          print('Base 2024-01 anterior preservada e conferida.')
-          PY
-      - name: Obter janeiro e fevereiro de 2020
-        run: |
-          python scripts/arquivar_anac_rima.py --mode inicial --start 2020-01 --end 2020-02 --limit 2 --out-dir data/anac/rima
-      - name: Validar integridade dos meses sem alterar 2024
-        shell: bash
-        run: |
-          python - <<'PY'
-          import csv,gzip,hashlib,io,json
-          from pathlib import Path
-          root=Path('data/anac/rima')
-          manifest=json.loads((root/'manifesto.json').read_text(encoding='utf-8'))
-          for month in ('2020-01','2020-02','2024-01'):
-              item=manifest['competencias'][month]
-              file=Path(item['caminho_sbkp'])
-              data=file.read_bytes()
-              assert hashlib.sha256(data).hexdigest()==item['sha256_sbkp_gzip'], month
-              content=gzip.decompress(data).decode('utf-8')
-              rows=list(csv.DictReader(io.StringIO(content), delimiter=';'))
-              assert len(rows)==item['linhas_sbkp'] and len(rows)>0, month
-              assert all(r['NR_AEROPORTO_REFERENCIA']=='SBKP' for r in rows), month
-              assert all(f"{int(r['ANO']):04d}-{int(r['MES']):02d}"==month for r in rows), month
-              print(month, len(rows), 'linhas; SHA256 validado')
-          PY
-      - name: Versionar somente os novos arquivos historicos
-        shell: bash
-        run: |
-          set -euo pipefail
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add data/anac/rima/manifesto.json data/anac/rima/sbkp/2020/
-          if ! git diff --cached --quiet; then
-            git commit -m 'data: adicionar RIMA ANAC SBKP jan-fev 2020 validados'
-            git push origin HEAD:feature/anac-rima-staging-20261028
-          fi
+      - run: echo "Workflow antigo intencionalmente desativado - consultar Issue #8"

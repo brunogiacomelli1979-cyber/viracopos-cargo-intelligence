@@ -1,52 +1,13 @@
-name: Diagnosticar formatos ANAC RIMA 2019
+# WORKFLOW LEGADO DESATIVADO. Consultar Issue #8 (ANAC-02/07).
+# Preservado para rastreabilidade, SEM executar download ou escrita.
+name: inspecionar anac 2019 [INATIVO]
 on:
-  push:
-    branches: [feature/anac-rima-staging-20261028]
-    paths: ['.github/workflows/inspecionar-anac-2019.yml']
   workflow_dispatch:
 permissions:
   contents: read
 jobs:
-  arquivos:
+  desativado:
+    if: false
     runs-on: ubuntu-latest
-    timeout-minutes: 8
     steps:
-      - uses: actions/checkout@v4
-      - name: Investigar amostra limitada de JSON e CSV
-        run: |
-          python - <<'PY'
-          import json,re,ssl
-          from html.parser import HTMLParser
-          from urllib.error import HTTPError,URLError
-          from urllib.request import Request,urlopen
-          from scripts.arquivar_anac_rima import BASE_URL
-          class Links(HTMLParser):
-              def __init__(self):super().__init__();self.names=[]
-              def handle_starttag(self,tag,attrs):
-                  if tag=="a":
-                      name=dict(attrs).get("href","")
-                      if name:self.names.append(name)
-          def probe(label,url,kind):
-              req=Request(url,headers={"Range":"bytes=0-4095","User-Agent":"VCP-Insights-formats-audit/1.0"})
-              try:
-                  with urlopen(req,timeout=25,context=ssl.create_default_context()) as f:
-                      chunk=f.read(4096)
-                      out={"alvo":label,"http":f.status,"content_type":f.headers.get("Content-Type"),
-                           "content_range":f.headers.get("Content-Range"),"url_final":f.geturl(),
-                           "bytes_amostra":len(chunk)}
-                      if kind=="html":
-                          p=Links();p.feed(chunk.decode("utf-8",errors="replace"))
-                          out["nomes"]=p.names[:60]
-                      else:
-                          out["inicio"]=chunk[:420].decode("utf-8",errors="replace")
-                      print(json.dumps(out,ensure_ascii=False),flush=True)
-              except HTTPError as e:
-                  print(json.dumps({"alvo":label,"http":e.code},ensure_ascii=False),flush=True)
-              except (OSError,URLError) as e:
-                  print(json.dumps({"alvo":label,"erro_rede":str(e)[:160]},ensure_ascii=False),flush=True)
-          probe("listagem_2019",BASE_URL+"2019/","html")
-          probe("jan_2019_json",BASE_URL+"2019/Movimentacoes_Aeroportuarias_201901.json","data")
-          probe("fev_2019_json",BASE_URL+"2019/Movimentacoes_Aeroportuarias_201902.json","data")
-          probe("mar_2019_csv",BASE_URL+"2019/Movimentacoes_Aeroportuarias_201903.csv","data")
-          probe("dez_2019_csv_dup",BASE_URL+"2019/Movimentacoes_Aeroportuarias_201912.csv.csv","data")
-          PY
+      - run: echo "Workflow antigo intencionalmente desativado - consultar Issue #8"
