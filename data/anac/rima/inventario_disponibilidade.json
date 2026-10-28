@@ -1,0 +1,16 @@
+{
+  "schema": "anac-rima-inventario-v1",
+  "origem": "Listagem oficial ANAC/RIMA dos diretorios anuais; nao representa download ou validacao integral dos arquivos",
+  "evidencia": "https://github.com/brunogiacomelli1979-cyber/viracopos-cargo-intelligence/actions/runs/40687137171",
+  "consulta_em": "2026-10-28",
+  "anos": {
+    "2020": {"meses_csv": [1,2,3,4,5,6,7,8,9,10,11,12]},
+    "2021": {"meses_csv": [1,2,3,4,5,6,7,8,9,10,11,12]},
+    "2022": {"meses_csv": [1,2,3,4,5,6,7,8,9,10,11,12], "observacao": "Julho constava apenas como CSV; nao presumir JSON"},
+    "2023": {"meses_csv": [1,2,3,4,5,6,7,8,9,10,11,12]},
+    "2024": {"meses_csv": [1,2,3,4,5,6,7,8,9,10,11,12]},
+    "2025": {"meses_csv": [1,2,3,4,5,6,7,8,9,10,11,12]}
+  },
+  "indices_indisponiveis": ["2026"],
+  "observacoes": ["2026: indice anual e URLs convencionais examinados retornaram HTTP 404; outros endpoints nao foram descartados", "Arquivos listados podem estar corrompidos, inacessiveis ou revisados; cada mes deve passar por captura e auditoria independentes"]
+}
