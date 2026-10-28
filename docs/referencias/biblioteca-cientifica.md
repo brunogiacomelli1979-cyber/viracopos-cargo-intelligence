@@ -62,7 +62,7 @@
 - **Aplicação:** benchmarks ingênuo e ingênuo sazonal; decomposição; regressões e modelos de séries temporais; validação temporal com origem móvel; separação entre previsões *ex ante* e *ex post*.
 - **Regra para VCP:** nunca usar dados futuros na construção do preditor; comparar alternativas com testes fora da amostra e horizontes explícitos.
 - **Status:** conteúdo metodológico online consultado; não implementado nem testado no projeto.
-- **Fontes:** https://otexts.com/fpp3/ · https://otexts.robjhyndman.com/fpp3/tscv.html · https://otexts.com/fpp3/regression.html
+- **Fontes:** https://otexts.com/fpp3/ · https://otexts.com/fpp3/toolbox.html#time-series-cross-validation · https://otexts.com/fpp3/regression.html
 
 ### REF-006 — OCDE: Composite Leading Indicators (CLI)
 
