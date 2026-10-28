@@ -1,4 +1,4 @@
-name: Piloto historico ANAC RIMA 2019 SBKP
+name: Piloto historico ANAC RIMA 2020 SBKP
 on:
   push:
     branches: [feature/anac-rima-staging-20261028]
@@ -38,7 +38,7 @@ jobs:
           PY
       - name: Obter janeiro e fevereiro de 2019
         run: |
-          python scripts/arquivar_anac_rima.py --mode inicial --start 2019-01 --end 2019-02 --limit 2 --out-dir data/anac/rima
+          python scripts/arquivar_anac_rima.py --mode inicial --start 2020-01 --end 2020-02 --limit 2 --out-dir data/anac/rima
       - name: Validar integridade dos meses sem alterar 2024
         shell: bash
         run: |
@@ -47,7 +47,7 @@ jobs:
           from pathlib import Path
           root=Path('data/anac/rima')
           manifest=json.loads((root/'manifesto.json').read_text(encoding='utf-8'))
-          for month in ('2019-01','2019-02','2024-01'):
+          for month in ('2020-01','2020-02','2024-01'):
               item=manifest['competencias'][month]
               file=Path(item['caminho_sbkp'])
               data=file.read_bytes()
@@ -65,8 +65,8 @@ jobs:
           set -euo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add data/anac/rima/manifesto.json data/anac/rima/sbkp/2019/
+          git add data/anac/rima/manifesto.json data/anac/rima/sbkp/2020/
           if ! git diff --cached --quiet; then
-            git commit -m 'data: adicionar RIMA ANAC SBKP jan-fev 2019 validados'
+            git commit -m 'data: adicionar RIMA ANAC SBKP jan-fev 2020 validados'
             git push origin HEAD:feature/anac-rima-staging-20261028
           fi
