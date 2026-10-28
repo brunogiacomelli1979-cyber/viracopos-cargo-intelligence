@@ -77,6 +77,30 @@
       "rma_url_pdf": null
     },
     {
+      "mes": "2020-03",
+      "natureza": "domestica",
+      "rima_carga_t": 2831.205,
+      "rma_carga_t": null,
+      "rima_movimentos": 5953,
+      "rma_movimentos": null,
+      "qualidade_rima": "conferido_sha256",
+      "qualidade_rma": "nao_disponivel",
+      "rima_sha256": "658c8fd91950238e02d6e698ec5a58e97b288f5963740cc41076f3ff2ccccd22",
+      "rma_url_pdf": null
+    },
+    {
+      "mes": "2020-03",
+      "natureza": "internacional",
+      "rima_carga_t": 12877.354,
+      "rma_carga_t": null,
+      "rima_movimentos": 928,
+      "rma_movimentos": null,
+      "qualidade_rima": "conferido_sha256",
+      "qualidade_rma": "nao_disponivel",
+      "rima_sha256": "658c8fd91950238e02d6e698ec5a58e97b288f5963740cc41076f3ff2ccccd22",
+      "rma_url_pdf": null
+    },
+    {
       "mes": "2024-01",
       "natureza": "domestica",
       "rima_carga_t": 5908.499,
@@ -689,6 +713,62 @@
       "sha256_sbkp_gzip": "6d32d980e02cd3c868be8f2a8184b0bdff5a8d1bb7ae16f659417f151c3832cb"
     },
     {
+      "mes": "2020-03",
+      "movimentos": 6881,
+      "por_natureza": {
+        "domestica": {
+          "com_carga": 3071,
+          "com_carga__com_passageiros": 2966,
+          "com_carga__sem_passageiros_registrados": 105,
+          "com_passageiros": 5577,
+          "movimentos": 5953,
+          "sem_carga": 2882,
+          "sem_carga__com_passageiros": 2611,
+          "sem_carga__sem_passageiros_registrados": 271,
+          "sem_passageiros_registrados": 376,
+          "service_type:C": 14,
+          "service_type:D": 79,
+          "service_type:F": 86,
+          "service_type:G": 86,
+          "service_type:H": 48,
+          "service_type:J": 5457,
+          "service_type:K": 4,
+          "service_type:N": 18,
+          "service_type:P": 74,
+          "service_type:T": 9,
+          "service_type:W": 10,
+          "service_type:Y": 7,
+          "service_type:Z": 61
+        },
+        "internacional": {
+          "com_carga": 534,
+          "com_carga__com_passageiros": 192,
+          "com_carga__sem_passageiros_registrados": 342,
+          "com_passageiros": 313,
+          "movimentos": 928,
+          "sem_carga": 394,
+          "sem_carga__com_passageiros": 121,
+          "sem_carga__sem_passageiros_registrados": 273,
+          "sem_passageiros_registrados": 615,
+          "service_type:C": 2,
+          "service_type:D": 22,
+          "service_type:F": 565,
+          "service_type:G": 12,
+          "service_type:H": 18,
+          "service_type:J": 291,
+          "service_type:L": 1,
+          "service_type:N": 2,
+          "service_type:P": 2,
+          "service_type:X": 4,
+          "service_type:Y": 4,
+          "service_type:Z": 5
+        }
+      },
+      "criterio": "com_carga é QT_CARGA > 0, não implica importação/exportação. Passageiros baseados em QT_PAX_* disponíveis. Um voo de passageiros pode transportar carga.",
+      "nao_e_fluxo_aduaneiro": true,
+      "sha256_sbkp_gzip": "658c8fd91950238e02d6e698ec5a58e97b288f5963740cc41076f3ff2ccccd22"
+    },
+    {
       "mes": "2024-01",
       "movimentos": 9348,
       "por_natureza": {
@@ -744,7 +824,7 @@
       "sha256_sbkp_gzip": "be370a36e8857d37a88cbc483683337fde5c403342339ad37cd57cc6de1549de"
     }
   ],
-  "meses_anac": 3,
+  "meses_anac": 4,
   "meses_com_duas_fontes": 1,
   "atencao": "Fontes distintas e dados esparsos; RMA 2024 em transcrição preliminar sem PDF integral verificado.",
   "cobertura": "Só meses efetivamente observados, nenhum preenchimento ou extrapolação.",

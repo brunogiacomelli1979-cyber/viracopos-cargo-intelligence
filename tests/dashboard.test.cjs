@@ -51,8 +51,15 @@ test('RIMA/RMA preview retains provenance and can distinguish passenger flights 
   const comparison=JSON.parse(fs.readFileSync('data/comparativo_rima_rma.json','utf8'));
   assert.equal(comparison.status,'preliminar_com_divergencias');
   assert.equal(comparison.versao,2);
-  assert.deepEqual(comparison.perfil_voos.map(item=>item.mes),['2020-01','2020-02','2024-01']);
-  assert.equal(comparison.serie_mensal.length,46);
+  const manifest=JSON.parse(fs.readFileSync('data/anac/rima/manifesto.json','utf8'));
+  const expected=Object.keys(manifest.competencias).sort();
+  assert.deepEqual(comparison.perfil_voos.map(item=>item.mes),expected);
+  assert.equal(comparison.meses_anac,expected.length);
+  const monthSet=new Set(comparison.serie_mensal.map(row=>row.mes));
+  assert.equal(comparison.serie_mensal.length,monthSet.size*2);
+  for(const month of monthSet){
+    assert.deepEqual(comparison.serie_mensal.filter(row=>row.mes===month).map(row=>row.natureza).sort(),['domestica','internacional']);
+  }
   assert.equal(comparison.meses_com_duas_fontes,1);
   const sparse2020=comparison.serie_mensal.find(r=>r.mes==='2020-01'&&r.natureza==='internacional');
   assert.equal(sparse2020.rma_carga_t,null);
