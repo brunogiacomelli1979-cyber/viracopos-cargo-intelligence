@@ -82,7 +82,40 @@ def load_preliminary(path):
         raise ValueError("Status da referência preliminar inesperado")
     for field in RMA_FIELDS:
         _weight(obj.get(field), field)
+    counts = ("movimentos_domesticos", "movimentos_internacionais")
+    if any(key in obj for key in counts):
+        if not all(key in obj for key in counts):
+            raise ValueError("Contagens RMA precisam ser fornecidas juntas")
+        for key in counts:
+            _movement_count(obj[key], key)
     return obj
+
+
+def _movement_count(value, source):
+    if isinstance(value, bool) or not re.fullmatch(r"\d+", str(value)):
+        raise ValueError(f"Contagem de movimentos {source} inválida")
+    return int(value)
+
+
+def _anac_movements(groups, nature):
+    total = 0
+    for movement in ("pouso", "decolagem"):
+        group = groups.get(f"{nature}/{movement}")
+        if group is None or not isinstance(group.get("registros"), int) or group["registros"] < 0:
+            return None
+        total += group["registros"]
+    return total
+
+
+def _compare_movements(anac_count, rma_count):
+    if anac_count is None:
+        return {"comparavel": False, "motivo": "contagem ANAC ausente"}
+    if rma_count is None:
+        return {"comparavel": False, "motivo": "contagem RMA não informada"}
+    rma = _movement_count(rma_count, "RMA")
+    return {"comparavel": True, "anac": anac_count, "rma": rma,
+            "diferenca": anac_count-rma,
+            "alerta": "contagens_divergentes" if anac_count != rma else "contagens_iguais_nao_comprovam_conciliacao"}
 
 
 def _anac_tonnes(groups, nature):
@@ -144,7 +177,7 @@ def reconcile(rima_report, rma_current, preliminary=None):
         "alertas": [],
         "liberado_dashboard": False,
         "liberado_modelagem": False,
-        "criterio": "Mesmo mês e unidade convertida; números não implicam mesmo universo estatístico."
+        "criterio": "Mesmo aeroporto e competência; RMA/RIMA do operador têm obrigação regulatória comum, mas versões e critérios de contabilização exigem conciliação documental."
     }
     for month in overlapping:
         groups = rima[month]["grupos"]
@@ -153,9 +186,13 @@ def reconcile(rima_report, rma_current, preliminary=None):
         result = {
             "rma_fonte": src["fonte"],
             "referencia_pdf_verificada": not provisional,
-            "natureza_distinta": "ANAC: soma embarcada/desembarcada em aeronaves; RMA: movimentação operacional da concessionária; população potencialmente distinta",
+            "relacao_regulatoria": "RMA e RIMA são apresentados pelo operador à ANAC sob a Resolução 464/2018; classificação, datas, publicação e revisões devem ser reconciliadas",
             "comparacao_domestica": _compare(_anac_tonnes(groups, "domestica"), src["carga_domestica_t"]),
             "comparacao_internacional": _compare(_anac_tonnes(groups, "internacional"), src["carga_internacional_t"]),
+            "movimentos_domesticos": _compare_movements(
+                _anac_movements(groups, "domestica"), src.get("movimentos_domesticos")),
+            "movimentos_internacionais": _compare_movements(
+                _anac_movements(groups, "internacional"), src.get("movimentos_internacionais")),
             "courier_rma_t_nao_comparado_ao_correio_anac": src["courier_internacional_t"],
             "status": ("preliminar_nao_publicavel" if provisional else "diferencas_a_reconciliar_metodologicamente"),
         }
@@ -163,6 +200,12 @@ def reconcile(rima_report, rma_current, preliminary=None):
             if result[f"comparacao_{nature}"].get("alerta", "").startswith("discrepancia"):
                 summary["alertas"].append({"mes": month, "natureza": nature,
                                            "tipo": "divergencia_fisica_conceitual_a_investigar"})
+        for nature in ("domesticos", "internacionais"):
+            if result[f"movimentos_{nature}"].get("alerta") == "contagens_divergentes":
+                summary["alertas"].append({
+                    "mes": month, "natureza": nature,
+                    "tipo": "movimentos_RIMA_RMA_divergentes_revisao_a_investigar"
+                })
         summary["comparacoes"][month] = result
     summary["situacao"] = (
         "sem_mes_coincidente" if not overlapping

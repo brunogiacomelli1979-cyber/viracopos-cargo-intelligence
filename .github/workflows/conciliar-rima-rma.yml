@@ -40,6 +40,8 @@ jobs:
           assert pre["comparacoes"]["2024-01"]["referencia_pdf_verificada"] is False
           assert not curr["liberado_dashboard"] and not pre["liberado_dashboard"]
           assert pre["comparacoes"]["2024-01"]["comparacao_internacional"]["diferenca_t"] == "2053.919"
+          assert pre["comparacoes"]["2024-01"]["movimentos_domesticos"]["diferenca"] == 69
+          assert pre["comparacoes"]["2024-01"]["movimentos_internacionais"]["diferenca"] == 12
           print("Comparacao apenas exploratoria, com divergencia registrada e publicacao bloqueada.")
           PY
       - uses: actions/upload-artifact@v4

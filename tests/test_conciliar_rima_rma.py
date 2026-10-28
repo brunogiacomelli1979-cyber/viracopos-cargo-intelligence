@@ -46,6 +46,42 @@ class ReconcilerTests(unittest.TestCase):
                        "tipo": "divergencia_fisica_conceitual_a_investigar"}, obj["alertas"])
         self.assertEqual(obj["comparacoes"]["2024-01"]["courier_rma_t_nao_comparado_ao_correio_anac"], "604")
 
+    def test_movement_counts_are_reconciled_separately(self):
+        groups = {
+            **GROUPS,
+            "domestica/pouso": {**GROUPS["domestica/pouso"], "registros": 4193},
+            "domestica/decolagem": {**GROUPS["domestica/decolagem"], "registros": 4214},
+            "internacional/pouso": {**GROUPS["internacional/pouso"], "registros": 472},
+            "internacional/decolagem": {**GROUPS["internacional/decolagem"], "registros": 469},
+        }
+        anac = {"resultado": "aprovado_tecnicamente", "erros": [],
+                "comparacoes": {"2024-01": {"grupos": groups}}}
+        prelim = {"mes": "2024-01", "carga_domestica_t": "5908",
+                  "carga_internacional_t": "13962",
+                  "courier_internacional_t": "604",
+                  "movimentos_domesticos": 8338, "movimentos_internacionais": 929,
+                  "status": "transcricao_preliminar_nao_certificada"}
+        out = reconcile(anac, {}, prelim)
+        row = out["comparacoes"]["2024-01"]
+        self.assertEqual(row["movimentos_domesticos"]["diferenca"], 69)
+        self.assertEqual(row["movimentos_internacionais"]["diferenca"], 12)
+        self.assertEqual(row["comparacao_internacional"]["diferenca_t"], "2053.919")
+        self.assertEqual(len([x for x in out["alertas"] if x["tipo"] == "movimentos_RIMA_RMA_divergentes_revisao_a_investigar"]), 2)
+        self.assertFalse(out["liberado_dashboard"])
+
+    def test_reject_invalid_preliminary_movement_counts(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "prelim.json"
+            payload = {"mes": "2024-01", "url_pdf": "https://www.viracopos.com/data/files/rma.pdf",
+                       "carga_domestica_t": "5908", "carga_internacional_t": "13962",
+                       "courier_internacional_t": "604",
+                       "status": "transcricao_preliminar_nao_certificada",
+                       "verificacao_pdf_completa": False, "sha256_pdf": None,
+                       "movimentos_domesticos": -1, "movimentos_internacionais": 929}
+            path.write_text(json.dumps(payload), encoding="utf-8")
+            with self.assertRaisesRegex(ValueError,"Contagem"):
+                load_preliminary(path)
+
     def test_incomplete_anac_is_not_treated_as_zero(self):
         groups = {**GROUPS, "internacional/pouso": {"status": "incompleto", "carga_kg": None}}
         self.assertIsNone(_anac_tonnes(groups, "internacional"))
