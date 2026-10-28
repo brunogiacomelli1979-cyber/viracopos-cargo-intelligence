@@ -17,6 +17,24 @@ class ServiceProfileTests(unittest.TestCase):
         self.assertEqual(r["registros"],3)
         self.assertFalse(r["publicavel"])
 
+    def test_date_audit_with_out_of_month_calco(self):
+        header = HEADER.strip() + ";DT_CALCO\n"
+        data = (header +
+                "2024;01;SBKP;P;I;F;1000;2024-01-03\n" +
+                "2024;01;SBKP;D;I;F;2000;2024-02-01\n" +
+                "2024;01;SBKP;P;D;J;500;31/01/2024\n").encode()
+        r = profile_csv(data, "2024-01")
+        self.assertEqual(r["auditoria_calco"]["ocorrencias"]["na_competencia"], 2)
+        self.assertEqual(r["auditoria_calco"]["ocorrencias"]["fora_da_competencia"], 1)
+        self.assertEqual(r["total_internacional_kg"], "3000")
+        self.assertFalse(r["publicavel"])
+
+    def test_unknown_date_not_silently_assumed_valid(self):
+        header = HEADER.strip() + ";DT_CALCO\n"
+        data = (header + "2024;01;SBKP;P;I;F;1000;SEM_DATA\n").encode()
+        r = profile_csv(data, "2024-01")
+        self.assertEqual(r["auditoria_calco"]["ocorrencias"]["formato_desconhecido"], 1)
+
     def test_missing_cargo_is_rejected(self):
         data=(HEADER+"2024;01;SBKP;P;I;F;\n").encode()
         with self.assertRaisesRegex(ValueError,"ausente"):

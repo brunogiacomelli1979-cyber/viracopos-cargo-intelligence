@@ -10,12 +10,28 @@ import io
 import json
 from collections import defaultdict
 from decimal import Decimal
+from datetime import datetime
+from collections import Counter
 from pathlib import Path
 
 from conciliar_rima_rma import _weight
 from validar_agrupamento_rima import validate
 
 ROOT = Path(__file__).resolve().parents[1]
+
+
+def _date_month(value):
+    """Lê formatos conhecidos; não interpreta formatos desconhecidos."""
+    raw = (value or "").strip()
+    if not raw:
+        return None
+    for fmt in ("%Y-%m-%d", "%d/%m/%Y", "%Y/%m/%d",
+                "%Y-%m-%d %H:%M:%S", "%d/%m/%Y %H:%M:%S"):
+        try:
+            return datetime.strptime(raw, fmt).strftime("%Y-%m")
+        except ValueError:
+            pass
+    return "formato_desconhecido"
 
 
 def profile_csv(data, month):
@@ -27,6 +43,10 @@ def profile_csv(data, month):
         raise ValueError("Esquema insuficiente para perfil de serviço")
     groups = defaultdict(lambda: {"registros": 0, "carga_kg": Decimal(0), "carga_zero": 0})
     directions = defaultdict(lambda: {"registros": 0, "carga_kg": Decimal(0)})
+    date_counts = Counter()
+    by_nature = defaultdict(Counter)
+    date_samples = {}
+    has_calco = "DT_CALCO" in (reader.fieldnames or [])
     for row in reader:
         if None in row or any(v is None for v in row.values()):
             raise ValueError("CSV com coluna ausente")
@@ -44,6 +64,19 @@ def profile_csv(data, month):
         agg = directions[(row["NR_NATUREZA"], row["NR_MOVIMENTO_TIPO"])]
         agg["registros"] += 1
         agg["carga_kg"] += cargo
+        if has_calco:
+            raw_calco = row["DT_CALCO"].strip()
+            calco_month = _date_month(raw_calco)
+            label = ("data_ausente" if calco_month is None
+                     else "formato_desconhecido" if calco_month == "formato_desconhecido"
+                     else "na_competencia" if calco_month == month
+                     else "fora_da_competencia")
+            date_counts[label] += 1
+            by_nature[row["NR_NATUREZA"]][label] += 1
+            if label in ("formato_desconhecido", "fora_da_competencia"):
+                key_name = f"{row['NR_NATUREZA']}/{row['NR_MOVIMENTO_TIPO']}/{label}"
+                if len(date_samples.setdefault(key_name, [])) < 3:
+                    date_samples[key_name].append(raw_calco[:60])
     totals = {nat: sum((v["carga_kg"] for (n, m), v in directions.items() if n == nat),
                        Decimal(0)) for nat in ("D", "I")}
     entries = []
@@ -66,6 +99,14 @@ def profile_csv(data, month):
         "total_domestica_kg": format(totals["D"], "f"),
         "total_internacional_kg": format(totals["I"], "f"),
         "grupos_por_servico": entries,
+        "auditoria_calco": {
+            "campo_disponivel": has_calco,
+            "ocorrencias": dict(date_counts),
+            "por_natureza": {"domestica": dict(by_nature["D"]),
+                             "internacional": dict(by_nature["I"])},
+            "amostras_sem_identificadores": date_samples,
+            "criterio": "DT_CALCO = calço (pouso) ou descalço (decolagem). Datas fora do mês não são excluídas automaticamente."
+        },
         "publicavel": False,
         "alerta": "Service Type é dado descritivo: não excluir categorias para forçar equivalência RMA."
     }
