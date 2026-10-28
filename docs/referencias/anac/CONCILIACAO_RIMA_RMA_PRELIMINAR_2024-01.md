@@ -61,3 +61,19 @@ Não escolher uma hipótese sem teste e evidência.
 5. Documentar se as séries são apenas **complementares** ou se há reconciliação metodológica legítima. Qualquer divergência não explicada impede promover como indicador intercambiável.
 
 **Conclusão:** foi resolvido o problema de **ausência de comparação válida no código**, e foi identificada uma discrepância exploratória relevante. **A causa da divergência e a certificação documental permanecem abertas**. A ANAC-04 não está encerrada, e os portões da [Issue #8](https://github.com/brunogiacomelli1979-cyber/viracopos-cargo-intelligence/issues/8) continuam bloqueando publicação/automação.
+
+## 7. Perfil de serviço ANAC 2024-01 — hipótese investigada, não explicação
+
+[GitHub Actions #40689762587](https://github.com/brunogiacomelli1979-cyber/viracopos-cargo-intelligence/actions/runs/40689762587) examinou **somente o recorte SBKP janeiro/2024 já arquivado**, agrupando `QT_CARGA` por `NR_SERVICE_TYPE` e movimento. Os totais foram **conferidos novamente** contra os 16.015.919 kg internacionais e 5.908.499 kg domésticos validados. O relatório é provisório e não publica dados.
+
+| Service Type ANAC (código, sem interpretação de categoria ainda) | Carga internacional (kg) | Participação do total internacional ANAC |
+|---|---:|---:|
+| F | 12.460.311 | 77,7995% |
+| J | 1.932.728 | 12,0675% |
+| H | 1.539.675 | 9,6134% |
+| G | 42.087 | 0,2628% |
+| Y | 41.118 | 0,2567% |
+
+Os cinco grupos perfazem os **16.015.919 kg**. A carga internacional não aparece em apenas um tipo de serviço, mas **não há evidência para excluir nenhum deles** ou afirmar que o RMA considera os mesmos códigos. Interpretar os códigos apenas mediante o dicionário IATA/ANAC e escopo específico do RMA.
+
+**Consequência:** a divergência de **2.053,919 t** entre as duas fontes permanece sem causa demonstrada. Esta investigação não autoriza adaptar os dados para fazê-los coincidir. Código auditável: [`scripts/investigar_escopo_rima.py`](../../../scripts/investigar_escopo_rima.py) e [testes](../../../tests/test_investigar_escopo_rima.py).
