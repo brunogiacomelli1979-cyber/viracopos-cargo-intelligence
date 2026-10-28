@@ -1,0 +1,29 @@
+name: Inventariar disponibilidade ANAC RIMA 2020+ (sem CSV)
+on:
+  push:
+    branches: [feature/anac-rima-staging-20261028]
+    paths: ['.github/workflows/inventariar-anac-rima.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inventario:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Testar extracao de indice sem rede
+        run: python -m unittest discover -s tests -p 'test_inventariar_anac_rima.py' -v
+      - name: Ler apenas indices anuais oficiais 2020+
+        run: python scripts/inventariar_anac_rima.py --output reports/anac/inventario-2020+.json
+      - name: Publicar inventario como artefato temporario
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: inventario-anac-rima-2020-mais
+          path: reports/anac/inventario-2020+.json
+          if-no-files-found: ignore
+          retention-days: 30
