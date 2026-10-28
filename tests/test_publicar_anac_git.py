@@ -125,6 +125,20 @@ class PublishIntegrationTests(unittest.TestCase):
         with self.assertRaisesRegex(PublishError, "reprovado"):
             publish(worker)
 
+    def test_orphan_gzip_is_not_committed_with_valid_month(self):
+        worker = self.clone("worker", HOMOLOG_BRANCH)
+        add_month(worker, "2020-02", 120)
+        extra = worker / "data/anac/rima/sbkp/2020/versoes/2020-02/orfao.csv.gz"
+        extra.parent.mkdir(parents=True, exist_ok=True)
+        extra.write_bytes(b"arquivo nao inventariado")
+        original_head = command(worker, "ls-remote", "origin",
+                                f"refs/heads/{HOMOLOG_BRANCH}").split()[0]
+        with self.assertRaisesRegex(PublishError, "sem referência no manifesto"):
+            publish(worker)
+        self.assertEqual(command(worker, "ls-remote", "origin",
+                                  f"refs/heads/{HOMOLOG_BRANCH}").split()[0],
+                         original_head)
+
     def test_branch_principal_bloqueada(self):
         worker = self.clone("worker", HOMOLOG_BRANCH)
         with self.assertRaisesRegex(PublishError, "bloqueada"):

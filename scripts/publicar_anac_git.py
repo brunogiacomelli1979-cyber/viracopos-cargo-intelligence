@@ -6,6 +6,7 @@ Não baixa dados da ANAC nem altera o dashboard.
 """
 
 import argparse
+import json
 import os
 import subprocess
 from pathlib import Path
@@ -60,6 +61,17 @@ def publish(directory, branch=HOMOLOG_BRANCH, *, before_push=None):
     if not changes:
         return {"status": "sem_alteracoes", "commit": None}
 
+    # Arquivos gzip adicionais só podem constar no commit se forem
+    # citados pelo manifesto como versão corrente ou histórica.
+    # O auditor inspeciona snapshots referenciados; sem este controle,
+    # um .csv.gz órfão poderia entrar em um commit válido.
+    receipt = json.loads((root / MANIFEST).read_text(encoding="utf-8"))
+    permitted_snapshots = set()
+    for entry in receipt["competencias"].values():
+        permitted_snapshots.add(entry["caminho_sbkp"])
+        for old in entry.get("revisoes", []):
+            permitted_snapshots.add(old["caminho_sbkp"])
+
     manifest_changed = False
     for line in changes:
         pieces = line.split("\t")
@@ -70,6 +82,8 @@ def publish(directory, branch=HOMOLOG_BRANCH, *, before_push=None):
             manifest_changed = True
         elif (file_path.startswith(ARCHIVE_PREFIX)
               and file_path.endswith(".csv.gz") and status == "A"):
+            if file_path not in permitted_snapshots:
+                raise PublishError(f"Snapshot sem referência no manifesto: {file_path}")
             continue
         else:
             raise PublishError(f"Alteração proibida em ANAC: {status} {file_path}")
