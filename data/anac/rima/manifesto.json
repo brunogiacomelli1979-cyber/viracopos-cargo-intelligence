@@ -1,0 +1,49 @@
+{
+  "aeroporto": "SBKP",
+  "atualizado_em_utc": "2026-10-28T11:16:41.688825+00:00",
+  "competencias": {
+    "2024-01": {
+      "bytes_original": 33708604,
+      "bytes_sbkp_gzip": 220596,
+      "caminho_sbkp": "data/anac/rima/sbkp/2024/2024-01.csv.gz",
+      "codificacao_origem": "utf-8",
+      "coletado_em_utc": "2026-10-28T11:16:41.688825+00:00",
+      "colunas": [
+        "ANO",
+        "MES",
+        "NR_AEROPORTO_REFERENCIA",
+        "NR_MOVIMENTO_TIPO",
+        "NR_AERONAVE_MARCAS",
+        "NR_AERONAVE_TIPO",
+        "NR_AERONAVE_OPERADOR",
+        "NR_VOO_OUTRO_AEROPORTO",
+        "NR_VOO_NUMERO",
+        "NR_SERVICE_TYPE",
+        "NR_NATUREZA",
+        "DT_PREVISTO",
+        "HH_PREVISTO",
+        "DT_CALCO",
+        "HH_CALCO",
+        "DT_TOQUE",
+        "HH_TOQUE",
+        "NR_CABECEIRA",
+        "NR_BOX",
+        "NR_PONTE_CONECTOR_REMOTO",
+        "NR_TERMINAL",
+        "QT_PAX_LOCAL",
+        "QT_PAX_CONEXAO_DOMESTICO",
+        "QT_PAX_CONEXAO_INTERNACIONAL",
+        "QT_CORREIO",
+        "QT_CARGA"
+      ],
+      "conteudo_sbkp_sha256": "6a0fb7873b608e74a61524d6a42fbf0c0b543e868f49788e769e2fd8f54d73a0",
+      "linhas_origem": 187310,
+      "linhas_sbkp": 9348,
+      "revisoes": [],
+      "sha256_original": "34f84f8f96d3893eb7d2039115c68de3282fbb078078be53509529e8b0ecd5e5",
+      "sha256_sbkp_gzip": "be370a36e8857d37a88cbc483683337fde5c403342339ad37cd57cc6de1549de",
+      "url_original": "https://sistemas.anac.gov.br/dadosabertos/Operador%20Aeroportu%C3%A1rio/Dados%20de%20Movimenta%C3%A7%C3%A3o%20Aeroportu%C3%A1rias/2024/Movimentacoes_Aeroportuarias_202401.csv"
+    }
+  },
+  "schema": "anac_rima_sbkp_v1"
+}
