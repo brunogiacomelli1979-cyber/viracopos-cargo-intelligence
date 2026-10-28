@@ -102,7 +102,10 @@ def build_inventory(*, today=None, fetcher=fetch_directory):
             formats = indexes[year].get(month, [])
             status = "listado" if formats else "nao_listado"
         result["competencias"][month] = {"status": status, "formatos": formats}
-        result["contagens"][status if status != "listado" else "listadas"] += 1
+        counter_key = {"listado": "listadas",
+                       "nao_listado": "nao_listadas",
+                       "indice_inacessivel": "indice_inacessivel"}[status]
+        result["contagens"][counter_key] += 1
     return result
 
 
