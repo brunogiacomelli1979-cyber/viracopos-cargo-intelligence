@@ -87,6 +87,32 @@ class ArchiveTests(unittest.TestCase):
             self.assertTrue(_verify_snapshot(root, second))
             self.assertTrue(_verify_snapshot(root, first))
 
+    def test_revision_of_real_legacy_path_preserves_old_month(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp) / "data/anac/rima"
+            manifest = load_manifest(root)
+            stamp = "2026-10-28T00:00:00+00:00"
+            raw = ROWS.replace(b"2024;01", b"2020;01")
+            store_month(root, manifest, "2020-01", raw, official_url("2020-01"), stamp)
+            entry = manifest["competencias"]["2020-01"]
+            versioned = Path(temp) / entry["caminho_sbkp"]
+            legacy = root / "sbkp/2020/2020-01.csv.gz"
+            legacy.parent.mkdir(parents=True, exist_ok=True)
+            legacy.write_bytes(versioned.read_bytes())
+            versioned.unlink()
+            entry["caminho_sbkp"] = "data/anac/rima/sbkp/2020/2020-01.csv.gz"
+            (root / "manifesto.json").write_text(json.dumps(manifest))
+            old_bytes = legacy.read_bytes()
+            revised = raw.replace(b"100;1", b"500;1")
+            self.assertEqual(store_month(root, manifest, "2020-01", revised,
+                                         official_url("2020-01"), stamp), "revisado")
+            self.assertEqual(legacy.read_bytes(), old_bytes)
+            latest = manifest["competencias"]["2020-01"]
+            self.assertEqual(latest["revisoes"][0]["caminho_sbkp"],
+                             "data/anac/rima/sbkp/2020/2020-01.csv.gz")
+            self.assertTrue(_verify_snapshot(root, latest))
+            self.assertTrue(_verify_snapshot(root, latest["revisoes"][0]))
+
     @staticmethod
     def make_opener(fail_month=None, failure="404"):
         class Response:
