@@ -173,6 +173,42 @@ class ArchiveTests(unittest.TestCase):
                 self.assertTrue(_verify_snapshot(root, entry))
                 self.assertIn("/versoes/", entry["caminho_sbkp"])
 
+    def test_invalid_weight_rejected_before_promoting_any_file(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "data/anac/rima"
+            receipt = load_manifest(root)
+            original = ROWS.replace(b"2024;01", b"2020;01").replace(b";;0", b";50;0")
+            store_month(root, receipt, "2020-01", original,
+                        official_url("2020-01"), "2026-10-28T00:00:00+00:00")
+            before = (root / "manifesto.json").read_bytes()
+            prior_files = {p.relative_to(root):p.read_bytes() for p in root.rglob("*.csv.gz")}
+
+            class Response:
+                status = 200
+                def __init__(self, url):
+                    self.url = url
+                def __enter__(self):
+                    return self
+                def __exit__(self, *exc):
+                    return False
+                def geturl(self):
+                    return self.url
+                def read(self, count):
+                    csvdata = (HEADER + "2020;03;SBKP;P;I;-100;0\\n").encode()
+                    return csvdata[:count]
+            def opener(request, timeout=None, context=None):
+                return Response(request.full_url)
+
+            args = SimpleNamespace(mode="inicial", start="2020-03", end="2020-03",
+                                   refresh=0, limit=1, out_dir=root)
+            result = run(args, opener=opener,
+                         today=__import__("datetime").date(2026, 10, 28))
+            self.assertEqual(result, 1)
+            self.assertEqual((root / "manifesto.json").read_bytes(), before)
+            self.assertEqual({p.relative_to(root):p.read_bytes() for p in root.rglob("*.csv.gz")},
+                             prior_files)
+            self.assertNotIn("2020-03", load_manifest(root)["competencias"])
+
     def test_monthly_selects_missing_and_refresh(self):
         manifest={"competencias":{"2024-01":{}}}
         months=choose_months(manifest,"mensal","2024-01","2024-03",1,0)

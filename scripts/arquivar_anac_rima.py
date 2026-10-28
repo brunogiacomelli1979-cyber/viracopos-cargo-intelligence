@@ -338,8 +338,24 @@ def run(args, opener=urlopen, today=None):
                 result["falhas"].append({"mes": month, "erro": str(exc)})
                 print(f"{month}: ERRO: {exc}", file=sys.stderr, flush=True)
         if not result["falhas"]:
-            _promote_complete_batch(root, staged_root, original_digest)
-            result["publicado"] = True
+            # Validar semântica de quantidades/CSV e somas independentes
+            # ANTES de promover snapshots e manifesto para a área de trabalho.
+            # O GitHub Actions repetirá essas checagens após a promoção.
+            try:
+                from auditar_anac_rima import inspect
+                from validar_agrupamento_rima import validate
+                staged_repo = staged_root.parent.parent.parent
+                audit = inspect(staged_repo)
+                if audit["erros_criticos"]:
+                    raise ValueError(f"Auditoria integral do lote reprovada: {audit['erros_criticos'][:3]}")
+                crosscheck = validate(staged_repo)
+                if crosscheck["resultado"] != "aprovado_tecnicamente" or crosscheck["erros"]:
+                    raise ValueError(f"Agregação independente reprovada: {crosscheck['erros'][:3]}")
+                _promote_complete_batch(root, staged_root, original_digest)
+                result["publicado"] = True
+            except (OSError, ValueError, RuntimeError, KeyError, csv.Error, UnicodeError) as exc:
+                result["falhas"].append({"mes": "lote", "erro": str(exc)})
+                print(f"Lote: ERRO: {exc}", file=sys.stderr, flush=True)
 
     print(json.dumps(result, ensure_ascii=False, indent=2))
     return 1 if result["falhas"] else 0

@@ -179,12 +179,18 @@ class CompletePipelineTests(unittest.TestCase):
 
     def test_invalid_weight_blocks_publication_after_staging(self):
         original = self.remote_shas()
+        archive = self.worker / "data/anac/rima"
+        original_manifest = (archive / "manifesto.json").read_bytes()
+        original_gzip = {p.relative_to(archive):p.read_bytes()
+                         for p in archive.rglob("*.csv.gz")}
         status = run(self.args(), opener=fake_opener(invalid=True),
                      today=date(2026, 10, 28))
-        self.assertEqual(status, 0)
-        self.assertEqual(inspect(self.worker)["integridade_arquivos"], "reprovada")
-        with self.assertRaisesRegex(PublishError, "reprovado"):
-            publish(self.worker)
+        self.assertEqual(status, 1)
+        self.assertEqual((archive / "manifesto.json").read_bytes(), original_manifest)
+        self.assertEqual({p.relative_to(archive):p.read_bytes()
+                          for p in archive.rglob("*.csv.gz")}, original_gzip)
+        self.assertEqual(inspect(self.worker)["integridade_arquivos"], "aprovada")
+        self.assertEqual(publish(self.worker), {"status": "sem_alteracoes", "commit": None})
         self.assertEqual(self.remote_shas(), original)
 
 
