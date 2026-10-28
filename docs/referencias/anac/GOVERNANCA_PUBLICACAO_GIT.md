@@ -37,7 +37,7 @@ Todos esses testes rodam com **Git bare/clone local e amostras sintéticas**, se
 
 ## Ensaio de escrita remota real — aprovado em 28/10/2026
 
-Foi introduzido o [workflow de homologação sem dados](../../../../.github/workflows/ensaiar-publicacao-git-anac.yml) que roda **apenas** na branch `feature/anac-rima-staging-20261028`, com permissão `contents:write` limitada ao job e sem nenhuma requisição à ANAC. O script [`scripts/ensaiar_publicacao_git_anac.py`](../../../scripts/ensaiar_publicacao_git_anac.py) executa:
+Foi introduzido o [workflow de homologação sem dados](../../../.github/workflows/ensaiar-publicacao-git-anac.yml) que roda **apenas** na branch `feature/anac-rima-staging-20261028`, com permissão `contents:write` limitada ao job e sem nenhuma requisição à ANAC. O script [`scripts/ensaiar_publicacao_git_anac.py`](../../../scripts/ensaiar_publicacao_git_anac.py) executa:
 
 1. Verificação de contexto (`GITHUB_ACTIONS=true`, repositório e branch autorizados), de arquivos versionados intactos, manifesto/hash do acervo e correspondência entre HEAD local e branch remota.
 2. Criação de uma **ref temporária de teste** em `ci/anac06-probe-<run>-<attempt>`, apontando somente para o SHA já existente da branch de homologação. Não cria commits, CSVs, relatórios RMA, nem altera `main`.
