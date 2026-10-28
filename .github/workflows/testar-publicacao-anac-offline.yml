@@ -1,0 +1,27 @@
+name: Testar publicacao Git ANAC sem rede (homologacao)
+on:
+  push:
+    branches: [feature/anac-rima-staging-20261028]
+    paths:
+      - '.github/workflows/testar-publicacao-anac-offline.yml'
+      - 'scripts/publicar_anac_git.py'
+      - 'tests/test_publicar_anac_git.py'
+      - '.github/workflows/arquivar-anac-rima.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  testar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Conferir ambiente Git
+        run: git --version
+      - name: Testes de conflito, integridade e branch isolada
+        run: python -m unittest discover -s tests -p 'test_publicar_anac_git.py' -v
+      - name: Conferir os tres meses reais sem baixar dados
+        run: python scripts/auditar_anac_rima.py
