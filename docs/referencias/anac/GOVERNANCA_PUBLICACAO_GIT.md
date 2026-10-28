@@ -34,3 +34,30 @@ Todos esses testes rodam com **Git bare/clone local e amostras sintéticas**, se
 **Decisão:** o núcleo de concorrência Git está testado em laboratório, mas **ANAC-06 permanece aberta** até comprovação operacional. Manter a expansão, o merge e a publicação no dashboard suspensos.
 
 [Política de armazenamento e rollback](ARQUIVO_HISTORICO_RIMA.md) · [Registro de pendências](REGISTRO_PENDENCIAS_E_PORTOES_2026-10-28.md) · [Issue #8](https://github.com/brunogiacomelli1979-cyber/viracopos-cargo-intelligence/issues/8).
+
+## Ensaio de escrita remota real — aprovado em 28/10/2026
+
+Foi introduzido o [workflow de homologação sem dados](../../../../.github/workflows/ensaiar-publicacao-git-anac.yml) que roda **apenas** na branch `feature/anac-rima-staging-20261028`, com permissão `contents:write` limitada ao job e sem nenhuma requisição à ANAC. O script [`scripts/ensaiar_publicacao_git_anac.py`](../../../scripts/ensaiar_publicacao_git_anac.py) executa:
+
+1. Verificação de contexto (`GITHUB_ACTIONS=true`, repositório e branch autorizados), de arquivos versionados intactos, manifesto/hash do acervo e correspondência entre HEAD local e branch remota.
+2. Criação de uma **ref temporária de teste** em `ci/anac06-probe-<run>-<attempt>`, apontando somente para o SHA já existente da branch de homologação. Não cria commits, CSVs, relatórios RMA, nem altera `main`.
+3. Leitura da referência recém-publicada diretamente no servidor para conferir o SHA.
+4. Remoção da ref no mesmo job, também com conferência remota. O teste é reprovado se a limpeza falhar, se o SHA da ref não for esperado ou se `main`/homologação divergirem.
+5. Testes de regressão com repositórios Git `bare` locais: criação/verificação/remoção sem alteração dos HEADs, recusa de `tracked` modificado, recusa fora do GitHub Actions, sanitização de identificadores.
+
+**Primeira execução:** [#40695764521](https://github.com/brunogiacomelli1979-cyber/viracopos-cargo-intelligence/actions/runs/40695764521) reprovou porque um relatório temporário não versionado deixou a working tree suja. A escrita remota não foi iniciada. **Segunda:** [#40695884637](https://github.com/brunogiacomelli1979-cyber/viracopos-cargo-intelligence/actions/runs/40695884637) identificou um teste com mensagem antiga, corrigido. Nenhuma referência temporária foi criada nessa execução. Ambas as falhas foram tratadas e não omitidas.
+
+**Execução aprovada:** [GitHub Actions #40695960222](https://github.com/brunogiacomelli1979-cyber/viracopos-cargo-intelligence/actions/runs/40695960222); [evidência JSON (artefato 12819212862)](https://github.com/brunogiacomelli1979-cyber/viracopos-cargo-intelligence/actions/runs/40695960222/artifacts/12819212862). Criou e removeu `ci/anac06-probe-40695960222-1`, verificou SHA de origem, e confirmou:
+- `ref_removida=true`; nenhum prefixo `ci/anac06-probe` ficou listado entre as branches do repositório.
+- `main_inalterada=true`; SHA da `main`: `6202cd22dbe47ebab34fa4f3d13b099e0975d279`.
+- `homologacao_inalterada=true` durante o teste; SHA: `1b7df6505e2ab940c4523d99bd99ca3ab9ebffb4`.
+- Auditoria dos **3 meses ANAC existentes** aprovada, sem coleta adicional.
+- [Validação geral #40695971955](https://github.com/brunogiacomelli1979-cyber/viracopos-cargo-intelligence/actions/runs/40695971955) concluída com sucesso, sem deploy da PR.
+
+### Escopo de aprovação e pendência residual
+
+**Aprovado:** permissão de escrita remota do token GitHub Actions em ref de ensaio isolada, criação/leitura/remoção e preservação de `main` e homologação. Isso vai além dos testes em repositório Git local.
+
+**Ainda não comprovado:** um `git commit` e `git push` de **novo extrato ANAC validado** pelo script real `scripts/publicar_anac_git.py` para a branch de homologação sob políticas de publicação operacionais. A coleta continua suspensa até ANAC-04/10/11 e demais portões pertinentes. A criação de uma ref temporária **não é** demonstração de backfill/cron funcional. **ANAC-06 permanece aberta**, agora com controle de permissões remotas encerrado como subetapa.
+
+Em caso de falha futura, verificar as referências `ci/anac06-probe-*` e a evidência de limpeza antes de reexecutar. Nunca excluir uma referência cujo SHA não coincida com o commit originalmente registrado pelo teste.
