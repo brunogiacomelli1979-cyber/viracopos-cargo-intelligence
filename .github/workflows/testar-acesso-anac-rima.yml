@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   acesso:
@@ -103,3 +103,15 @@ jobs:
           name: amostra-oficial-anac-rima-sbkp-2024-01
           path: data/anac/rima/
           retention-days: 7
+      - name: Arquivar copia validada na branch de desenvolvimento
+        if: success()
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/anac/rima/manifesto.json data/anac/rima/sbkp/
+          if ! git diff --cached --quiet; then
+            git commit -m 'data: preservar ANAC RIMA SBKP 2024-01 verificado'
+            git push origin HEAD:feature/anac-rima-staging-20261028
+          fi
