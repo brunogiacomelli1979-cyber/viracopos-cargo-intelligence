@@ -28,6 +28,8 @@ MAX_GZIP = 10_000_000
 
 def locate_original(vault, month, sha256):
     vault = Path(vault).resolve()
+    if not re.fullmatch(r"20\d{2}-(0[1-9]|1[0-2])", month) or month < "2020-01":
+        raise ValueError("Competencia invalida; nao acessar recibos")
     if not SHA.fullmatch(sha256):
         raise ValueError("SHA-256 do recibo deve ter 64 digitos hexadecimais")
     receipt_path = vault / "receipts" / month / f"{sha256}.json"
@@ -122,18 +124,32 @@ def _inspect_existing(final, sha, month):
     if not info_path.is_file() or not gzip_path.is_file():
         raise ValueError("Staging ja existe, mas esta incompleto; nao sobrescrever")
     info = json.loads(info_path.read_text(encoding="utf-8"))
-    if (info.get("sha256_original") != sha or info.get("competencia") != month
+    if (info.get("schema") != "anac-rima-sbkp-offline-v1"
+            or info.get("estado") != "staging_validado_local_nao_publicado"
+            or info.get("sha256_original") != sha or info.get("competencia") != month
             or digest_file(gzip_path) != (info.get("sha256_gzip"), info.get("bytes_gzip"))):
         raise ValueError("Staging previamente existente diverge; nao sobrescrever")
+    digest, total = hashlib.sha256(), 0
+    try:
+        with gzip.open(gzip_path, "rb") as decompressed:
+            while chunk := decompressed.read(CHUNK):
+                total += len(chunk)
+                if total > MAX_CSV:
+                    raise ValueError("Staging descompactado ultrapassa limite")
+                digest.update(chunk)
+    except (OSError, EOFError) as exc:
+        raise ValueError("Gzip de staging danificado") from exc
+    if (digest.hexdigest() != info.get("sha256_csv_sbkp")
+            or total != info.get("bytes_csv_sbkp")):
+        raise ValueError("Conteudo de staging diverge; nao reutilizar")
     return info
 
 
 def prepare(vault, month, sha256, out_dir):
     """Executa QA e publica apenas pacote local versionado, nunca dados de producao."""
     output = Path(out_dir).resolve()
-    if (output == ROOT / "data" or output.is_relative_to(ROOT / "_site")
-            or output.is_relative_to(ROOT / "data/anac/rima")):
-        raise ValueError("Nao utilizar caminho publico ou acervo versionado como staging")
+    if output.is_relative_to(ROOT) and not output.is_relative_to(ROOT / "data/staging"):
+        raise ValueError("Dentro do repositorio, staging deve estar em data/staging/")
     raw, receipt = locate_original(vault, month, sha256)
     final = output / month / sha256
     if final.exists():
