@@ -1,0 +1,36 @@
+name: Validar agregacao ANAC RIMA em dados reais arquivados
+on:
+  push:
+    branches: [feature/anac-rima-staging-20261028]
+    paths:
+      - '.github/workflows/validar-agrupamento-anac.yml'
+      - 'scripts/validar_agrupamento_rima.py'
+      - 'tests/test_validar_agrupamento_rima.py'
+      - 'scripts/processar_anac_rima.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Testes offline do agregador e da validacao cruzada
+        run: |
+          python -m unittest discover -s tests -p 'test_processar_anac_rima.py' -v
+          python -m unittest discover -s tests -p 'test_validar_agrupamento_rima.py' -v
+      - name: Auditar integridade dos meses arquivados
+        run: python scripts/auditar_anac_rima.py --output reports/anac/perfil-acervo.json
+      - name: Calcular e conferir totais independentes dos meses reais
+        run: python scripts/validar_agrupamento_rima.py --output reports/anac/validacao-agrupamento.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: anac-validacao-agrupamento-real
+          path: reports/anac/
+          if-no-files-found: ignore
+          retention-days: 14
