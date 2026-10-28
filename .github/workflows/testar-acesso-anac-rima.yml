@@ -41,7 +41,41 @@ jobs:
               print("DNS falhou:",repr(err))
               raise
           PY
-          python scripts/arquivar_anac_rima.py --mode inicial --start 2024-01 --end 2024-01 --limit 1 --out-dir data/anac/rima
+          python - <<'PY'
+          import csv,io,collections
+          from datetime import datetime,timezone
+          from pathlib import Path
+          from scripts.arquivar_anac_rima import official_url,fetch_original,filter_sbkp,store_month,load_manifest
+          month="2024-01"
+          raw,url=fetch_original(official_url(month))
+          print("Downloaded original bytes:",len(raw),flush=True)
+          text=raw.decode("utf-8-sig",errors="replace")
+          lines=text.splitlines()
+          print("Header preamble:",lines[0][:100],flush=True)
+          headers=next(csv.reader([lines[1]],delimiter=";"))
+          print("Real header names:",repr(headers),flush=True)
+          index={name:ix for ix,name in enumerate(headers)}
+          airport_name=next((n for n in ["NR_AEROPORTO_REFERENCIA","NR_AEROPORTO"] if n in index),None)
+          print("Actual airport field:",airport_name,flush=True)
+          for name in ["QT_CARGA","QT_CORREIO","NR_MOVIMENTO_TIPO","NR_NATUREZA"]:
+              print("Field found",name,name in index,flush=True)
+          if airport_name:
+              counts=collections.Counter()
+              shown=0
+              for row in csv.reader(io.StringIO("\n".join(lines[2:])),delimiter=";"):
+                  if len(row)!=len(headers) or row[index[airport_name]].strip().upper()!="SBKP": continue
+                  counts[(row[index["NR_MOVIMENTO_TIPO"]],row[index["NR_NATUREZA"]])]+=1
+                  if shown<3:
+                      sample={key:row[index[key]] for key in ["ANO","MES",airport_name,"NR_MOVIMENTO_TIPO","NR_NATUREZA","QT_CARGA","QT_CORREIO"] if key in index}
+                      print("SBKP sample",sample,flush=True)
+                      shown+=1
+                  if sum(counts.values())>=1000: break
+              print("SBKP codes within first 1000 matching rows:",counts,flush=True)
+          compressed,metadata=filter_sbkp(raw,month)
+          root=Path("data/anac/rima")
+          manifest=load_manifest(root)
+          print("Archived:",store_month(root,manifest,month,raw,url,datetime.now(timezone.utc).isoformat()),flush=True)
+          PY
       - name: Verificar manifestos e arquivos gerados
         shell: bash
         run: |
