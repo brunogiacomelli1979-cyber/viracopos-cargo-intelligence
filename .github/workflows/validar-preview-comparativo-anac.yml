@@ -46,7 +46,11 @@ jobs:
           import json
           preview=json.loads(Path('data/comparativo_rima_rma.json').read_text())
           assert preview['liberado_para_indicadores'] is False
-          assert preview['perfil_voos'][0]['movimentos']==9348
+          assert [p['mes'] for p in preview['perfil_voos']] == ['2020-01','2020-02','2024-01']
+          assert preview['perfil_voos'][-1]['movimentos']==9348
+          assert preview['meses_anac']==3
+          assert preview['meses_com_duas_fontes']==1
+          assert len(preview['serie_mensal'])==46
           assert preview['recortes'][1]['qualidade_rma']=='transcricao_preliminar_pdf_nao_certificado'
           assert 'comparativo-mes' in Path('_site/index.html').read_text()
           assert 'dados-comparativo-rima-rma' in Path('_site/index.html').read_text()
