@@ -52,8 +52,11 @@ def probe(root, *, run_id, attempt="1", strict=True):
                    or os.environ.get("GITHUB_REF_NAME") != BRANCH):
         raise RemoteProbeError("Ensaio remoto permitido apenas no GitHub Actions e branch de homologação")
     name = f"{PREFIX}{run_id}-{attempt}"
-    if git(root, "status", "--porcelain"):
-        raise RemoteProbeError("Working tree não está limpo; nenhum push de ensaio autorizado")
+    # Relatórios gerados no runner são arquivos não versionados e não entram
+    # em nenhum push: este ensaio publica apenas o SHA HEAD já existente.
+    # Bloquear toda modificação de arquivo TRACKED e do índice Git.
+    if git(root, "status", "--porcelain", "--untracked-files=no"):
+        raise RemoteProbeError("Arquivo versionado modificado; nenhum push de ensaio autorizado")
     if git(root, "diff", "--cached", "--name-only"):
         raise RemoteProbeError("Índice Git não está limpo")
     audit = inspect(root)
