@@ -69,3 +69,9 @@ O monitoramento diário existente deve continuar reportando falhas novas, sem ac
 **ANAC-01 — desfecho: fora do escopo (decisão de cobertura).** Não bloqueia mais P1 por si só. Os demais incidentes **ANAC-02 a ANAC-11** seguem sujeitos aos portões P0–P5 e não foram dispensados. No arquivador e no processador, datas anteriores a 2020-01 passaram a ser recusadas, com testes de regressão. Sem liberação de cron, sem novos downloads, sem alteração do painel.
 
 Documento de referência: [Política do recorte 2020](../../RECORTE_TEMPORAL_2020.md).
+
+## Encerramento de ANAC-03 — processador de registros reais
+
+**Status: concluída tecnicamente em 28/10/2026.** Na [execução #40683558361](https://github.com/brunogiacomelli1979-cyber/viracopos-cargo-intelligence/actions/runs/40683558361), os testes offline do processador (10) e de validação cruzada (3) passaram. Os três CSVs SBKP arquivados (2020-01, 2020-02 e 2024-01) foram descompactados com conferência de SHA-256 e processados. Um segundo cálculo independente confirmou as **contagens e somas por natureza e movimento** nos **28.087 registros**, sem divergência registrada. Dados ausentes são mantidos como não informados; grupos sem movimentos não são classificados como tonelagem zero automaticamente.
+
+**Limites do encerramento:** ANAC-03 refere-se exclusivamente ao contrato técnico de leitura/agregação dos três meses existentes. A validação dos demais meses, a comparação com RMA, a governança de revisões e a atualização contínua permanecem abertas (ANAC-04/06/08/09/11). **Não foi liberada publicação nem retomada da carga histórica.**
