@@ -1,0 +1,60 @@
+name: Diagnosticar TLS oficial Viracopos (somente leitura)
+on:
+  push:
+    branches: [feature/anac-rima-staging-20261028]
+    paths: ['.github/workflows/diagnosticar-tls-viracopos.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  diagnostico:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verificar origens oficiais sem ignorar certificados TLS
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p reports/anac
+          python - <<'PY'
+          import json,ssl
+          from datetime import datetime,timezone
+          from pathlib import Path
+          from urllib.error import HTTPError,URLError
+          from urllib.request import Request,urlopen
+          urls={
+              "institucional_www":"https://www.viracopos.com/pt_br/institucional/estatisticas-e-publicacoes.htm",
+              "institucional_sem_www":"https://viracopos.com/pt_br/institucional/estatisticas-e-publicacoes.htm",
+              "cargo_www":"https://www.viracopos.com/pt_br/cargo/dados-de-movimentacao.htm",
+          }
+          findings={}
+          for name,url in urls.items():
+              record={"url":url}
+              try:
+                  req=Request(url,headers={"User-Agent":"VCP-Insights-Document-Audit/1.0"})
+                  with urlopen(req,timeout=20,context=ssl.create_default_context()) as response:
+                      preview=response.read(1000)
+                      record.update({"http":response.status,"url_final":response.geturl(),
+                                     "conteudo":response.headers.get("Content-Type"),
+                                     "bytes_amostra":len(preview),"html":b"<html" in preview.lower()})
+              except (HTTPError,URLError,OSError,TimeoutError,ValueError) as exc:
+                  record["erro"]=str(exc)[:450]
+              print(json.dumps({"origem":name,**record},ensure_ascii=False),flush=True)
+              findings[name]=record
+          report={"capturado_utc":datetime.now(timezone.utc).isoformat(),
+                  "metodo":"GET HTTPS usando SSL default; maximo 1000 bytes lidos por URL; sem --insecure",
+                  "origens":findings}
+          Path("reports/anac/diagnostico-tls-vcp.json").write_text(
+              json.dumps(report,indent=2,ensure_ascii=False)+"\n",encoding="utf-8")
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: diagnostico-tls-viracopos
+          path: reports/anac/diagnostico-tls-vcp.json
+          retention-days: 14
+          if-no-files-found: ignore
