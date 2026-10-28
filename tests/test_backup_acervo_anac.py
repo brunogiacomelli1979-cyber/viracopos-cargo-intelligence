@@ -45,7 +45,7 @@ class BackupRestoreTests(unittest.TestCase):
         shutil.rmtree(self.source)
         self.original.unlink()
         restored = restore(self.backups, snap, self.recovered)
-        self.assertEqual(restored["estado"], "backup_verificado")
+        self.assertEqual(restored["estado"], "restaurado_em_novo_diretorio")
         self.assertTrue(audit(self.recovered)["aprovado"])
         prepared = prepare(self.recovered, "2020-04", self.first["sha256"],
                            self.root / "offline-staging")
